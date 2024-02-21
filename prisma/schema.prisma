@@ -11,7 +11,166 @@ datasource db {
 }
 
 model User {
-  id             Int    @id @default(autoincrement())
-  employeeId     String @unique
-  hashedPassword String
+  id             Int             @id @default(autoincrement())
+  employeeId     String          @unique @db.VarChar(255)
+  hashedPassword String          @db.VarChar(255)
+  firstName      String?         @db.VarChar(255)
+  lastName       String?         @db.VarChar(255)
+  email          String?         @db.VarChar(255)
+  phone1         String?         @db.VarChar(255)
+  phone2         String?         @db.VarChar(255)
+  title          String?         @db.VarChar(255)
+  role           String?         @db.VarChar(255)
+  profile        String?         @db.VarChar(255)
+  isActive       Boolean         @default(true)
+  address1       String?         @db.VarChar(255)
+  address2       String?         @db.VarChar(255)
+  cityId         Int?
+  city           CityMaster?     @relation("userCity", fields: [cityId], references: [id])
+  districtId     Int?
+  district       DistrictMaster? @relation("userDistrict", fields: [districtId], references: [id])
+  stateId        Int?
+  state          StateMaster?    @relation("userState", fields: [stateId], references: [id])
+  createdOn      DateTime        @default(now())
+}
+
+model Branch {
+  id         Int             @id @default(autoincrement())
+  branchCode String          @unique @db.VarChar(255)
+  branchName String          @db.VarChar(255)
+  address1   String?         @db.VarChar(255)
+  address2   String?         @db.VarChar(255)
+  cityId     Int?
+  city       CityMaster?     @relation("branchCity", fields: [cityId], references: [id])
+  districtId Int?
+  district   DistrictMaster? @relation("branchDistrict", fields: [districtId], references: [id])
+  stateId    Int?
+  state      StateMaster?    @relation("branchState", fields: [stateId], references: [id])
+  phone1     String?         @db.VarChar(255)
+  phone2     String?         @db.VarChar(255)
+  isHub      Boolean
+  isActive   Boolean         @default(true)
+  createdOn  DateTime        @default(now())
+  consignors Consignor[]     @relation("consignorBranch")
+  consignees Consignee[]     @relation("consigneeBranch")
+}
+
+model Consignor {
+  consignorId           Int                 @id @default(autoincrement())
+  consignorCode         String              @unique
+  publicName            String?             @db.VarChar(255)
+  legalName             String?             @db.VarChar(255)
+  industryTypeId        Int?
+  industryType          IndustryTypeMaster? @relation("consignorIndustryType", fields: [industryTypeId], references: [id])
+  commodityId           Int?
+  commodity             CommodityMaster?    @relation("ConsignoreCommodity", fields: [commodityId], references: [id])
+  address1              String?             @db.VarChar(255)
+  address2              String?             @db.VarChar(255)
+  cityId                Int?
+  city                  CityMaster?         @relation("consignorCity", fields: [cityId], references: [id])
+  districtId            Int?
+  disstrict             DistrictMaster?     @relation("consignorDistrict", fields: [districtId], references: [id])
+  stateId               Int?
+  state                 StateMaster?        @relation("consignorState", fields: [stateId], references: [id])
+  gstNumber             String?             @db.VarChar(255)
+  panNumber             String?             @db.VarChar(255)
+  tanNumber             String?             @db.VarChar(255)
+  cinNumber             String?             @db.VarChar(255)
+  taxCategory           String?             @db.VarChar(255)
+  parentConsignorId     Int?
+  parentConsignor       Consignor?          @relation("parentConsignor", fields: [parentConsignorId], references: [consignorId])
+  childConsignors       Consignor[]         @relation("parentConsignor")
+  branchId              Int?
+  branch                Branch?             @relation("consignorBranch", fields: [branchId], references: [id])
+  keyContactName        String?             @db.VarChar(255)
+  keyContactDesignation String?             @db.VarChar(255)
+  keyContactAddress     String?             @db.VarChar(255)
+  distanceFromBranchKms Int?
+  createdOn             DateTime?           @default(now())
+  modifiedOn            DateTime?
+  consignees            Consignee[]         @relation("consigneeConsignor")
+}
+
+model Consignee {
+  consigneeId         Int             @id @default(autoincrement())
+  consignorId         Int
+  consignor           Consignor       @relation("consigneeConsignor", fields: [consignorId], references: [consignorId])
+  consigneeCode       String          @unique @db.VarChar(255)
+  consigneeName       String          @db.VarChar(255)
+  phone1              String?         @db.VarChar(255)
+  phone2              String?         @db.VarChar(255)
+  email               String?         @db.VarChar(255)
+  address1            String?         @db.VarChar(255)
+  address2            String?         @db.VarChar(255)
+  cityId              Int?
+  city                CityMaster?     @relation("consigneeCity", fields: [cityId], references: [id])
+  districtId          Int?
+  district            DistrictMaster? @relation("consigneeDistrict", fields: [districtId], references: [id])
+  stateId             Int?
+  state               StateMaster?    @relation("consigneeState", fields: [stateId], references: [id])
+  branchId            Int?
+  branch              Branch?         @relation("consigneeBranch", fields: [branchId], references: [id])
+  distanceToBranchKms Int?
+  odaType             String?         @db.VarChar(255)
+  tatNumber           Int?
+  createdOn           DateTime?       @default(now())
+  modifiedOn          DateTime?
+}
+
+//MASTER TABLES
+
+model IndustryTypeMaster {
+  id         Int         @id @default(autoincrement())
+  value      String      @unique @db.VarChar(255)
+  isActive   Boolean     @default(true)
+  createdOn  DateTime    @default(now())
+  consignors Consignor[] @relation("consignorIndustryType")
+}
+
+model CommodityMaster {
+  id         Int         @id @default(autoincrement())
+  value      String      @unique @db.VarChar(255)
+  isActive   Boolean     @default(true)
+  createdOn  DateTime    @default(now())
+  consignors Consignor[] @relation("ConsignoreCommodity")
+}
+
+model PincodesMaster {
+  id        Int      @id @default(autoincrement())
+  value     Int      @unique
+  isActive  Boolean  @default(true)
+  createdOn DateTime @default(now())
+}
+
+model CityMaster {
+  id         Int         @id @default(autoincrement())
+  name       String      @unique @db.VarChar(255)
+  isActive   Boolean     @default(true)
+  createdOn  DateTime    @default(now())
+  users      User[]      @relation("userCity")
+  branches   Branch[]    @relation("branchCity")
+  consignors Consignor[] @relation("consignorCity")
+  consignees Consignee[] @relation("consigneeCity")
+}
+
+model DistrictMaster {
+  id         Int         @id @default(autoincrement())
+  name       String      @unique @db.VarChar(255)
+  isActive   Boolean     @default(true)
+  createdOn  DateTime    @default(now())
+  users      User[]      @relation("userDistrict")
+  branches   Branch[]    @relation("branchDistrict")
+  consignors Consignor[] @relation("consignorDistrict")
+  consignees Consignee[] @relation("consigneeDistrict")
+}
+
+model StateMaster {
+  id         Int         @id @default(autoincrement())
+  name       String      @unique @db.VarChar(255)
+  isActive   Boolean     @default(true)
+  createdOn  DateTime    @default(now())
+  users      User[]      @relation("userState")
+  branches   Branch[]    @relation("branchState")
+  consignors Consignor[] @relation("consignorState")
+  consignees Consignee[] @relation("consigneeState")
 }

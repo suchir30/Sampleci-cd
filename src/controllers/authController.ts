@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
-import { validateUser } from '../services/userService';
+import * as userService from '../services/userService';
+
+
 import jwt from 'jsonwebtoken';
 
 export const login = async (req: Request, res: Response) => {
@@ -9,9 +11,9 @@ export const login = async (req: Request, res: Response) => {
     return res.status(400).send('Employee ID and password are required');
   }
 
-  const isValidUser = await validateUser(employeeId, password);
+  const isValidUser = await userService.validateUser(employeeId, password);
   if (!isValidUser) {
-    return res.status(401).send('Invalid credentials');
+    return res.send({status:401,message:'Invalid credentials'});
   }
 
   if (!process.env.JWT_SECRET) {

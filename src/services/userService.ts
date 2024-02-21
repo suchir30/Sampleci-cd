@@ -18,4 +18,4 @@ export const createUser = async (employeeId: string, password: string): Promise<
         hashedPassword
       }
     });
-  };
+};
