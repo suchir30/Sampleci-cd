@@ -6,10 +6,10 @@ const router = Router();
 // Master models
 router.get('/industryType', apiController.getIndustryTypes);
 router.get('/commodity', apiController.getCommodities);
-router.post('/city', apiController.getCities);
-router.post('/district', apiController.getDistricts);
-router.post('/state', apiController.getStates);
-router.post('/pincode', apiController.getPincodes);
+router.get('/city', apiController.getCities);
+router.get('/district', apiController.getDistricts);
+router.get('/state', apiController.getStates);
+router.get('/pincode', apiController.getPincodes);
 
 // Model GET
 router.get('/branch', apiController.getBranches);

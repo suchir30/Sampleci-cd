@@ -1,81 +1,71 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 
 import * as masterDataService from '../services/masterDataService';
 import * as consignorService from '../services/consignorService';
 import * as consigneeService from '../services/consigneeService';
 import * as AWBService from '../services/AWBService';
 import {AWBCreateData} from '../types/awbTypes';
+import { HttpStatusCode } from '../types/apiTypes';
+import { buildObjectFetchRepsonse } from '../utils/apiUtils';
 
 
-export const getIndustryTypes = async (_req: Request, res: Response) => {
+export const getIndustryTypes = async (_req: Request, res: Response, next: NextFunction) => {
   try {
     const industryTypes = await masterDataService.getIndustryTypes();
-    res.send({ code: 200, message: `Successful`, data: industryTypes })
-  } catch (error) {
-    console.error('Error retrieving industry types:', error);
-    res.send({
-      code: 500, message: 'Internal Server Error',
-    });
+    res.status(HttpStatusCode.OK).json(buildObjectFetchRepsonse(industryTypes));
+  } catch (err) {
+    console.error('Error retrieving industry types:', err);
+    next(err);
   }
 }
 
-export const getCommodities = async (_req: Request, res: Response) => {
+export const getCommodities = async (_req: Request, res: Response, next: NextFunction) => {
   try {
     const commodities = await masterDataService.getCommodities();
-    res.send({ code: 200, message: `Successful`, data: commodities })
-  } catch (error) {
-    console.error('Error retrieving commodities:', error);
-    res.send({
-      code: 500, message: 'Internal Server Error',
-    });
+    res.status(HttpStatusCode.OK).json(buildObjectFetchRepsonse(commodities));
+  } catch (err) {
+    console.error('Error retrieving commodities:', err);
+    next(err);
   }
 }
 
-export const getCities = async (req: Request, res: Response) => {
+export const getCities = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const cities = await masterDataService.getCities();
-    res.send({ code: 200, message: `Successful`, data: cities })
-  } catch (error) {
-    console.error('Error retrieving cities:', error);
-    res.send({
-      code: 500, message: 'Internal Server Error',
-    });
+    res.status(HttpStatusCode.OK).json(buildObjectFetchRepsonse(cities));
+  } catch (err) {
+    console.error('Error retrieving cities:', err);
+    next(err);
   }
 }
 
-export const getDistricts = async (req: Request, res: Response) => {
+export const getDistricts = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const districts = await masterDataService.getDistricts();
-    res.send({ code: 200, message: `Successful`, data: districts })
-  } catch (error) {
-    console.error('Error retrieving districts:', error);
-    res.send({
-      code: 500, message: 'Internal Server Error',
-    });
+    res.status(HttpStatusCode.OK).json(buildObjectFetchRepsonse(districts));
+  } catch (err) {
+    console.error('Error retrieving districts:', err);
+    next(err);
   }
 }
 
-export const getStates = async (req: Request, res: Response) => {
+export const getStates = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const states = await masterDataService.getStates();
-    res.send({ code: 200, message: `Successful`, data: states })
-  } catch (error) {
-    console.error('Error retrieving states:', error);
-    res.send({
-      code: 500, message: 'Internal Server Error',
-    });
+    res.status(HttpStatusCode.OK).json(buildObjectFetchRepsonse(states));
+  } catch (err) {
+    console.error('Error retrieving states:', err);
+    next(err);
   }
 }
 
-export const getPincodes = async (_req: Request, res: Response) => {
+export const getPincodes = async (_req: Request, res: Response, next: NextFunction) => {
   try {
     const pincodes = await masterDataService.getPincodes();
-    res.send({ code: 200, message: `Successful`, data: pincodes })
-  } catch (error) {
-    console.error('Error retrieving pincodes:', error);
-    res.send({
-      code: 500, message: 'Internal Server Error',
-    });
+    res.status(HttpStatusCode.OK).json(buildObjectFetchRepsonse(pincodes));
+  } catch (err) {
+    console.error('Error retrieving pincodes:', err);
+    next(err);
   }
 }
 
