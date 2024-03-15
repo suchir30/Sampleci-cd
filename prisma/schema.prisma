@@ -35,24 +35,26 @@ model User {
 }
 
 model Branch {
-  id         Int             @id @default(autoincrement())
-  branchCode String          @unique @db.VarChar(255)
-  branchName String          @db.VarChar(255)
-  address1   String?         @db.VarChar(255)
-  address2   String?         @db.VarChar(255)
-  cityId     Int?
-  city       CityMaster?     @relation("branchCity", fields: [cityId], references: [id])
-  districtId Int?
-  district   DistrictMaster? @relation("branchDistrict", fields: [districtId], references: [id])
-  stateId    Int?
-  state      StateMaster?    @relation("branchState", fields: [stateId], references: [id])
-  phone1     String?         @db.VarChar(255)
-  phone2     String?         @db.VarChar(255)
-  isHub      Boolean
-  isActive   Boolean         @default(true)
-  createdOn  DateTime        @default(now())
-  consignors Consignor[]     @relation("consignorBranch")
-  consignees Consignee[]     @relation("consigneeBranch")
+  id              Int             @id @default(autoincrement())
+  branchCode      String          @unique @db.VarChar(255)
+  branchName      String          @db.VarChar(255)
+  address1        String?         @db.VarChar(255)
+  address2        String?         @db.VarChar(255)
+  cityId          Int?
+  city            CityMaster?     @relation("branchCity", fields: [cityId], references: [id])
+  districtId      Int?
+  district        DistrictMaster? @relation("branchDistrict", fields: [districtId], references: [id])
+  stateId         Int?
+  state           StateMaster?    @relation("branchState", fields: [stateId], references: [id])
+  phone1          String?         @db.VarChar(255)
+  phone2          String?         @db.VarChar(255)
+  isHub           Boolean
+  isActive        Boolean         @default(true)
+  createdOn       DateTime        @default(now())
+  consignors      Consignor[]     @relation("consignorBranch")
+  consignees      Consignee[]     @relation("consigneeBranch")
+  AWBfromBranches AirWayBill[]    @relation("AWBFromBranch")
+  AWBtoBranches   AirWayBill[]    @relation("AWBToBranch")
 }
 
 model Consignor {
@@ -87,8 +89,9 @@ model Consignor {
   keyContactAddress     String?             @db.VarChar(255)
   distanceFromBranchKms Int?
   createdOn             DateTime?           @default(now())
-  modifiedOn            DateTime?
+  modifiedOn            DateTime?           @updatedAt
   consignees            Consignee[]         @relation("consigneeConsignor")
+  AWBs                  AirWayBill[]        @relation("AWBConsignor")
 }
 
 model Consignee {
@@ -114,7 +117,66 @@ model Consignee {
   odaType             String?         @db.VarChar(255)
   tatNumber           Int?
   createdOn           DateTime?       @default(now())
-  modifiedOn          DateTime?
+  modifiedOn          DateTime?       @updatedAt
+  AWBs                AirWayBill[]    @relation("AWBConsignee")
+}
+
+model AirWayBill {
+  id            Int           @id @default(autoincrement())
+  AWBCode       String        @db.VarChar(255)
+  consignorId   Int
+  consignor     Consignor     @relation("AWBConsignor", fields: [consignorId], references: [consignorId])
+  consigneeId   Int?
+  consignee     Consignee?    @relation("AWBConsignee", fields: [consigneeId], references: [consigneeId])
+  fromBranchId  Int
+  toBranchId    Int
+  fromBranch    Branch        @relation("AWBFromBranch", fields: [fromBranchId], references: [id])
+  toBranch      Branch        @relation("AWBToBranch", fields: [toBranchId], references: [id])
+  numOfArticles Int
+  invoiceNumber Int?
+  invoiceValue  Float?        @db.Float
+  weightKgs     Float?        @db.Float
+  ratePerKg     Float?        @db.Float
+  rollupVolume  Float?        @db.Float
+  rollupWeight  Float?        @db.Float
+  grandTotal    Float?        @db.Float
+  createdOn     DateTime?     @default(now())
+  modifiedOn    DateTime?     @updatedAt
+  AWBLineItems  AwbLineItem[]
+  AWBArticles   AwbArticle[]
+}
+
+model AwbLineItem {
+  id                  Int        @id @default(autoincrement())
+  AWBId               Int
+  AWB                 AirWayBill @relation(fields: [AWBId], references: [id])
+  AWBLineItemId       Int
+  lineItemDescription String     @db.VarChar(255)
+  numOfArticles       Int
+  ActualWeightKg      Float?     @db.Float
+  lengthCms           Float?     @db.Float
+  breadthCms          Float?     @db.Float
+  heightCms           Float?     @db.Float
+  chargedWeight       Float?     @db.Float
+  createdOn           DateTime?  @default(now())
+  modifiedOn          DateTime?  @updatedAt
+}
+
+enum ArticleStatus {
+  CREATED
+  PRINTED
+  DELETED
+}
+
+model AwbArticle {
+  id           Int           @id @default(autoincrement())
+  AWBId        Int
+  AWB          AirWayBill    @relation(fields: [AWBId], references: [id])
+  articleCode  String        @db.VarChar(255)
+  articleIndex Int
+  status       ArticleStatus @default(CREATED)
+  createdOn    DateTime?     @default(now())
+  modifiedOn   DateTime?     @updatedAt
 }
 
 //MASTER TABLES

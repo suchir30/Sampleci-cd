@@ -2,6 +2,10 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
 const tokenAuth = (req: Request, res: Response, next: NextFunction): void => {
+    if (process.env.USE_TOKEN_AUTH === '0') {
+        next();
+        return;
+    }
     const bearerHeader = req.headers['authorization'];
     if (typeof bearerHeader !== 'undefined') {
         const [_, token] = bearerHeader.split(' ');

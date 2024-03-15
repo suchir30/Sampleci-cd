@@ -1,7 +1,10 @@
 import { Request, Response } from 'express';
+
 import * as masterDataService from '../services/masterDataService';
 import * as consignorService from '../services/consignorService';
 import * as consigneeService from '../services/consigneeService';
+import * as AWBService from '../services/AWBService';
+import {AWBCreateData} from '../types/awbTypes';
 
 
 export const getIndustryTypes = async (_req: Request, res: Response) => {
@@ -125,7 +128,6 @@ export const getConsignees = async (_req: Request, res: Response) => {
   }
 }
 
-
 export const createConsignees = async (req: Request, res: Response) => {
   const consigneesData = req.body.consignees;
   try {
@@ -133,6 +135,95 @@ export const createConsignees = async (req: Request, res: Response) => {
     res.send({ code: 200, message: `Consignee Created Successful`, data: consignees })
   } catch (error) {
     console.error('Error creating consignees:', error);
+    res.send({
+      code: 500, message: 'Internal Server Error',
+    });
+  }
+}
+
+export const generateBulkAWBForConsignor = async (req: Request, res: Response) => {
+  const { consignorId, awbData }: { consignorId: number, awbData: AWBCreateData[] } = req.body;
+  try {
+    const result = await AWBService.generateBulkAWBForConsignor(consignorId, awbData);
+    res.send({
+      code: 200, message: "Created successfully", data: result
+    })
+  } catch (error) {
+    console.error('Error generateBulkAWBForConsignor', error);
+    res.send({
+      code: 500, message: 'Internal Server Error',
+    });
+  }
+}
+
+export const updateArticleCountForAWB = async (req: Request, res: Response) => {
+  const { AWBId, newArticleCount }: { AWBId: number, newArticleCount: number } = req.body;
+  try {
+    const result = await AWBService.updateArticleCountForAWB(AWBId, newArticleCount);
+    res.send({ code: 200, message: `Updated Successfully`, data: result })
+  } catch (error) {
+    console.error('Error updateArticleCountForAWB', error);
+    res.send({
+      code: 500, message: 'Internal Server Error',
+    });
+  }
+}
+
+export const generateAWBArticles = async (req: Request, res: Response) => {
+  const AWBId: number = req.body.AWBId;
+
+  try {
+    const result = await AWBService.generateAWBArticles(AWBId);
+    res.send({ code: 200, message: `Articles Generated Successfully`, data: result })
+  } catch (error) {
+    console.error('Error generateAWBArticles', error);
+    res.send({
+      code: 500, message: 'Internal Server Error',
+    });
+  }
+
+}
+
+export const addAWBArticles = async (req: Request, res: Response) => {
+  const AWBId: number = req.body.AWBId;
+  const numArticlesToAdd: number = req.body.numArticlesToAdd
+
+  try {
+    const result = await AWBService.addAWBArticles(AWBId, numArticlesToAdd);
+    res.send({ code: 200, message: `Articles Aded Successfully`, data: result })
+  } catch (error) {
+    console.error('Error addAWBArticles', error);
+    res.send({
+      code: 500, message: 'Internal Server Error',
+    });
+  }
+
+}
+
+export const markAWBArticlesAsPrinted = async (req: Request, res: Response) => {
+  const AWBId: number = req.body.AWBId;
+
+  try {
+    const result = await AWBService.markAWBArticlesAsPrinted(AWBId);
+    res.send({ code: 200, message: `Printed Successfully`, data: result })
+  } catch (error) {
+    console.error('Error markAWBArticlesAsPrinted', error);
+    res.send({
+      code: 500, message: 'Internal Server Error',
+    });
+  }
+
+}
+
+export const markAWBArticleAsDeleted = async (req: Request, res: Response) => {
+  const articleId: number = req.body.articleId;
+  const AWBId: number = req.body.AWBId;
+
+  try {
+    const result = await AWBService.markAWBArticleAsDeleted(articleId, AWBId);
+    res.send({ code: 200, message: `Removed Successfully`, data: result })
+  } catch (error) {
+    console.error('Error markAWBArticlesAsDeleted', error);
     res.send({
       code: 500, message: 'Internal Server Error',
     });
