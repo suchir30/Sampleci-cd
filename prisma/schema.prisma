@@ -59,9 +59,9 @@ model Branch {
 
 model Consignor {
   consignorId           Int                 @id @default(autoincrement())
-  consignorCode         String              @unique
-  publicName            String?             @db.VarChar(255)
-  legalName             String?             @db.VarChar(255)
+  consignorCode         String?             @db.VarChar(255)
+  publicName            String              @db.VarChar(255)
+  legalName             String              @db.VarChar(255)
   industryTypeId        Int?
   industryType          IndustryTypeMaster? @relation("consignorIndustryType", fields: [industryTypeId], references: [id])
   commodityId           Int?
@@ -98,7 +98,7 @@ model Consignee {
   consigneeId         Int             @id @default(autoincrement())
   consignorId         Int
   consignor           Consignor       @relation("consigneeConsignor", fields: [consignorId], references: [consignorId])
-  consigneeCode       String          @unique @db.VarChar(255)
+  consigneeCode       String          @db.VarChar(255)
   consigneeName       String          @db.VarChar(255)
   phone1              String?         @db.VarChar(255)
   phone2              String?         @db.VarChar(255)

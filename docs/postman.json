@@ -1,9 +1,10 @@
 {
 	"info": {
-		"_postman_id": "eb78211a-31bc-42df-9a83-e27f9d23b372",
+		"_postman_id": "ebd172c9-643f-42f3-b655-dd820a59602b",
 		"name": "vroomster api specs",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "33643588"
+		"_exporter_id": "17314708",
+		"_collection_link": "https://blue-sunset-656950.postman.co/workspace/Vroom~bd2fde8b-f248-46a4-b764-7b18c7ce9493/collection/17314708-ebd172c9-643f-42f3-b655-dd820a59602b?action=share&source=collection_link&creator=17314708"
 	},
 	"item": [
 		{
@@ -16,7 +17,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"employeeId\":\"employee123\",\r\n    \"password\": \"password12345\"\r\n}",
+							"raw": "{\r\n    \"employeeId\":\"employee123\",\r\n    \"password\": \"password123\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -771,7 +772,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MDg0OTg4MDUsImV4cCI6MTcwODUwMjQwNX0.EevvglubV9SNCmR55M-XHSm7DWFitz4_o2De7SnSjiw",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MTA3NDY1NTcsImV4cCI6MTcxMDc1MDE1N30._rXI9C8R3EvOh44WAf408sDfcnGBMQc0BzBMknQRPuU",
 								"type": "text"
 							}
 						],
@@ -948,7 +949,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MDg0OTg4MDUsImV4cCI6MTcwODUwMjQwNX0.EevvglubV9SNCmR55M-XHSm7DWFitz4_o2De7SnSjiw",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MTA3NDY1NTcsImV4cCI6MTcxMDc1MDE1N30._rXI9C8R3EvOh44WAf408sDfcnGBMQc0BzBMknQRPuU",
 								"type": "text"
 							}
 						],
@@ -986,15 +987,6 @@
 										"type": "text"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": "",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
 									"raw": "http://localhost:3000/api/city",
 									"protocol": "http",
@@ -1094,15 +1086,6 @@
 										"type": "text"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": "",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
 									"raw": "http://localhost:3000/api/district",
 									"protocol": "http",
@@ -1202,15 +1185,6 @@
 										"type": "text"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": "",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
 									"raw": "http://localhost:3000/api/state",
 									"protocol": "http",
@@ -1310,15 +1284,6 @@
 										"type": "text"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": "",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
 									"raw": "http://localhost:3000/api/pincode",
 									"protocol": "http",
@@ -1382,7 +1347,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MDg0OTg4MDUsImV4cCI6MTcwODUwMjQwNX0.EevvglubV9SNCmR55M-XHSm7DWFitz4_o2De7SnSjiw",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MTA4MzA4MTksImV4cCI6MTcxMDgzNDQxOX0.KXsDkAn9qv0isyp6DijdMO5p0a_4E3DCIjKFpFS6ej8",
 								"type": "text"
 							}
 						],
@@ -1399,7 +1364,68 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "/api/branch success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MTA4MzA4MTksImV4cCI6MTcxMDgzNDQxOX0.KXsDkAn9qv0isyp6DijdMO5p0a_4E3DCIjKFpFS6ej8",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:3000/api/branch",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"branch"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "332"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"14c-nebjGBDONaXP1SwYbLOLQS2W4S4\""
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 19 Mar 2024 07:19:12 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"branchCode\": \"Virat18\",\n            \"branchName\": \"Virat\",\n            \"address1\": \"oldtown\",\n            \"address2\": \"macherla\",\n            \"city\": {\n                \"id\": 1,\n                \"name\": \"HYDERABAD\",\n                \"isActive\": true,\n                \"createdOn\": \"2024-03-19T12:46:02.473Z\"\n            },\n            \"phone1\": null,\n            \"phone2\": null,\n            \"isHub\": true,\n            \"district\": {\n                \"name\": \"Guntur\"\n            },\n            \"state\": {\n                \"name\": \"TELANGANA\"\n            }\n        }\n    ]\n}"
+						}
+					]
 				}
 			]
 		},
@@ -1413,7 +1439,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MDg0OTg4MDUsImV4cCI6MTcwODUwMjQwNX0.EevvglubV9SNCmR55M-XHSm7DWFitz4_o2De7SnSjiw",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MTA4MzA4MTksImV4cCI6MTcxMDgzNDQxOX0.KXsDkAn9qv0isyp6DijdMO5p0a_4E3DCIjKFpFS6ej8",
 								"type": "text"
 							}
 						],
@@ -1430,7 +1456,68 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "getConsignors Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MTA4MzA4MTksImV4cCI6MTcxMDgzNDQxOX0.KXsDkAn9qv0isyp6DijdMO5p0a_4E3DCIjKFpFS6ej8",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:3000/api/consignor",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"consignor"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "645"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"285-Y6BaGL1DwxWTeLaNBpkBvM1pHdU\""
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 19 Mar 2024 07:18:36 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"consignorId\": 2,\n            \"consignorCode\": \"INDUS181\",\n            \"publicName\": \"null\",\n            \"legalName\": \"null\",\n            \"industryTypeId\": null,\n            \"commodityId\": null,\n            \"address1\": null,\n            \"address2\": null,\n            \"cityId\": null,\n            \"districtId\": null,\n            \"stateId\": null,\n            \"gstNumber\": null,\n            \"panNumber\": null,\n            \"tanNumber\": null,\n            \"cinNumber\": null,\n            \"taxCategory\": null,\n            \"parentConsignorId\": null,\n            \"branchId\": null,\n            \"keyContactName\": null,\n            \"keyContactDesignation\": null,\n            \"keyContactAddress\": null,\n            \"distanceFromBranchKms\": null,\n            \"createdOn\": \"2024-03-19T07:12:29.881Z\",\n            \"modifiedOn\": \"2024-03-19T07:12:29.881Z\",\n            \"city\": null,\n            \"state\": null,\n            \"industryType\": null,\n            \"parentConsignor\": null,\n            \"branch\": null\n        }\n    ]\n}"
+						}
+					]
 				},
 				{
 					"name": "createConsignor",
@@ -1439,13 +1526,13 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MDg2OTA2NzMsImV4cCI6MTcwODY5NDI3M30.CIDtOm-aGSWsiiOjdbl2p6KGPLweoUpBPKqa0BhWtfk",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MTA4MzA4MTksImV4cCI6MTcxMDgzNDQxOX0.KXsDkAn9qv0isyp6DijdMO5p0a_4E3DCIjKFpFS6ej8",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"consignors\":[\r\n       {\r\n        \"consignorCode\": \"INDUS1\",\r\n        \"publicName\": \"INDIA US\",\r\n        \"legalName\": \"INDUS\",\r\n        \"industryTypeId\": 1,\r\n        \"commodityId\": 1,\r\n        \"address1\":\"23 gokul Street\",\r\n        \"address2\": \"macherla\",\r\n        \"cityId\":1,\r\n        \"gstNumber\": \"GST123456\",\r\n        \"stateId\": 1,\r\n        \"panNumber\": \"PAN123456\",\r\n        \"tanNumber\": \"TAN123456\",\r\n        \"cinNumber\": \"CIN123456\",\r\n        \"taxCategory\": \"Category A\",\r\n        \"parentConsignorId\":null,\r\n        \"branchId\": 1,\r\n        \"keyContactName\": \"John Doe\",\r\n        \"keyContactDesignation\": \"Manager\",\r\n        \"keyContactAddress\": \"456 Example Road\",\r\n        \"distanceFromBranchKms\": 10\r\n        }\r\n        ]\r\n}",
+							"raw": "{\r\n    \"consignorsData\":[\r\n       {\r\n        \"consignorCode\": \"INDUS181\",\r\n        \"publicName\":\"null\",\r\n        \"legalName\": \"null\",\r\n        \"industryTypeId\": 1,\r\n        \"commodityId\": 1,\r\n        \"address1\":\"23 gokul Street\",\r\n        \"address2\": \"macherla\",\r\n        \"cityId\":1,\r\n        \"gstNumber\": \"GST123456\",\r\n        \"stateId\": 1,\r\n        \"panNumber\": \"PAN123456\",\r\n        \"tanNumber\": \"TAN123456\",\r\n        \"cinNumber\": \"CIN123456\",\r\n        \"taxCategory\": \"Category A\",\r\n        \"parentConsignorId\":null,\r\n        \"branchId\": 1,\r\n        \"keyContactName\": \"John Doe\",\r\n        \"keyContactDesignation\": \"Manager\",\r\n        \"keyContactAddress\": \"456 Example Road\",\r\n        \"distanceFromBranchKms\": 10\r\n        }       ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1465,7 +1552,77 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "createConsignor Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MTA4MzA4MTksImV4cCI6MTcxMDgzNDQxOX0.KXsDkAn9qv0isyp6DijdMO5p0a_4E3DCIjKFpFS6ej8",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"consignorsData\":[\r\n       {\r\n        \"consignorCode\": \"INDUS181\",\r\n        \"publicName\":\"null\",\r\n        \"legalName\": \"null\",\r\n        \"industryTypeId\": 1,\r\n        \"commodityId\": 1,\r\n        \"address1\":\"23 gokul Street\",\r\n        \"address2\": \"macherla\",\r\n        \"cityId\":1,\r\n        \"gstNumber\": \"GST123456\",\r\n        \"stateId\": 1,\r\n        \"panNumber\": \"PAN123456\",\r\n        \"tanNumber\": \"TAN123456\",\r\n        \"cinNumber\": \"CIN123456\",\r\n        \"taxCategory\": \"Category A\",\r\n        \"parentConsignorId\":null,\r\n        \"branchId\": 1,\r\n        \"keyContactName\": \"John Doe\",\r\n        \"keyContactDesignation\": \"Manager\",\r\n        \"keyContactAddress\": \"456 Example Road\",\r\n        \"distanceFromBranchKms\": 10\r\n        }       ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/consignor",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"consignor"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "59"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"3b-gotx/Oo8HmKpb25jePiK3ypt4q8\""
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 19 Mar 2024 07:18:56 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Consignor Created Successful\"\n}"
+						}
+					]
 				}
 			]
 		},
@@ -1479,13 +1636,13 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MDg2OTA2NzMsImV4cCI6MTcwODY5NDI3M30.CIDtOm-aGSWsiiOjdbl2p6KGPLweoUpBPKqa0BhWtfk",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MTA4MzA4MTksImV4cCI6MTcxMDgzNDQxOX0.KXsDkAn9qv0isyp6DijdMO5p0a_4E3DCIjKFpFS6ej8",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"consignees\": [\r\n    {\r\n      \"consignorId\": 2,\r\n      \"consigneeCode\": \"C001xc\",\r\n      \"consigneeName\": \"Consignee 1\",\r\n      \"phone1\": \"123-456-7890\",\r\n      \"phone2\": \"123-456-7890\",\r\n      \"email\": \"consignee1@example.com\",\r\n      \"address1\": \"123 Main St\",\r\n      \"address2\": \"456 Elm St\",\r\n      \"cityId\": 1,\r\n      \"districtId\": 1,\r\n      \"stateId\": 1,\r\n      \"branchId\": 1,\r\n      \"distanceToBranchKms\": 10,\r\n      \"odaType\": \"ODA\",\r\n      \"tatNumber\": 1\r\n    },\r\n    {\r\n      \"consignorId\": 2,\r\n      \"consigneeCode\": \"C001x\",\r\n      \"consigneeName\": \"Consignee 2\",\r\n      \"phone1\": \"123-456-7891\",\r\n      \"phone2\": \"123-456-7890\",\r\n      \"email\": \"consignee2@example.com\",\r\n      \"address1\": \"456 Elm St\",\r\n      \"address2\": \"456 Elm St\",\r\n      \"cityId\": 2,\r\n      \"districtId\": 2,\r\n      \"stateId\": 2,\r\n      \"branchId\": 1,\r\n      \"distanceToBranchKms\": 15,\r\n      \"odaType\": \"ODA\",\r\n      \"tatNumber\": 2\r\n    }\r\n  ]\r\n}\r\n",
+							"raw": "{\r\n  \"consignees\": [\r\n    {\r\n      \"consignorId\": 2,\r\n      \"consigneeCode\":\"nv\",\r\n      \"consigneeName\": \"Consignee 1\",\r\n      \"phone1\": \"123-456-7890\",\r\n      \"phone2\": \"123-456-7890\",\r\n      \"email\": \"consignee1@example.com\",\r\n      \"address1\": \"123 Main St\",\r\n      \"address2\": \"456 Elm St\"\r\n      \r\n    },\r\n    {\r\n      \"consignorId\": 2,\r\n      \"consigneeCode\": \"vb\",\r\n      \"consigneeName\": \"Consignee 2\",\r\n      \"phone1\": \"123-456-7891\",\r\n      \"phone2\": \"123-456-7890\",\r\n      \"email\": \"consignee2@example.com\",\r\n      \"address1\": \"456 Elm St\",\r\n      \"address2\": \"456 Elm St\",\r\n      \"cityId\": 2,\r\n      \"districtId\": 2,\r\n      \"stateId\": 2,\r\n      \"branchId\": 1,\r\n      \"distanceToBranchKms\": 15,\r\n      \"odaType\": \"ODA\",\r\n      \"tatNumber\": 2\r\n    }\r\n  ]\r\n}\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1507,19 +1664,19 @@
 					},
 					"response": [
 						{
-							"name": "/api/consignee",
+							"name": "createConsignee Success",
 							"originalRequest": {
 								"method": "POST",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MDg0OTg4MDUsImV4cCI6MTcwODUwMjQwNX0.EevvglubV9SNCmR55M-XHSm7DWFitz4_o2De7SnSjiw",
+										"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MTA4MzA4MTksImV4cCI6MTcxMDgzNDQxOX0.KXsDkAn9qv0isyp6DijdMO5p0a_4E3DCIjKFpFS6ej8",
 										"type": "text"
 									}
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n  \"consignees\": [\r\n    {\r\n      \"consignorId\": 1,\r\n      \"consigneeCode\": \"C001xc\",\r\n      \"consigneeName\": \"Consignee 1\",\r\n      \"phone1\": \"123-456-7890\",\r\n      \"phone2\": \"123-456-7890\",\r\n      \"email\": \"consignee1@example.com\",\r\n      \"address1\": \"123 Main St\",\r\n      \"address2\": \"456 Elm St\",\r\n      \"cityId\": 1,\r\n      \"districtId\": 1,\r\n      \"stateId\": 1,\r\n      \"branchId\": 1,\r\n      \"distanceToBranchKms\": 10,\r\n      \"odaType\": \"ODA\",\r\n      \"tatNumber\": 1\r\n    },\r\n    {\r\n      \"consignorId\": 1,\r\n      \"consigneeCode\": \"C001x\",\r\n      \"consigneeName\": \"Consignee 2\",\r\n      \"phone1\": \"123-456-7891\",\r\n      \"phone2\": \"123-456-7890\",\r\n      \"email\": \"consignee2@example.com\",\r\n      \"address1\": \"456 Elm St\",\r\n      \"address2\": \"456 Elm St\",\r\n      \"cityId\": 2,\r\n      \"districtId\": 2,\r\n      \"stateId\": 2,\r\n      \"branchId\": 1,\r\n      \"distanceToBranchKms\": 15,\r\n      \"odaType\": \"ODA\",\r\n      \"tatNumber\": 2\r\n    }\r\n  ]\r\n}\r\n",
+									"raw": "{\r\n  \"consignees\": [\r\n    {\r\n      \"consignorId\": 2,\r\n      \"consigneeCode\":\"nv\",\r\n      \"consigneeName\": \"Consignee 1\",\r\n      \"phone1\": \"123-456-7890\",\r\n      \"phone2\": \"123-456-7890\",\r\n      \"email\": \"consignee1@example.com\",\r\n      \"address1\": \"123 Main St\",\r\n      \"address2\": \"456 Elm St\"\r\n      \r\n    },\r\n    {\r\n      \"consignorId\": 2,\r\n      \"consigneeCode\": \"vb\",\r\n      \"consigneeName\": \"Consignee 2\",\r\n      \"phone1\": \"123-456-7891\",\r\n      \"phone2\": \"123-456-7890\",\r\n      \"email\": \"consignee2@example.com\",\r\n      \"address1\": \"456 Elm St\",\r\n      \"address2\": \"456 Elm St\",\r\n      \"cityId\": 2,\r\n      \"districtId\": 2,\r\n      \"stateId\": 2,\r\n      \"branchId\": 1,\r\n      \"distanceToBranchKms\": 15,\r\n      \"odaType\": \"ODA\",\r\n      \"tatNumber\": 2\r\n    }\r\n  ]\r\n}\r\n",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1553,15 +1710,15 @@
 								},
 								{
 									"key": "Content-Length",
-									"value": "72"
+									"value": "59"
 								},
 								{
 									"key": "ETag",
-									"value": "W/\"48-2g2puYaZCYN3Lj2GmtCrxMqBBAg\""
+									"value": "W/\"3b-ONZxcRdxFuNHxhrGwMp0hM1/jM8\""
 								},
 								{
 									"key": "Date",
-									"value": "Wed, 21 Feb 2024 07:28:54 GMT"
+									"value": "Tue, 19 Mar 2024 07:16:04 GMT"
 								},
 								{
 									"key": "Connection",
@@ -1573,7 +1730,7 @@
 								}
 							],
 							"cookie": [],
-							"body": "{\n    \"code\": 200,\n    \"message\": \"Consignee Created Successful\",\n    \"data\": {\n        \"count\": 2\n    }\n}"
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Consignee Created Successful\"\n}"
 						}
 					]
 				},
@@ -1587,7 +1744,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MDg0OTg4MDUsImV4cCI6MTcwODUwMjQwNX0.EevvglubV9SNCmR55M-XHSm7DWFitz4_o2De7SnSjiw",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MTA4MzA4MTksImV4cCI6MTcxMDgzNDQxOX0.KXsDkAn9qv0isyp6DijdMO5p0a_4E3DCIjKFpFS6ej8",
 								"type": "text"
 							}
 						],
@@ -1613,7 +1770,77 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "getConsignees Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MTA4MzA4MTksImV4cCI6MTcxMDgzNDQxOX0.KXsDkAn9qv0isyp6DijdMO5p0a_4E3DCIjKFpFS6ej8",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/consignee",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"consignee"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "4491"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"118b-5GBHD+KXEXjMzPHCyunvDwFkGpc\""
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 19 Mar 2024 07:17:47 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"consigneeId\": 13,\n            \"consignorId\": 2,\n            \"consigneeCode\": \"C0019\",\n            \"consigneeName\": \"Consignee 1\",\n            \"phone1\": \"123-456-7890\",\n            \"phone2\": \"123-456-7890\",\n            \"email\": \"consignee1@example.com\",\n            \"address1\": \"123 Main St\",\n            \"address2\": \"456 Elm St\",\n            \"cityId\": null,\n            \"districtId\": null,\n            \"stateId\": null,\n            \"branchId\": null,\n            \"distanceToBranchKms\": null,\n            \"odaType\": null,\n            \"tatNumber\": null,\n            \"createdOn\": \"2024-03-19T07:13:32.094Z\",\n            \"modifiedOn\": \"2024-03-19T07:13:32.094Z\",\n            \"consignor\": {\n                \"consignorId\": 2,\n                \"consignorCode\": \"INDUS181\",\n                \"publicName\": \"null\",\n                \"legalName\": \"null\",\n                \"industryTypeId\": null,\n                \"commodityId\": null,\n                \"address1\": null,\n                \"address2\": null,\n                \"cityId\": null,\n                \"districtId\": null,\n                \"stateId\": null,\n                \"gstNumber\": null,\n                \"panNumber\": null,\n                \"tanNumber\": null,\n                \"cinNumber\": null,\n                \"taxCategory\": null,\n                \"parentConsignorId\": null,\n                \"branchId\": null,\n                \"keyContactName\": null,\n                \"keyContactDesignation\": null,\n                \"keyContactAddress\": null,\n                \"distanceFromBranchKms\": null,\n                \"createdOn\": \"2024-03-19T07:12:29.881Z\",\n                \"modifiedOn\": \"2024-03-19T07:12:29.881Z\"\n            },\n            \"city\": null,\n            \"district\": null,\n            \"state\": null,\n            \"branch\": null\n        },\n        {\n            \"consigneeId\": 14,\n            \"consignorId\": 2,\n            \"consigneeCode\": \"C0018\",\n            \"consigneeName\": \"Consignee 2\",\n            \"phone1\": \"123-456-7891\",\n            \"phone2\": \"123-456-7890\",\n            \"email\": \"consignee2@example.com\",\n            \"address1\": \"456 Elm St\",\n            \"address2\": \"456 Elm St\",\n            \"cityId\": null,\n            \"districtId\": null,\n            \"stateId\": null,\n            \"branchId\": null,\n            \"distanceToBranchKms\": null,\n            \"odaType\": null,\n            \"tatNumber\": null,\n            \"createdOn\": \"2024-03-19T07:13:32.094Z\",\n            \"modifiedOn\": \"2024-03-19T07:13:32.094Z\",\n            \"consignor\": {\n                \"consignorId\": 2,\n                \"consignorCode\": \"INDUS181\",\n                \"publicName\": \"null\",\n                \"legalName\": \"null\",\n                \"industryTypeId\": null,\n                \"commodityId\": null,\n                \"address1\": null,\n                \"address2\": null,\n                \"cityId\": null,\n                \"districtId\": null,\n                \"stateId\": null,\n                \"gstNumber\": null,\n                \"panNumber\": null,\n                \"tanNumber\": null,\n                \"cinNumber\": null,\n                \"taxCategory\": null,\n                \"parentConsignorId\": null,\n                \"branchId\": null,\n                \"keyContactName\": null,\n                \"keyContactDesignation\": null,\n                \"keyContactAddress\": null,\n                \"distanceFromBranchKms\": null,\n                \"createdOn\": \"2024-03-19T07:12:29.881Z\",\n                \"modifiedOn\": \"2024-03-19T07:12:29.881Z\"\n            },\n            \"city\": null,\n            \"district\": null,\n            \"state\": null,\n            \"branch\": null\n        },\n        {\n            \"consigneeId\": 15,\n            \"consignorId\": 2,\n            \"consigneeCode\": \"nv\",\n            \"consigneeName\": \"Consignee 1\",\n            \"phone1\": \"123-456-7890\",\n            \"phone2\": \"123-456-7890\",\n            \"email\": \"consignee1@example.com\",\n            \"address1\": \"123 Main St\",\n            \"address2\": \"456 Elm St\",\n            \"cityId\": null,\n            \"districtId\": null,\n            \"stateId\": null,\n            \"branchId\": null,\n            \"distanceToBranchKms\": null,\n            \"odaType\": null,\n            \"tatNumber\": null,\n            \"createdOn\": \"2024-03-19T07:16:04.679Z\",\n            \"modifiedOn\": \"2024-03-19T07:16:04.679Z\",\n            \"consignor\": {\n                \"consignorId\": 2,\n                \"consignorCode\": \"INDUS181\",\n                \"publicName\": \"null\",\n                \"legalName\": \"null\",\n                \"industryTypeId\": null,\n                \"commodityId\": null,\n                \"address1\": null,\n                \"address2\": null,\n                \"cityId\": null,\n                \"districtId\": null,\n                \"stateId\": null,\n                \"gstNumber\": null,\n                \"panNumber\": null,\n                \"tanNumber\": null,\n                \"cinNumber\": null,\n                \"taxCategory\": null,\n                \"parentConsignorId\": null,\n                \"branchId\": null,\n                \"keyContactName\": null,\n                \"keyContactDesignation\": null,\n                \"keyContactAddress\": null,\n                \"distanceFromBranchKms\": null,\n                \"createdOn\": \"2024-03-19T07:12:29.881Z\",\n                \"modifiedOn\": \"2024-03-19T07:12:29.881Z\"\n            },\n            \"city\": null,\n            \"district\": null,\n            \"state\": null,\n            \"branch\": null\n        },\n        {\n            \"consigneeId\": 16,\n            \"consignorId\": 2,\n            \"consigneeCode\": \"vb\",\n            \"consigneeName\": \"Consignee 2\",\n            \"phone1\": \"123-456-7891\",\n            \"phone2\": \"123-456-7890\",\n            \"email\": \"consignee2@example.com\",\n            \"address1\": \"456 Elm St\",\n            \"address2\": \"456 Elm St\",\n            \"cityId\": 2,\n            \"districtId\": 2,\n            \"stateId\": 2,\n            \"branchId\": 1,\n            \"distanceToBranchKms\": 15,\n            \"odaType\": \"ODA\",\n            \"tatNumber\": 2,\n            \"createdOn\": \"2024-03-19T07:16:04.679Z\",\n            \"modifiedOn\": \"2024-03-19T07:16:04.679Z\",\n            \"consignor\": {\n                \"consignorId\": 2,\n                \"consignorCode\": \"INDUS181\",\n                \"publicName\": \"null\",\n                \"legalName\": \"null\",\n                \"industryTypeId\": null,\n                \"commodityId\": null,\n                \"address1\": null,\n                \"address2\": null,\n                \"cityId\": null,\n                \"districtId\": null,\n                \"stateId\": null,\n                \"gstNumber\": null,\n                \"panNumber\": null,\n                \"tanNumber\": null,\n                \"cinNumber\": null,\n                \"taxCategory\": null,\n                \"parentConsignorId\": null,\n                \"branchId\": null,\n                \"keyContactName\": null,\n                \"keyContactDesignation\": null,\n                \"keyContactAddress\": null,\n                \"distanceFromBranchKms\": null,\n                \"createdOn\": \"2024-03-19T07:12:29.881Z\",\n                \"modifiedOn\": \"2024-03-19T07:12:29.881Z\"\n            },\n            \"city\": {\n                \"id\": 2,\n                \"name\": \"MUMBAI\",\n                \"isActive\": true,\n                \"createdOn\": \"2024-03-19T12:46:02.477Z\"\n            },\n            \"district\": {\n                \"id\": 2,\n                \"name\": \"Krishna\",\n                \"isActive\": true,\n                \"createdOn\": \"2024-03-19T12:46:02.503Z\"\n            },\n            \"state\": {\n                \"id\": 2,\n                \"name\": \"MAHARASHTRA\",\n                \"isActive\": true,\n                \"createdOn\": \"2024-03-19T12:46:02.526Z\"\n            },\n            \"branch\": {\n                \"id\": 1,\n                \"branchCode\": \"Virat18\",\n                \"branchName\": \"Virat\",\n                \"address1\": \"oldtown\",\n                \"address2\": \"macherla\",\n                \"cityId\": 1,\n                \"districtId\": 1,\n                \"stateId\": 1,\n                \"phone1\": null,\n                \"phone2\": null,\n                \"isHub\": true,\n                \"isActive\": true,\n                \"createdOn\": \"2024-03-19T12:46:02.559Z\"\n            }\n        }\n    ]\n}"
+						}
+					]
 				}
 			]
 		},
@@ -1648,7 +1875,78 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "generateAWB success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Barear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MTA4MzI4NTQsImV4cCI6MTcxMDgzNjQ1NH0.hBtkDwYS-8XH8YE6_gpcRNNfo163-xDFLCCbSxdCqvo",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"consignorId\": 2,\r\n    \"awbData\":[\r\n        {\r\n            \"consigneeId\": 14,\r\n            \"fromBranchId\":1,\r\n            \"toBranchId\": 1,\r\n            \"AWBCode\":\"KARAHY\",\r\n            \"numOfArticles\":10\r\n        },\r\n        { \r\n            \"consigneeId\": 14,\r\n            \"fromBranchId\":1,\r\n            \"toBranchId\": 1,\r\n            \"AWBCode\":\"KARAHY\",\r\n            \"numOfArticles\":10\r\n        }\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/AWB/generateAWB",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"AWB",
+										"generateAWB"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "44"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"2c-yVz+XJb39ChI17IP0EZYx95OqDs\""
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 19 Mar 2024 07:48:12 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Generated AWB\"\n}"
+						}
+					]
 				},
 				{
 					"name": "updateArticlesCount",
@@ -1708,7 +2006,78 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "generateAWBArticles success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Barear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MTA4NDA2NzksImV4cCI6MTcxMDg0NDI3OX0.oMxbJsUaoVR63yGJtBP4uMRGe318dtNPKnEMkbjIAag",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n   \"AWBId\": 5\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/AWB/generateAWBArticles",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"AWB",
+										"generateAWBArticles"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1778"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"6f2-GuZZB9N+4qsikKjlT9QsRtKfIVY\""
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 19 Mar 2024 09:38:09 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"id\": 16,\n            \"AWBId\": 5,\n            \"articleCode\": \"INDUS1811903240030001\",\n            \"articleIndex\": 1,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T09:36:00.963Z\",\n            \"modifiedOn\": \"2024-03-19T09:36:00.963Z\"\n        },\n        {\n            \"id\": 17,\n            \"AWBId\": 5,\n            \"articleCode\": \"INDUS1811903240030002\",\n            \"articleIndex\": 2,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T09:36:00.963Z\",\n            \"modifiedOn\": \"2024-03-19T09:36:00.963Z\"\n        },\n        {\n            \"id\": 18,\n            \"AWBId\": 5,\n            \"articleCode\": \"INDUS1811903240030003\",\n            \"articleIndex\": 3,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T09:36:00.963Z\",\n            \"modifiedOn\": \"2024-03-19T09:36:00.963Z\"\n        },\n        {\n            \"id\": 19,\n            \"AWBId\": 5,\n            \"articleCode\": \"INDUS1811903240030004\",\n            \"articleIndex\": 4,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T09:36:00.963Z\",\n            \"modifiedOn\": \"2024-03-19T09:36:00.963Z\"\n        },\n        {\n            \"id\": 20,\n            \"AWBId\": 5,\n            \"articleCode\": \"INDUS1811903240030005\",\n            \"articleIndex\": 5,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T09:36:00.963Z\",\n            \"modifiedOn\": \"2024-03-19T09:36:00.963Z\"\n        },\n        {\n            \"id\": 21,\n            \"AWBId\": 5,\n            \"articleCode\": \"INDUS1811903240030006\",\n            \"articleIndex\": 6,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T09:36:00.963Z\",\n            \"modifiedOn\": \"2024-03-19T09:36:00.963Z\"\n        },\n        {\n            \"id\": 22,\n            \"AWBId\": 5,\n            \"articleCode\": \"INDUS1811903240030007\",\n            \"articleIndex\": 7,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T09:36:00.963Z\",\n            \"modifiedOn\": \"2024-03-19T09:36:00.963Z\"\n        },\n        {\n            \"id\": 23,\n            \"AWBId\": 5,\n            \"articleCode\": \"INDUS1811903240030008\",\n            \"articleIndex\": 8,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T09:36:00.963Z\",\n            \"modifiedOn\": \"2024-03-19T09:36:00.963Z\"\n        },\n        {\n            \"id\": 24,\n            \"AWBId\": 5,\n            \"articleCode\": \"INDUS1811903240030009\",\n            \"articleIndex\": 9,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T09:36:00.963Z\",\n            \"modifiedOn\": \"2024-03-19T09:36:00.963Z\"\n        },\n        {\n            \"id\": 25,\n            \"AWBId\": 5,\n            \"articleCode\": \"INDUS1811903240030010\",\n            \"articleIndex\": 10,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T09:36:00.963Z\",\n            \"modifiedOn\": \"2024-03-19T09:36:00.963Z\"\n        }\n    ]\n}"
+						}
+					]
 				},
 				{
 					"name": "addAWBArticles",
@@ -1738,7 +2107,78 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "addAWBArticles success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Barear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MTA4NDA2NzksImV4cCI6MTcxMDg0NDI3OX0.oMxbJsUaoVR63yGJtBP4uMRGe318dtNPKnEMkbjIAag",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n   \"AWBId\": 3,\r\n   \"numArticlesToAdd\": 6\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/AWB/addAWBArticles",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"AWB",
+										"addAWBArticles"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "2991"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"baf-V7Y8pYm6R2R67GvV2SjyUrKbhe4\""
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 19 Mar 2024 09:48:12 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"AWBId\": 3,\n            \"articleCode\": \"INDUS1811903240010001\",\n            \"articleIndex\": 1,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T07:53:58.647Z\",\n            \"modifiedOn\": \"2024-03-19T07:53:58.647Z\"\n        },\n        {\n            \"id\": 2,\n            \"AWBId\": 3,\n            \"articleCode\": \"INDUS1811903240010002\",\n            \"articleIndex\": 2,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T07:53:58.647Z\",\n            \"modifiedOn\": \"2024-03-19T07:53:58.647Z\"\n        },\n        {\n            \"id\": 3,\n            \"AWBId\": 3,\n            \"articleCode\": \"INDUS1811903240010003\",\n            \"articleIndex\": 3,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T07:53:58.647Z\",\n            \"modifiedOn\": \"2024-03-19T07:53:58.647Z\"\n        },\n        {\n            \"id\": 4,\n            \"AWBId\": 3,\n            \"articleCode\": \"INDUS1811903240010004\",\n            \"articleIndex\": 4,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T07:53:58.647Z\",\n            \"modifiedOn\": \"2024-03-19T07:53:58.647Z\"\n        },\n        {\n            \"id\": 5,\n            \"AWBId\": 3,\n            \"articleCode\": \"INDUS1811903240010005\",\n            \"articleIndex\": 5,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T07:53:58.647Z\",\n            \"modifiedOn\": \"2024-03-19T07:53:58.647Z\"\n        },\n        {\n            \"id\": 26,\n            \"AWBId\": 3,\n            \"articleCode\": \"INDUS1811903240010006\",\n            \"articleIndex\": 6,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T09:45:48.092Z\",\n            \"modifiedOn\": \"2024-03-19T09:45:48.092Z\"\n        },\n        {\n            \"id\": 27,\n            \"AWBId\": 3,\n            \"articleCode\": \"INDUS1811903240010007\",\n            \"articleIndex\": 7,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T09:45:48.092Z\",\n            \"modifiedOn\": \"2024-03-19T09:45:48.092Z\"\n        },\n        {\n            \"id\": 28,\n            \"AWBId\": 3,\n            \"articleCode\": \"INDUS1811903240010008\",\n            \"articleIndex\": 8,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T09:45:48.092Z\",\n            \"modifiedOn\": \"2024-03-19T09:45:48.092Z\"\n        },\n        {\n            \"id\": 29,\n            \"AWBId\": 3,\n            \"articleCode\": \"INDUS1811903240010009\",\n            \"articleIndex\": 9,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T09:45:48.092Z\",\n            \"modifiedOn\": \"2024-03-19T09:45:48.092Z\"\n        },\n        {\n            \"id\": 30,\n            \"AWBId\": 3,\n            \"articleCode\": \"INDUS1811903240010010\",\n            \"articleIndex\": 10,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T09:45:48.092Z\",\n            \"modifiedOn\": \"2024-03-19T09:45:48.092Z\"\n        },\n        {\n            \"id\": 31,\n            \"AWBId\": 3,\n            \"articleCode\": \"INDUS1811903240010011\",\n            \"articleIndex\": 11,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T09:45:48.092Z\",\n            \"modifiedOn\": \"2024-03-19T09:45:48.092Z\"\n        },\n        {\n            \"id\": 32,\n            \"AWBId\": 3,\n            \"articleCode\": \"INDUS1811903240010012\",\n            \"articleIndex\": 12,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T09:48:12.815Z\",\n            \"modifiedOn\": \"2024-03-19T09:48:12.815Z\"\n        },\n        {\n            \"id\": 33,\n            \"AWBId\": 3,\n            \"articleCode\": \"INDUS1811903240010013\",\n            \"articleIndex\": 13,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T09:48:12.815Z\",\n            \"modifiedOn\": \"2024-03-19T09:48:12.815Z\"\n        },\n        {\n            \"id\": 34,\n            \"AWBId\": 3,\n            \"articleCode\": \"INDUS1811903240010014\",\n            \"articleIndex\": 14,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T09:48:12.815Z\",\n            \"modifiedOn\": \"2024-03-19T09:48:12.815Z\"\n        },\n        {\n            \"id\": 35,\n            \"AWBId\": 3,\n            \"articleCode\": \"INDUS1811903240010015\",\n            \"articleIndex\": 15,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T09:48:12.815Z\",\n            \"modifiedOn\": \"2024-03-19T09:48:12.815Z\"\n        },\n        {\n            \"id\": 36,\n            \"AWBId\": 3,\n            \"articleCode\": \"INDUS1811903240010016\",\n            \"articleIndex\": 16,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T09:48:12.815Z\",\n            \"modifiedOn\": \"2024-03-19T09:48:12.815Z\"\n        },\n        {\n            \"id\": 37,\n            \"AWBId\": 3,\n            \"articleCode\": \"INDUS1811903240010017\",\n            \"articleIndex\": 17,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T09:48:12.815Z\",\n            \"modifiedOn\": \"2024-03-19T09:48:12.815Z\"\n        }\n    ]\n}"
+						}
+					]
 				},
 				{
 					"name": "markAWBArticlesAsPrinted",
@@ -1768,7 +2208,78 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "markAWBArticlesAsPrinted success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Barear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MTA4NDA2NzksImV4cCI6MTcxMDg0NDI3OX0.oMxbJsUaoVR63yGJtBP4uMRGe318dtNPKnEMkbjIAag",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n   \"AWBId\": 3\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/AWB/markAWBArticlesAsPrinted",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"AWB",
+										"markAWBArticlesAsPrinted"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "64"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"40-A+ntqnYhJjNvdcs2J2/NVaX4K2U\""
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 19 Mar 2024 09:54:50 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"AWB Articles Printed Successfully\"\n}"
+						}
+					]
 				},
 				{
 					"name": "markAWBArticleAsDeleted",
@@ -1798,7 +2309,78 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "markAWBArticleAsDeleted success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "barear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MTA4NDA2NzksImV4cCI6MTcxMDg0NDI3OX0.oMxbJsUaoVR63yGJtBP4uMRGe318dtNPKnEMkbjIAag",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n   \"AWBId\": 4,\r\n   \"articleId\": 6\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/AWB/markAWBArticleAsDeleted",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"AWB",
+										"markAWBArticleAsDeleted"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1602"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"642-bZtxlAdsUiSDaXr7SH2YLB40/00\""
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 19 Mar 2024 09:58:27 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"id\": 7,\n            \"AWBId\": 4,\n            \"articleCode\": \"INDUS1811903240020002\",\n            \"articleIndex\": 2,\n            \"status\": \"PRINTED\",\n            \"createdOn\": \"2024-03-19T09:34:24.513Z\",\n            \"modifiedOn\": \"2024-03-19T09:57:49.963Z\"\n        },\n        {\n            \"id\": 8,\n            \"AWBId\": 4,\n            \"articleCode\": \"INDUS1811903240020003\",\n            \"articleIndex\": 3,\n            \"status\": \"PRINTED\",\n            \"createdOn\": \"2024-03-19T09:34:24.513Z\",\n            \"modifiedOn\": \"2024-03-19T09:57:49.963Z\"\n        },\n        {\n            \"id\": 9,\n            \"AWBId\": 4,\n            \"articleCode\": \"INDUS1811903240020004\",\n            \"articleIndex\": 4,\n            \"status\": \"PRINTED\",\n            \"createdOn\": \"2024-03-19T09:34:24.513Z\",\n            \"modifiedOn\": \"2024-03-19T09:57:49.963Z\"\n        },\n        {\n            \"id\": 10,\n            \"AWBId\": 4,\n            \"articleCode\": \"INDUS1811903240020005\",\n            \"articleIndex\": 5,\n            \"status\": \"PRINTED\",\n            \"createdOn\": \"2024-03-19T09:34:24.513Z\",\n            \"modifiedOn\": \"2024-03-19T09:57:49.963Z\"\n        },\n        {\n            \"id\": 11,\n            \"AWBId\": 4,\n            \"articleCode\": \"INDUS1811903240020006\",\n            \"articleIndex\": 6,\n            \"status\": \"PRINTED\",\n            \"createdOn\": \"2024-03-19T09:34:24.513Z\",\n            \"modifiedOn\": \"2024-03-19T09:57:49.963Z\"\n        },\n        {\n            \"id\": 12,\n            \"AWBId\": 4,\n            \"articleCode\": \"INDUS1811903240020007\",\n            \"articleIndex\": 7,\n            \"status\": \"PRINTED\",\n            \"createdOn\": \"2024-03-19T09:34:24.513Z\",\n            \"modifiedOn\": \"2024-03-19T09:57:49.963Z\"\n        },\n        {\n            \"id\": 13,\n            \"AWBId\": 4,\n            \"articleCode\": \"INDUS1811903240020008\",\n            \"articleIndex\": 8,\n            \"status\": \"PRINTED\",\n            \"createdOn\": \"2024-03-19T09:34:24.513Z\",\n            \"modifiedOn\": \"2024-03-19T09:57:49.963Z\"\n        },\n        {\n            \"id\": 14,\n            \"AWBId\": 4,\n            \"articleCode\": \"INDUS1811903240020009\",\n            \"articleIndex\": 9,\n            \"status\": \"PRINTED\",\n            \"createdOn\": \"2024-03-19T09:34:24.513Z\",\n            \"modifiedOn\": \"2024-03-19T09:57:49.963Z\"\n        },\n        {\n            \"id\": 15,\n            \"AWBId\": 4,\n            \"articleCode\": \"INDUS1811903240020010\",\n            \"articleIndex\": 10,\n            \"status\": \"PRINTED\",\n            \"createdOn\": \"2024-03-19T09:34:24.513Z\",\n            \"modifiedOn\": \"2024-03-19T09:57:49.963Z\"\n        }\n    ]\n}"
+						}
+					]
 				}
 			]
 		}

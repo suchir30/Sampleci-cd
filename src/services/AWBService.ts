@@ -69,6 +69,8 @@ export const generateBulkAWBForConsignor = async (consignorId: number, awbData: 
             }
         }
 
+        
+
         const createdAWBs = await prisma.airWayBill.createMany({
             data: awbData.map(data => ({
                 consignorId: data.consignorId,
@@ -111,7 +113,12 @@ const createAWBArticlesHelper = async (prisma: any, AWBId: number, AWBCode: stri
             }
         })
     });
-    return createdArticles;
+    const generateArticles = await prisma.awbArticle.findMany({
+        where: {
+            AWBId: AWBId,
+        },
+    });
+   return generateArticles
 }
 
 export const generateAWBArticles = async (AWBId: number) => {
@@ -132,7 +139,12 @@ export const generateAWBArticles = async (AWBId: number) => {
             },
         });
         if (anyArticle !== null) {
-            throw Error(`Articles have already been generated for AWB=${AWBId}`);
+            const generateArticles = await prisma.awbArticle.findMany({
+                where: {
+                    AWBId: AWBId,
+                },
+            });
+           return generateArticles
         }
         return await createAWBArticlesHelper(prisma, AWBId, awb.AWBCode, awb.numOfArticles);
     });
@@ -186,11 +198,20 @@ export const markAWBArticlesAsPrinted = async (AWBId: number) => {
 };
 
 export const markAWBArticleAsDeleted = async (articleId: number, AWBId: number) => {
-    const deletedArticle = prisma.awbArticle.update({
+    prisma.awbArticle.update({
         where: { id: articleId, AWBId },
         data: {
             status: ArticleStatus.DELETED,
         }
     });
+    const deletedArticle = await prisma.awbArticle.findMany({
+        where: {
+            AWBId: AWBId,
+            status: {
+                not: ArticleStatus.DELETED
+            }
+        },
+    });
     return deletedArticle;
+   
 };
