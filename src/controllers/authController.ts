@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
 import * as userService from '../services/userService';
-import { buildNoContentRepsonse, buildObjectFetchRepsonse, throwValidationError } from '../utils/apiUtils';
+import { buildNoContentRepsonse, buildObjectFetchRepsonse, throwValidationError,APIError } from '../utils/apiUtils';
 import { HttpStatusCode } from '../types/apiTypes';
 
 export const login = async (req: Request, res: Response, next: NextFunction) => {
@@ -25,9 +25,15 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     res.status(HttpStatusCode.OK).json(buildObjectFetchRepsonse({ token }));
   } catch (err) {
     console.log("Error login", err);
-    next(err);
+    // Set status code to 400 for validation errors
+    if (err instanceof APIError && err.errorCode === HttpStatusCode.BadRequest) {
+      res.status(HttpStatusCode.BadRequest).json({ message: err.message });
+    } else {
+      next(err); // For other errors, pass them to the error handler middleware
+    }
   }
 };
+
 
 export const generateOTP = async (req: Request, res: Response, next: NextFunction) => {
   try {
