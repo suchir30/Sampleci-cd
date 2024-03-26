@@ -35,7 +35,7 @@ export const throwValidationError = (errors: {message: string, key?: string}[]) 
     });
 };
 
-export const buildObjectFetchRepsonse = (data: any, message?: string): APIResponse<any> => {
+export const buildObjectFetchResponse = (data: any, message?: string): APIResponse<any> => {
     return {
         statusCode: HttpStatusCode.OK,
         message: message || "Success",
@@ -43,7 +43,7 @@ export const buildObjectFetchRepsonse = (data: any, message?: string): APIRespon
     }
 };
 
-export const buildNoContentRepsonse = (message?: string): APIResponse<undefined> => {
+export const buildNoContentResponse = (message?: string): APIResponse<undefined> => {
     return {
         statusCode: HttpStatusCode.OK,
         message: message || "Success"
