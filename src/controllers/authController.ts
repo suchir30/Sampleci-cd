@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
 import * as userService from '../services/userService';
-import { buildNoContentRepsonse, buildObjectFetchRepsonse, throwValidationError } from '../utils/apiUtils';
+import { buildNoContentResponse, buildObjectFetchResponse, throwValidationError } from '../utils/apiUtils';
 import { HttpStatusCode } from '../types/apiTypes';
 
 export const login = async (req: Request, res: Response, next: NextFunction) => {
@@ -21,8 +21,11 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     if (!process.env.JWT_SECRET) {
       throw new Error('JWT_SECRET is not set in the environment');
     }
+    
     const token = jwt.sign({ employeeId }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.status(HttpStatusCode.OK).json(buildObjectFetchRepsonse({ token }));
+    const expirationTime = Date.now() + 3600000; // 1 hour in milliseconds
+
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse({ token, expirationTime      }));
   } catch (err) {
     console.log("Error login", err);
     next(err);
@@ -43,7 +46,7 @@ export const generateOTP = async (req: Request, res: Response, next: NextFunctio
       throwValidationError([{ message: "Invalid Employee ID" }]);
     }
 
-    res.status(HttpStatusCode.OK).json(buildObjectFetchRepsonse({ phoneNumber }, 'OTP sent successfully'));
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse({ phoneNumber }, 'OTP sent successfully'));
   } catch (err) {
     console.error('Error generating OTP:', err);
     next(err);
@@ -54,7 +57,7 @@ export const verifyOTP = async (req: Request, res: Response, next: NextFunction)
   try {
     const { otp } = req.body;
     if (otp === '654321') {
-      return res.status(HttpStatusCode.OK).send(buildNoContentRepsonse("OTP Verification Successful"));
+      return res.status(HttpStatusCode.OK).send(buildNoContentResponse("OTP Verification Successful"));
     } else {
       throwValidationError([{ message: "Invalid OTP" }]);
     }
@@ -71,10 +74,9 @@ export const changePassword = async (req: Request, res: Response, next: NextFunc
       throwValidationError([{ message: 'User ID and new password are required' }]);
     }
     await userService.updateUserPassword(userId, password);
-    res.status(HttpStatusCode.OK).send(buildNoContentRepsonse("Password changed successfully"));
+    res.status(HttpStatusCode.OK).send(buildNoContentResponse("Password changed successfully"));
   } catch (err) {
     console.error('Error changing password:', err);
     next(err);
   }
 };
-

@@ -6,7 +6,7 @@ import * as consigneeService from '../services/consigneeService';
 import * as AWBService from '../services/AWBService';
 import { AWBCreateData } from '../types/awbTypes';
 import { HttpStatusCode } from '../types/apiTypes';
-import { buildNoContentRepsonse, buildObjectFetchRepsonse, throwValidationError } from '../utils/apiUtils';
+import { buildNoContentResponse, buildObjectFetchResponse, throwValidationError } from '../utils/apiUtils';
 import { Consignee, Consignor } from '@prisma/client';
 
 
@@ -14,7 +14,7 @@ import { Consignee, Consignor } from '@prisma/client';
 export const getIndustryTypes = async (_req: Request, res: Response, next: NextFunction) => {
   try {
     const industryTypes = await masterDataService.getIndustryTypes();
-    res.status(HttpStatusCode.OK).json(buildObjectFetchRepsonse(industryTypes));
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(industryTypes));
   } catch (err) {
     console.error('Error retrieving industry types:', err);
     next(err);
@@ -24,7 +24,7 @@ export const getIndustryTypes = async (_req: Request, res: Response, next: NextF
 export const getCommodities = async (_req: Request, res: Response, next: NextFunction) => {
   try {
     const commodities = await masterDataService.getCommodities();
-    res.status(HttpStatusCode.OK).json(buildObjectFetchRepsonse(commodities));
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(commodities));
   } catch (err) {
     console.error('Error retrieving commodities:', err);
     next(err);
@@ -34,7 +34,7 @@ export const getCommodities = async (_req: Request, res: Response, next: NextFun
 export const getCities = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const cities = await masterDataService.getCities();
-    res.status(HttpStatusCode.OK).json(buildObjectFetchRepsonse(cities));
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(cities));
   } catch (err) {
     console.error('Error retrieving cities:', err);
     next(err);
@@ -44,7 +44,7 @@ export const getCities = async (req: Request, res: Response, next: NextFunction)
 export const getDistricts = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const districts = await masterDataService.getDistricts();
-    res.status(HttpStatusCode.OK).json(buildObjectFetchRepsonse(districts));
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(districts));
   } catch (err) {
     console.error('Error retrieving districts:', err);
     next(err);
@@ -54,7 +54,7 @@ export const getDistricts = async (req: Request, res: Response, next: NextFuncti
 export const getStates = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const states = await masterDataService.getStates();
-    res.status(HttpStatusCode.OK).json(buildObjectFetchRepsonse(states));
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(states));
   } catch (err) {
     console.error('Error retrieving states:', err);
     next(err);
@@ -64,7 +64,7 @@ export const getStates = async (req: Request, res: Response, next: NextFunction)
 export const getPincodes = async (_req: Request, res: Response, next: NextFunction) => {
   try {
     const pincodes = await masterDataService.getPincodes();
-    res.status(HttpStatusCode.OK).json(buildObjectFetchRepsonse(pincodes));
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(pincodes));
   } catch (err) {
     console.error('Error retrieving pincodes:', err);
     next(err);
@@ -74,7 +74,7 @@ export const getPincodes = async (_req: Request, res: Response, next: NextFuncti
 export const getBranches = async (_req: Request, res: Response, next: NextFunction) => {
   try {
     const branches = await masterDataService.getBranches();
-    res.status(HttpStatusCode.OK).json(buildObjectFetchRepsonse(branches));
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(branches));
   } catch (err) {
     console.error('Error retrieving branches:', err);
     next(err);
@@ -84,7 +84,7 @@ export const getBranches = async (_req: Request, res: Response, next: NextFuncti
 export const getConsignors = async (_req: Request, res: Response, next: NextFunction) => {
   try {
     const consignors = await consignorService.getConsignors();
-    res.status(HttpStatusCode.OK).json(buildObjectFetchRepsonse(consignors));
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(consignors));
   } catch (err) {
     console.error('ERROR retrieving consignors:', err);
     next(err)
@@ -112,7 +112,7 @@ export const createConsignors = async (req: Request, res: Response, next: NextFu
       throwValidationError(errors);
     }
     await consignorService.createConsignors(consignorsData);
-    res.status(HttpStatusCode.OK).json(buildNoContentRepsonse("Consignor Created Successful"));
+    res.status(HttpStatusCode.OK).json(buildNoContentResponse("Consignor Created Successful"));
   } catch (err) {
     console.error('Error creating consignors:', err);
     next(err);
@@ -122,7 +122,7 @@ export const createConsignors = async (req: Request, res: Response, next: NextFu
 export const getConsignees = async (_req: Request, res: Response, next: NextFunction) => {
   try {
     const consignees = await consigneeService.getConsignees();
-    res.status(HttpStatusCode.OK).json(buildObjectFetchRepsonse(consignees));
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(consignees));
   } catch (err) {
     console.error('Error retrieving consignees:', err);
     next(err)
@@ -150,7 +150,7 @@ export const createConsignees = async (req: Request, res: Response, next: NextFu
       throwValidationError(errors);
     }
     await consigneeService.createConsignees(consigneesData);
-    res.status(HttpStatusCode.OK).json(buildNoContentRepsonse("Consignee Created Successful"));
+    res.status(HttpStatusCode.OK).json(buildNoContentResponse("Consignee Created Successful"));
   } catch (err) {
     console.error('Error creating consignees:', err);
     next(err)
@@ -174,7 +174,7 @@ export const generateBulkAWBForConsignor = async (req: Request, res: Response, n
       throwValidationError(errors);
     }
     await AWBService.generateBulkAWBForConsignor(consignorId, awbData);
-    res.status(HttpStatusCode.OK).json(buildNoContentRepsonse("Generated AWB"));
+    res.status(HttpStatusCode.OK).json(buildNoContentResponse("Generated AWB"));
   } catch (err) {
     console.error('Error generateBulkAWBForConsignor', err);
     next(err)
@@ -196,7 +196,7 @@ export const updateArticleCountForAWB = async (req: Request, res: Response, next
       throwValidationError(errors);
     }
     const result = await AWBService.updateArticleCountForAWB(AWBId, newArticleCount);
-    res.status(HttpStatusCode.OK).json(buildObjectFetchRepsonse(result));
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(result));
   } catch (err) {
     console.error('Error updateArticleCountForAWB', err);
     next(err)
@@ -210,7 +210,7 @@ export const generateAWBArticles = async (req: Request, res: Response, next: Nex
       throwValidationError([{ message: `Mandatory field AWBid is missing` }]);
     }
     const result = await AWBService.generateAWBArticles(AWBId);
-    res.status(HttpStatusCode.OK).json(buildObjectFetchRepsonse(result));
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(result));
   } catch (err) {
     console.error('Error generateAWBArticles', err);
     next(err)
@@ -230,7 +230,7 @@ export const addAWBArticles = async (req: Request, res: Response, next: NextFunc
       }
     }
     const result = await AWBService.addAWBArticles(AWBId, numArticlesToAdd);
-    res.status(HttpStatusCode.OK).json(buildObjectFetchRepsonse(result));
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(result));
   } catch (err) {
     console.error('Error addAWBArticles', err);
     next(err)
@@ -244,7 +244,7 @@ export const markAWBArticlesAsPrinted = async (req: Request, res: Response, next
       throwValidationError([{ message: `Mandatory fields AWBId missing` }]);
     }
     await AWBService.markAWBArticlesAsPrinted(AWBId);
-    res.status(HttpStatusCode.OK).json(buildNoContentRepsonse("AWB Articles Printed Successfully"));
+    res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWB Articles Printed Successfully"));
   } catch (err) {
     console.error('Error markAWBArticlesAsPrinted', err);
     next(err)
@@ -264,7 +264,7 @@ export const markAWBArticleAsDeleted = async (req: Request, res: Response, next:
       }
     }
     const result = await AWBService.markAWBArticleAsDeleted(articleId, AWBId);
-    res.status(HttpStatusCode.OK).json(buildObjectFetchRepsonse(result));
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(result));
   } catch (err) {
     console.error('Error markAWBArticlesAsDeleted', err);
     next(err)
