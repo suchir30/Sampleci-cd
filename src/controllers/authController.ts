@@ -10,26 +10,26 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     const { employeeId, password } = req.body;
 
     if (!employeeId || !password) {
-      throwValidationError([{ message: "Employee ID and password are required" }]);
+      return throwValidationError([{ message: "Employee ID and password are required" }]);
     }
 
     const isValidUser = await userService.validateUser(employeeId, password);
     if (!isValidUser) {
-      throwValidationError([{ message: "Invalid Credentials" }]);
+      return throwValidationError([{ message: "Invalid Credentials" }]);
     }
 
     if (!process.env.JWT_SECRET) {
       throw new Error('JWT_SECRET is not set in the environment');
     }
     const token = jwt.sign({ employeeId }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.status(HttpStatusCode.OK).json(buildObjectFetchRepsonse({ token }));
+    return res.status(HttpStatusCode.OK).json(buildObjectFetchRepsonse({ token }));
+    
   } catch (err) {
     console.log("Error login", err);
-    // Set status code to 400 for validation errors
     if (err instanceof APIError && err.errorCode === HttpStatusCode.BadRequest) {
       res.status(HttpStatusCode.BadRequest).json({ message: err.message });
     } else {
-      next(err); // For other errors, pass them to the error handler middleware
+      next(err);
     }
   }
 };
@@ -51,8 +51,11 @@ export const generateOTP = async (req: Request, res: Response, next: NextFunctio
 
     res.status(HttpStatusCode.OK).json(buildObjectFetchRepsonse({ phoneNumber }, 'OTP sent successfully'));
   } catch (err) {
-    console.error('Error generating OTP:', err);
-    next(err);
+    if (err instanceof APIError && err.errorCode === HttpStatusCode.BadRequest) {
+      res.status(HttpStatusCode.BadRequest).json({ message: err.message });
+    } else {
+      next(err);
+    }
   }
 };
 
@@ -65,8 +68,11 @@ export const verifyOTP = async (req: Request, res: Response, next: NextFunction)
       throwValidationError([{ message: "Invalid OTP" }]);
     }
   } catch (err) {
-    console.error('Error verifyOTP:', err);
-    next(err);
+    if (err instanceof APIError && err.errorCode === HttpStatusCode.BadRequest) {
+      res.status(HttpStatusCode.BadRequest).json({ message: err.message });
+    } else {
+      next(err);
+    }
   }
 };
 
@@ -79,8 +85,15 @@ export const changePassword = async (req: Request, res: Response, next: NextFunc
     await userService.updateUserPassword(userId, password);
     res.status(HttpStatusCode.OK).send(buildNoContentRepsonse("Password changed successfully"));
   } catch (err) {
-    console.error('Error changing password:', err);
-    next(err);
+    if (err instanceof APIError && err.errorCode === HttpStatusCode.BadRequest) {
+      res.status(HttpStatusCode.BadRequest).json({ message: err.message });
+    } else {
+      if (err instanceof APIError && err.errorCode === HttpStatusCode.BadRequest) {
+        res.status(HttpStatusCode.BadRequest).json({ message: err.message });
+      } else {
+        next(err);
+      }
+    }
   }
 };
 
