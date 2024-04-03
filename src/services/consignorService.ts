@@ -1,6 +1,6 @@
-import { Consignor, PrismaClient } from '@prisma/client';
+import { Consignor } from '@prisma/client';
 
-const prisma = new PrismaClient();
+import prisma from '../client';
 
 export const getConsignors = async () => {
   const consignors = await prisma.consignor.findMany({
