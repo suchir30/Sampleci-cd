@@ -23,8 +23,14 @@ export const getConsignors = async () => {
 }
 
 export const createConsignors = async (consignorsData: Consignor[]) => {
+  for (const row of consignorsData){
+    if(!row.publicName ||!row.legalName){
+      return false
+    }
+  }
   const newConsignor = await prisma.consignor.createMany({
     data: consignorsData,
   });
-  return newConsignor;
+  // return newConsignor
+  return true;
 };
