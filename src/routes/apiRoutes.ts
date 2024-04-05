@@ -14,6 +14,7 @@ router.get('/pincode', apiController.getPincodes);
 // Model GET
 router.get('/branch', apiController.getBranches);
 router.get('/consignor', apiController.getConsignors);
+router.get('/gstList', apiController.getGstList);
 
 // Model POST
 router.post('/consignee', apiController.getConsignees);

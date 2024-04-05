@@ -81,6 +81,16 @@ export const getBranches = async (_req: Request, res: Response, next: NextFuncti
   }
 }
 
+export const getGstList = async (_req: Request, res: Response, next: NextFunction) => {
+  try {
+    const gstListRes = await masterDataService.getGstList();
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(gstListRes));
+  } catch (err) {
+    console.error('Error retrieving consignees:', err);
+    next(err)
+  }
+}
+
 export const getConsignors = async (_req: Request, res: Response, next: NextFunction) => {
   try {
     const consignors = await consignorService.getConsignors();
@@ -138,6 +148,7 @@ export const getConsignees = async (req: Request, res: Response, next: NextFunct
     next(err)
   }
 }
+
 
 export const createConsignees = async (req: Request, res: Response, next: NextFunction) => {
 
