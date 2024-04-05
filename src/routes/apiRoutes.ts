@@ -14,9 +14,9 @@ router.get('/pincode', apiController.getPincodes);
 // Model GET
 router.get('/branch', apiController.getBranches);
 router.get('/consignor', apiController.getConsignors);
-router.get('/consignee', apiController.getConsignees);
 
 // Model POST
+router.post('/consignee', apiController.getConsignees);
 router.post('/consignor', apiController.createConsignors);
 router.post('/consignee', apiController.createConsignees);
 router.post('/AWB/generateAWB', apiController.generateBulkAWBForConsignor);
