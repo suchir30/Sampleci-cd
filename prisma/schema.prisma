@@ -55,6 +55,7 @@ model Branch {
   consignees      Consignee[]     @relation("consigneeBranch")
   AWBfromBranches AirWayBill[]    @relation("AWBFromBranch")
   AWBtoBranches   AirWayBill[]    @relation("AWBToBranch")
+  consignorRateBranches ConsignorRateTable[] @relation("consignorRateBranch")
 }
 
 model Consignor {
@@ -92,13 +93,14 @@ model Consignor {
   modifiedOn            DateTime?           @updatedAt
   consignees            Consignee[]         @relation("consigneeConsignor")
   AWBs                  AirWayBill[]        @relation("AWBConsignor")
+  consignorRate        ConsignorRateTable[]         @relation("rateTableConsignor")
 }
 
 model Consignee {
   consigneeId         Int             @id @default(autoincrement())
   consignorId         Int
   consignor           Consignor       @relation("consigneeConsignor", fields: [consignorId], references: [consignorId])
-  consigneeCode       String          @db.VarChar(255)
+  consigneeCode       String?          @db.VarChar(255)
   consigneeName       String          @db.VarChar(255)
   phone1              String?         @db.VarChar(255)
   phone2              String?         @db.VarChar(255)
@@ -175,6 +177,23 @@ model AwbArticle {
   articleCode  String        @db.VarChar(255)
   articleIndex Int
   status       ArticleStatus @default(CREATED)
+  createdOn    DateTime?     @default(now())
+  modifiedOn   DateTime?     @updatedAt
+}
+
+enum RateConsignorStatus {
+  APPROVED
+  PENDING_APPROVAL
+}
+
+model ConsignorRateTable{
+  id           Int           @id @default(autoincrement())
+  consignorId  Int
+  consignor    Consignor     @relation("rateTableConsignor", fields: [consignorId], references: [consignorId])
+  branchId     Int?
+  branch       Branch?       @relation("consignorRateBranch", fields: [branchId], references: [id])
+  ratePerKg    Int
+  status       RateConsignorStatus @default(PENDING_APPROVAL)
   createdOn    DateTime?     @default(now())
   modifiedOn   DateTime?     @updatedAt
 }

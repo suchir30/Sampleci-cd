@@ -90,11 +90,11 @@ export const getConsignors = async (_req: Request, res: Response, next: NextFunc
     next(err)
   }
 }
-
 export const createConsignors = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const consignorsData: Consignor[] = req.body.consignorsDatax || [];
     const errors: { message: string, key?: string }[] = [];
+    
     if (!consignorsData.length) {
       throwValidationError([{message: "No consignors provided."}]);
     }
@@ -111,8 +111,14 @@ export const createConsignors = async (req: Request, res: Response, next: NextFu
     if (errors.length > 0) {
       throwValidationError(errors);
     }
-    await consignorService.createConsignors(consignorsData);
-    res.status(HttpStatusCode.OK).json(buildNoContentResponse("Consignor Created Successful"));
+    const createConsignorsRes =await consignorService.createConsignors(consignorsData);
+    console.log(createConsignorsRes,"ctrl**")
+    if(createConsignorsRes=="alreadyExists"){
+      throwValidationError([{message: "Provided Consignor Code Already Exists"}]);
+    }
+    else{
+      res.status(HttpStatusCode.OK).json(buildNoContentResponse("Consignor Created Successful"));
+    }
   } catch (err) {
     console.error('Error creating consignors:', err);
     next(err);
@@ -142,15 +148,21 @@ export const createConsignees = async (req: Request, res: Response, next: NextFu
       if (!consignee.consigneeName) {
         errors.push({ message: `Mandatory field 'consigneeName' is missing for consignees`, key: `consigneesData[${index}].consigneeName` });
       }
-      if (!consignee.consigneeCode) {
-        errors.push({ message: `Mandatory field 'consigneeCode' is missing for consignees`, key: `consigneesData[${index}].consigneeCode` });
-      }
+      // if (!consignee.consigneeCode) {
+      //   errors.push({ message: `Mandatory field 'consigneeCode' is missing for consignees`, key: `consigneesData[${index}].consigneeCode` });
+      // }
     });
     if (errors.length > 0) {
       throwValidationError(errors);
     }
-    await consigneeService.createConsignees(consigneesData);
-    res.status(HttpStatusCode.OK).json(buildNoContentResponse("Consignee Created Successful"));
+    const createConsigneesRes=await consigneeService.createConsignees(consigneesData);
+    if(createConsigneesRes=="alreadyExists"){
+      throwValidationError([{message: "Provided Consignee Code Already Exists"}]);
+    }
+    else{
+      res.status(HttpStatusCode.OK).json(buildNoContentResponse("Consignee Created Successful"));
+    }
+   
   } catch (err) {
     console.error('Error creating consignees:', err);
     next(err)

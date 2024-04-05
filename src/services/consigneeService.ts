@@ -1,4 +1,5 @@
 import { Consignee } from '@prisma/client';
+import { generateRandomCode } from '../scripts/randomGenerator';
 
 import prisma from '../client';
 
@@ -16,18 +17,52 @@ export const getConsignees = async () => {
   return consignees;
 }
 
+// export const createConsignees = async (consigneesData: Consignee[]) => {
+//   const consignees = await prisma.consignee.createMany({
+//     data: consigneesData,
+//   });
+//   return consignees;
+// };
+
 export const createConsignees = async (consigneesData: Consignee[]) => {
-  for (const row of consigneesData){
-    if(!row.consignorId ||!row.consigneeCode||!row.consigneeName){
-      return false
-    } 
-    if (row.phone1?.length!=10 || row.phone2?.length!=10|| (!row.email || !new RegExp("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$").test(row.email))){
-      return false
+  try {
+  
+    for (const consignee of consigneesData) {
+      
+      if (!consignee.consigneeCode) {
+        let codeExists = true;
+        let randomCode = '';
+        while (codeExists) {
+         randomCode =generateRandomCode(6);
+          const existingConsignee = await prisma.consignee.findFirst({
+            where: { consigneeCode: randomCode }
+          });
+          if (!existingConsignee) {
+            codeExists = false;
+          }
+        }
+        consignee.consigneeCode = randomCode;
+      }
+      else{
+        const givenConsignorExists = await prisma.consignee.findFirst({
+          where: { consigneeCode:consignee.consigneeCode}
+        });
+     
+        if(givenConsignorExists!=null){
+          return "alreadyExists";
+        }
+      }
     }
+
+    const newConsignors = await prisma.consignee.createMany({
+      data: consigneesData,
+    });
+
+    return newConsignors;
+  } catch (error) {
+    // Handle any errors
+    console.error('Error creating consignees:', error);
+    throw error;
   }
-  const consignees = await prisma.consignee.createMany({
-    data: consigneesData,
-  });
-  // return consignees
-  return true;
 };
+
