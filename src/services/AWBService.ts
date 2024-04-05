@@ -1,8 +1,9 @@
-import { AirWayBill, ArticleStatus, PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+import { ArticleStatus } from '@prisma/client';
 import moment from 'moment';
 
+import prisma from '../client';
 import { AWBCreateData } from '../types/awbTypes';
+
 
 export const generateBulkAWBForConsignor = async (consignorId: number, awbData: AWBCreateData[]) => {
 
