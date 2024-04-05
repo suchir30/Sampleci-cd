@@ -125,9 +125,13 @@ export const createConsignors = async (req: Request, res: Response, next: NextFu
   }
 }
 
-export const getConsignees = async (_req: Request, res: Response, next: NextFunction) => {
+export const getConsignees = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const consignees = await consigneeService.getConsignees();
+    const consignorId: number = req.body.consignorId;
+    if (!consignorId) {
+      throwValidationError([{message: "No Consignor Id Provided."}]);
+    }
+    const consignees = await consigneeService.getConsignees(consignorId);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(consignees));
   } catch (err) {
     console.error('Error retrieving consignees:', err);
