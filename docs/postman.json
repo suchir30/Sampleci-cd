@@ -17,7 +17,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"employeeId\":\"employee123\",\r\n    \"password\": \"password123\"\r\n}",
+							"raw": "{\r\n    \"employeeId\":\"vroomster2\",\r\n    \"password\": \"vroomster@2\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -389,7 +389,13 @@
 					"name": "verifyOTP",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Barear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MTEzNjMxMDAsImV4cCI6MTcxMTM2NjcwMH0.PqL1LUXWtRx4AnlGE5tdNvquQWzd7wNj27wmm1uZqoQ",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\"otp\": \"654321\"}",
@@ -548,7 +554,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"userId\": \"employee123\", \"password\": \"password1234\"}",
+							"raw": "{\"userId\": \"vroomster1\", \"password\": \"password1234\"}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -772,7 +778,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MTA3NDY1NTcsImV4cCI6MTcxMDc1MDE1N30._rXI9C8R3EvOh44WAf408sDfcnGBMQc0BzBMknQRPuU",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoidnJvb21zdGVyMiIsImlhdCI6MTcxMjI5Mjg0NSwiZXhwIjoxNzEyMjk2NDQ1fQ.arfknJn2aTx3wTEpHosAUS8Y6tedSRqO58tISvITOXQ",
 								"type": "text"
 							}
 						],
@@ -1334,6 +1340,93 @@
 							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"value\": 111111\n        },\n        {\n            \"id\": 2,\n            \"value\": 222222\n        }\n    ]\n}"
 						}
 					]
+				},
+				{
+					"name": "gstList",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Barear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoidnJvb21zdGVyMiIsImlhdCI6MTcxMjI5Mjg0NSwiZXhwIjoxNzEyMjk2NDQ1fQ.arfknJn2aTx3wTEpHosAUS8Y6tedSRqO58tISvITOXQ",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/api/gstList",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"gstList"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Barear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoidnJvb21zdGVyMiIsImlhdCI6MTcxMjI5Mjg0NSwiZXhwIjoxNzEyMjk2NDQ1fQ.arfknJn2aTx3wTEpHosAUS8Y6tedSRqO58tISvITOXQ",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:3000/api/gstList",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"gstList"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "116"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"74-Zz0X41VNq5QKC8aeoEN0FO68ey8\""
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 05 Apr 2024 04:55:24 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"name\": \"12%\"\n        },\n        {\n            \"id\": 2,\n            \"name\": \"18%\"\n        },\n        {\n            \"id\": 3,\n            \"name\": \"Exempt\"\n        }\n    ]\n}"
+						}
+					]
 				}
 			]
 		},
@@ -1526,13 +1619,13 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MTA4MzA4MTksImV4cCI6MTcxMDgzNDQxOX0.KXsDkAn9qv0isyp6DijdMO5p0a_4E3DCIjKFpFS6ej8",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoidnJvb21zdGVyMSAgICAiLCJpYXQiOjE3MTE5NjkwNTcsImV4cCI6MTcxMTk3MjY1N30.RHKaV3h5ecA3CSIMG8024DF99sT9DUWwGGXjVTp7YN4",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"consignorsData\":[\r\n       {\r\n        \"consignorCode\": \"INDUS181\",\r\n        \"publicName\":\"null\",\r\n        \"legalName\": \"null\",\r\n        \"industryTypeId\": 1,\r\n        \"commodityId\": 1,\r\n        \"address1\":\"23 gokul Street\",\r\n        \"address2\": \"macherla\",\r\n        \"cityId\":1,\r\n        \"gstNumber\": \"GST123456\",\r\n        \"stateId\": 1,\r\n        \"panNumber\": \"PAN123456\",\r\n        \"tanNumber\": \"TAN123456\",\r\n        \"cinNumber\": \"CIN123456\",\r\n        \"taxCategory\": \"Category A\",\r\n        \"parentConsignorId\":null,\r\n        \"branchId\": 1,\r\n        \"keyContactName\": \"John Doe\",\r\n        \"keyContactDesignation\": \"Manager\",\r\n        \"keyContactAddress\": \"456 Example Road\",\r\n        \"distanceFromBranchKms\": 10\r\n        }       ]\r\n}",
+							"raw": "{\r\n    \"consignorsDatax\":[\r\n       {\r\n        \"consignorCode\": \"\",\r\n        \"publicName\":\"null\",\r\n        \"legalName\": \"null\"\r\n        }       ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1642,7 +1735,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"consignees\": [\r\n    {\r\n      \"consignorId\": 2,\r\n      \"consigneeCode\":\"nv\",\r\n      \"consigneeName\": \"Consignee 1\",\r\n      \"phone1\": \"123-456-7890\",\r\n      \"phone2\": \"123-456-7890\",\r\n      \"email\": \"consignee1@example.com\",\r\n      \"address1\": \"123 Main St\",\r\n      \"address2\": \"456 Elm St\"\r\n      \r\n    },\r\n    {\r\n      \"consignorId\": 2,\r\n      \"consigneeCode\": \"vb\",\r\n      \"consigneeName\": \"Consignee 2\",\r\n      \"phone1\": \"123-456-7891\",\r\n      \"phone2\": \"123-456-7890\",\r\n      \"email\": \"consignee2@example.com\",\r\n      \"address1\": \"456 Elm St\",\r\n      \"address2\": \"456 Elm St\",\r\n      \"cityId\": 2,\r\n      \"districtId\": 2,\r\n      \"stateId\": 2,\r\n      \"branchId\": 1,\r\n      \"distanceToBranchKms\": 15,\r\n      \"odaType\": \"ODA\",\r\n      \"tatNumber\": 2\r\n    }\r\n  ]\r\n}\r\n",
+							"raw": "{\r\n  \"consignees\": [\r\n    {\r\n      \"consignorId\": 2,\r\n      \"consigneeCode\":\"A0111\",\r\n      \"consigneeName\": \"Consignee 1\",\r\n      \"phone1\": \"123-456-7890\",\r\n      \"phone2\": \"123-456-7890\",\r\n      \"email\": \"consignee1@example.com\",\r\n      \"address1\": \"123 Main St\",\r\n      \"address2\": \"456 Elm St\"\r\n      \r\n    },\r\n    {\r\n      \"consignorId\": 2,\r\n      \"consigneeCode\": \"A0012\",\r\n      \"consigneeName\": \"Consignee 2\",\r\n      \"phone1\": \"123-456-7891\",\r\n      \"phone2\": \"123-456-7890\",\r\n      \"email\": \"consignee2@example.com\",\r\n      \"address1\": \"456 Elm St\",\r\n      \"address2\": \"456 Elm St\",\r\n      \"cityId\": 2,\r\n      \"districtId\": 2,\r\n      \"stateId\": 2,\r\n      \"branchId\": 1,\r\n      \"distanceToBranchKms\": 15,\r\n      \"odaType\": \"ODA\",\r\n      \"tatNumber\": 2\r\n    }\r\n  ]\r\n}\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1736,11 +1829,8 @@
 				},
 				{
 					"name": "getConsignees",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
-						"method": "GET",
+						"method": "POST",
 						"header": [
 							{
 								"key": "Authorization",
@@ -1750,7 +1840,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "",
+							"raw": "{\r\n    \"consignorId\":3\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1851,10 +1941,16 @@
 					"name": "generateAWB",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Barear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MTA4MzI4NTQsImV4cCI6MTcxMDgzNjQ1NH0.hBtkDwYS-8XH8YE6_gpcRNNfo163-xDFLCCbSxdCqvo",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"consignorId\": 2,\r\n    \"awbData\":[\r\n        {\r\n            \"consigneeId\": 5,\r\n            \"toBranchId\": 1,\r\n            \"numOfArticles\":10\r\n        },\r\n        {\r\n            \"toBranchId\": 1,\r\n            \"numOfArticles\":10\r\n        }\r\n    ]\r\n}",
+							"raw": "{\r\n    \"consignorId\": 10,\r\n    \"awbData\":[\r\n        {\r\n            \"consigneeId\": 1,\r\n            \"fromBranchId\":1,\r\n            \"toBranchId\": 1,\r\n            \"AWBCode\":\"KARAHY\",\r\n            \"numOfArticles\":10\r\n        },\r\n        { \r\n            \"consigneeId\": 14,\r\n            \"fromBranchId\":1,\r\n            \"toBranchId\": 1,\r\n            \"AWBCode\":\"KARAHY\",\r\n            \"numOfArticles\":10\r\n        }\r\n    ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1952,10 +2048,16 @@
 					"name": "updateArticlesCount",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Barear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MTA4MzI4NTQsImV4cCI6MTcxMDgzNjQ1NH0.hBtkDwYS-8XH8YE6_gpcRNNfo163-xDFLCCbSxdCqvo",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n   \"AWBId\": 14,\r\n   \"newArticleCount\": 10\r\n}",
+							"raw": "{\r\n   \"AWBId\": 3,\r\n   \"newArticleCount\": 5\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1982,10 +2084,16 @@
 					"name": "generateAWBArticles",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Barear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MTA4NDA2NzksImV4cCI6MTcxMDg0NDI3OX0.oMxbJsUaoVR63yGJtBP4uMRGe318dtNPKnEMkbjIAag",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n   \"AWBId\": 14\r\n}",
+							"raw": "{\r\n   \"AWBId\": 5\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2083,10 +2191,16 @@
 					"name": "addAWBArticles",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Barear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MTA4NDA2NzksImV4cCI6MTcxMDg0NDI3OX0.oMxbJsUaoVR63yGJtBP4uMRGe318dtNPKnEMkbjIAag",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n   \"AWBId\": 14,\r\n   \"numArticlesToAdd\": 6\r\n}",
+							"raw": "{\r\n   \"AWBId\": 3,\r\n   \"numArticlesToAdd\": 6\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2184,10 +2298,16 @@
 					"name": "markAWBArticlesAsPrinted",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Barear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MTA4NDA2NzksImV4cCI6MTcxMDg0NDI3OX0.oMxbJsUaoVR63yGJtBP4uMRGe318dtNPKnEMkbjIAag",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n   \"AWBId\": 14\r\n}",
+							"raw": "{\r\n   \"AWBId\": 3\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2285,10 +2405,16 @@
 					"name": "markAWBArticleAsDeleted",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "barear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MTA4NDA2NzksImV4cCI6MTcxMDg0NDI3OX0.oMxbJsUaoVR63yGJtBP4uMRGe318dtNPKnEMkbjIAag",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n   \"AWBId\": 14,\r\n   \"articleId\": 28\r\n}",
+							"raw": "{\r\n   \"AWBId\": 4,\r\n   \"articleId\": 6\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"

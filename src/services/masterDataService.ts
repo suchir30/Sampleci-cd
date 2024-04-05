@@ -143,3 +143,21 @@ export const getBranches = async () => {
     throw error;
   }
 }
+
+export const getGstList = async () => {
+  try {
+    const gstList = await prisma.gstMaster.findMany({
+      where: {
+        isActive: true,
+      },
+      select: {
+        id: true,
+        name: true,
+      }
+    });
+    return gstList;
+  } catch (error) {
+    console.log('Error retrieving districts', error);
+    throw error
+  }
+}

@@ -13,7 +13,8 @@ const models = [
     'Consignor',
     'PincodesMaster',
     'Consignee',
-    'User'
+    'User',
+    'GstMaster'
 ];
 
 async function processRow(row: any, modelName: string) {

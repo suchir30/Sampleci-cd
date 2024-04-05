@@ -255,3 +255,10 @@ model StateMaster {
   consignors Consignor[] @relation("consignorState")
   consignees Consignee[] @relation("consigneeState")
 }
+
+model GstMaster {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique @db.VarChar(255)
+  isActive  Boolean  @default(true)
+  createdOn DateTime @default(now())
+}
