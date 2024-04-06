@@ -79,6 +79,8 @@ model Consignor {
   panNumber             String?             @db.VarChar(255)
   tanNumber             String?             @db.VarChar(255)
   cinNumber             String?             @db.VarChar(255)
+  gstId                 Int?
+  gst                   GstMaster?          @relation("ConsignorGstId", fields: [gstId], references: [id])
   taxCategory           String?             @db.VarChar(255)
   parentConsignorId     Int?
   parentConsignor       Consignor?          @relation("parentConsignor", fields: [parentConsignorId], references: [consignorId])
@@ -261,4 +263,5 @@ model GstMaster {
   name      String   @unique @db.VarChar(255)
   isActive  Boolean  @default(true)
   createdOn DateTime @default(now())
+  gstIds    Consignor[] @relation("ConsignorGstId")
 }
