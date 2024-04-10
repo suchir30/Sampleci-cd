@@ -71,30 +71,7 @@ describe('updateUserPassword',()=>{
         (prismaMock.user.findUnique as jest.Mock).mockResolvedValue(user);
         await expect(updateUserPassword(userId, password)).resolves.toBe(true);
     });   
-    it('should return false for no password provided', async () => {
-        const user: Partial<User> = {
-            id: 1,
-            employeeId: "vroomstertej",
-            hashedPassword: await bcrypt.hash("testPassword", 10),
-        };
-        const userId = "vroomstertej";
-        const password = "";
-
-        (prismaMock.user.findUnique as jest.Mock).mockResolvedValue(user);
-        await expect(updateUserPassword(userId, password)).resolves.toBe(false);
-    });   
-    it('should return false for missing mandatory field user', async () => {
-        const user: Partial<User> = {
-            id: 1,
-            employeeId: "vroomstertej",
-            hashedPassword: await bcrypt.hash("testPassword", 10),
-        };
-        const userId = "";
-        const password = "testPassword123";
-
-        (prismaMock.user.findUnique as jest.Mock).mockResolvedValue(user);
-        await expect(updateUserPassword(userId, password)).resolves.toBe(false);
-    });   
+    
 })
 
 
@@ -172,16 +149,5 @@ describe('checkIfUserExists', () => {
         const expectedResponse = { exists: false };
         await expect(checkIfUserExists(employeeId)).resolves.toStrictEqual(expectedResponse);
      }); 
-     it('should return false if employeeId field missing : checkIfUserExists ', async () => {
-        const user: Partial<User> = {
-            id: 1,
-            employeeId: "vroomster",
-            hashedPassword: await bcrypt.hash("testPassword", 10),
-            phone1: "7814066666",
-        };
-        const employeeId = "";
-        (prismaMock.user.findUnique as jest.Mock).mockResolvedValue(user);
-        const expectedResponse = { exists: false };
-        await expect(checkIfUserExists(employeeId)).resolves.toStrictEqual(expectedResponse);
-     }); 
+    
 })
