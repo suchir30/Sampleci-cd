@@ -98,8 +98,8 @@ export const updateArticleCountForAWB = async (AWBId: number, newArticleCount: n
         where: { id: AWBId },
         data: { numOfArticles: newArticleCount },
     });
-    return updateArticles;
-
+    // return updateArticles;
+    return true;
 };
 
 const createAWBArticlesHelper = async (prisma: any, AWBId: number, AWBCode: string, numArticlesToAdd: number, articleNumberStartAt: number = 1) => {
@@ -195,7 +195,8 @@ export const markAWBArticlesAsPrinted = async (AWBId: number) => {
         },
         data: { status: ArticleStatus.PRINTED }
     });
-    return printedArticles;
+    // return printedArticles;
+    return true;
 };
 
 export const markAWBArticleAsDeleted = async (articleId: number, AWBId: number) => {
@@ -213,6 +214,7 @@ export const markAWBArticleAsDeleted = async (articleId: number, AWBId: number) 
             }
         },
     });
-    return deletedArticle;
+    // return deletedArticle;
+    return true;
    
 };
