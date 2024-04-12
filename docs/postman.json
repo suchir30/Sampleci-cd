@@ -17,7 +17,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"employeeId\":\"vroomster2\",\r\n    \"password\": \"vroomster@2\"\r\n}",
+							"raw": "{\r\n    \"employeeId\":\"vroomster22\",\r\n    \"password\": \"vroomster@2\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1938,6 +1938,101 @@
 			"name": "awb",
 			"item": [
 				{
+					"name": "getAWB",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"consignorId\":10\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/AWB/getAWB",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"AWB",
+								"getAWB"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"consignorId\":10\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/AWB/getAWB",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"AWB",
+										"getAWB"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "773"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"305-7J/+GC/Bdr5v7NXoK5/X6gBQ+LM\""
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 12 Apr 2024 09:34:31 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"AWBCode\": \"CUST-A00183100424001\",\n            \"consignorId\": 10,\n            \"consigneeId\": 1,\n            \"fromBranchId\": 1,\n            \"toBranchId\": 1,\n            \"numOfArticles\": 10,\n            \"consignee\": {\n                \"consigneeCode\": \"A0001\",\n                \"consigneeName\": \"CHANDRAHASA AGENCIES\",\n                \"address1\": \"VENKATESHWARA TALKIES ROAD SATHUPALLI-507303,TS.\",\n                \"address2\": \"SATTUPALLI\",\n                \"city\": null,\n                \"district\": {\n                    \"name\": \"SATTUPALLI\"\n                },\n                \"state\": {\n                    \"name\": \"TELANGANA\"\n                }\n            }\n        },\n        {\n            \"id\": 2,\n            \"AWBCode\": \"CUST-A00183100424002\",\n            \"consignorId\": 10,\n            \"consigneeId\": 1,\n            \"fromBranchId\": 1,\n            \"toBranchId\": 1,\n            \"numOfArticles\": 10,\n            \"consignee\": {\n                \"consigneeCode\": \"A0001\",\n                \"consigneeName\": \"CHANDRAHASA AGENCIES\",\n                \"address1\": \"VENKATESHWARA TALKIES ROAD SATHUPALLI-507303,TS.\",\n                \"address2\": \"SATTUPALLI\",\n                \"city\": null,\n                \"district\": {\n                    \"name\": \"SATTUPALLI\"\n                },\n                \"state\": {\n                    \"name\": \"TELANGANA\"\n                }\n            }\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
 					"name": "generateAWB",
 					"request": {
 						"method": "POST",
@@ -2057,7 +2152,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n   \"AWBId\": 3,\r\n   \"newArticleCount\": 5\r\n}",
+							"raw": "{\r\n   \"AWBId\": 1,\r\n   \"newArticleCount\": 5\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2078,7 +2173,173 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Barear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MTA4MzI4NTQsImV4cCI6MTcxMDgzNjQ1NH0.hBtkDwYS-8XH8YE6_gpcRNNfo163-xDFLCCbSxdCqvo",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n   \"AWBId\": 1,\r\n   \"newArticleCount\": 5\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/AWB/updateArticleCount",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"AWB",
+										"updateArticleCount"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "50"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"32-+VLucNzds7jO7T4XNt6oJ5JqFes\""
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 12 Apr 2024 10:33:21 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": true\n}"
+						}
+					]
+				},
+				{
+					"name": "getAWBArticles",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"AWBId\":1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/AWB/getAWBArticles",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"AWB",
+								"getAWBArticles"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"AWBId\":1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/AWB/getAWBArticles",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"AWB",
+										"getAWBArticles"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1272"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"4f8-mSvkJEW4MTRPdP+fK1KjXLbVzRk\""
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 12 Apr 2024 10:05:11 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"AWBId\": 1,\n            \"articleCode\": \"CUST-A001831004240010001\",\n            \"articleIndex\": 1,\n            \"status\": \"PRINTED\",\n            \"createdOn\": \"2024-04-10T13:17:02.592Z\",\n            \"modifiedOn\": \"2024-04-12T06:32:49.618Z\"\n        },\n        {\n            \"id\": 2,\n            \"AWBId\": 1,\n            \"articleCode\": \"CUST-A001831004240010002\",\n            \"articleIndex\": 2,\n            \"status\": \"PRINTED\",\n            \"createdOn\": \"2024-04-10T13:17:02.592Z\",\n            \"modifiedOn\": \"2024-04-12T06:32:49.618Z\"\n        },\n        {\n            \"id\": 3,\n            \"AWBId\": 1,\n            \"articleCode\": \"CUST-A001831004240010003\",\n            \"articleIndex\": 3,\n            \"status\": \"PRINTED\",\n            \"createdOn\": \"2024-04-10T13:17:02.592Z\",\n            \"modifiedOn\": \"2024-04-12T06:32:49.618Z\"\n        },\n        {\n            \"id\": 4,\n            \"AWBId\": 1,\n            \"articleCode\": \"CUST-A001831004240010004\",\n            \"articleIndex\": 4,\n            \"status\": \"PRINTED\",\n            \"createdOn\": \"2024-04-10T13:17:02.592Z\",\n            \"modifiedOn\": \"2024-04-12T06:32:49.618Z\"\n        },\n        {\n            \"id\": 5,\n            \"AWBId\": 1,\n            \"articleCode\": \"CUST-A001831004240010005\",\n            \"articleIndex\": 5,\n            \"status\": \"PRINTED\",\n            \"createdOn\": \"2024-04-10T13:17:02.592Z\",\n            \"modifiedOn\": \"2024-04-12T06:32:49.618Z\"\n        },\n        {\n            \"id\": 8,\n            \"AWBId\": 1,\n            \"articleCode\": \"CUST-A001831004240010008\",\n            \"articleIndex\": 8,\n            \"status\": \"PRINTED\",\n            \"createdOn\": \"2024-04-10T13:17:02.592Z\",\n            \"modifiedOn\": \"2024-04-12T06:32:49.618Z\"\n        },\n        {\n            \"id\": 9,\n            \"AWBId\": 1,\n            \"articleCode\": \"CUST-A001831004240010009\",\n            \"articleIndex\": 9,\n            \"status\": \"PRINTED\",\n            \"createdOn\": \"2024-04-10T13:17:02.592Z\",\n            \"modifiedOn\": \"2024-04-12T06:32:49.618Z\"\n        }\n    ]\n}"
+						}
+					]
 				},
 				{
 					"name": "generateAWBArticles",
@@ -2093,7 +2354,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n   \"AWBId\": 5\r\n}",
+							"raw": "{\r\n   \"AWBId\": 1\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2200,7 +2461,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n   \"AWBId\": 3,\r\n   \"numArticlesToAdd\": 6\r\n}",
+							"raw": "{\r\n   \"AWBId\": 1,\r\n   \"numArticlesToAdd\": 5\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2291,6 +2552,76 @@
 							],
 							"cookie": [],
 							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"AWBId\": 3,\n            \"articleCode\": \"INDUS1811903240010001\",\n            \"articleIndex\": 1,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T07:53:58.647Z\",\n            \"modifiedOn\": \"2024-03-19T07:53:58.647Z\"\n        },\n        {\n            \"id\": 2,\n            \"AWBId\": 3,\n            \"articleCode\": \"INDUS1811903240010002\",\n            \"articleIndex\": 2,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T07:53:58.647Z\",\n            \"modifiedOn\": \"2024-03-19T07:53:58.647Z\"\n        },\n        {\n            \"id\": 3,\n            \"AWBId\": 3,\n            \"articleCode\": \"INDUS1811903240010003\",\n            \"articleIndex\": 3,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T07:53:58.647Z\",\n            \"modifiedOn\": \"2024-03-19T07:53:58.647Z\"\n        },\n        {\n            \"id\": 4,\n            \"AWBId\": 3,\n            \"articleCode\": \"INDUS1811903240010004\",\n            \"articleIndex\": 4,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T07:53:58.647Z\",\n            \"modifiedOn\": \"2024-03-19T07:53:58.647Z\"\n        },\n        {\n            \"id\": 5,\n            \"AWBId\": 3,\n            \"articleCode\": \"INDUS1811903240010005\",\n            \"articleIndex\": 5,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T07:53:58.647Z\",\n            \"modifiedOn\": \"2024-03-19T07:53:58.647Z\"\n        },\n        {\n            \"id\": 26,\n            \"AWBId\": 3,\n            \"articleCode\": \"INDUS1811903240010006\",\n            \"articleIndex\": 6,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T09:45:48.092Z\",\n            \"modifiedOn\": \"2024-03-19T09:45:48.092Z\"\n        },\n        {\n            \"id\": 27,\n            \"AWBId\": 3,\n            \"articleCode\": \"INDUS1811903240010007\",\n            \"articleIndex\": 7,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T09:45:48.092Z\",\n            \"modifiedOn\": \"2024-03-19T09:45:48.092Z\"\n        },\n        {\n            \"id\": 28,\n            \"AWBId\": 3,\n            \"articleCode\": \"INDUS1811903240010008\",\n            \"articleIndex\": 8,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T09:45:48.092Z\",\n            \"modifiedOn\": \"2024-03-19T09:45:48.092Z\"\n        },\n        {\n            \"id\": 29,\n            \"AWBId\": 3,\n            \"articleCode\": \"INDUS1811903240010009\",\n            \"articleIndex\": 9,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T09:45:48.092Z\",\n            \"modifiedOn\": \"2024-03-19T09:45:48.092Z\"\n        },\n        {\n            \"id\": 30,\n            \"AWBId\": 3,\n            \"articleCode\": \"INDUS1811903240010010\",\n            \"articleIndex\": 10,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T09:45:48.092Z\",\n            \"modifiedOn\": \"2024-03-19T09:45:48.092Z\"\n        },\n        {\n            \"id\": 31,\n            \"AWBId\": 3,\n            \"articleCode\": \"INDUS1811903240010011\",\n            \"articleIndex\": 11,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T09:45:48.092Z\",\n            \"modifiedOn\": \"2024-03-19T09:45:48.092Z\"\n        },\n        {\n            \"id\": 32,\n            \"AWBId\": 3,\n            \"articleCode\": \"INDUS1811903240010012\",\n            \"articleIndex\": 12,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T09:48:12.815Z\",\n            \"modifiedOn\": \"2024-03-19T09:48:12.815Z\"\n        },\n        {\n            \"id\": 33,\n            \"AWBId\": 3,\n            \"articleCode\": \"INDUS1811903240010013\",\n            \"articleIndex\": 13,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T09:48:12.815Z\",\n            \"modifiedOn\": \"2024-03-19T09:48:12.815Z\"\n        },\n        {\n            \"id\": 34,\n            \"AWBId\": 3,\n            \"articleCode\": \"INDUS1811903240010014\",\n            \"articleIndex\": 14,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T09:48:12.815Z\",\n            \"modifiedOn\": \"2024-03-19T09:48:12.815Z\"\n        },\n        {\n            \"id\": 35,\n            \"AWBId\": 3,\n            \"articleCode\": \"INDUS1811903240010015\",\n            \"articleIndex\": 15,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T09:48:12.815Z\",\n            \"modifiedOn\": \"2024-03-19T09:48:12.815Z\"\n        },\n        {\n            \"id\": 36,\n            \"AWBId\": 3,\n            \"articleCode\": \"INDUS1811903240010016\",\n            \"articleIndex\": 16,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T09:48:12.815Z\",\n            \"modifiedOn\": \"2024-03-19T09:48:12.815Z\"\n        },\n        {\n            \"id\": 37,\n            \"AWBId\": 3,\n            \"articleCode\": \"INDUS1811903240010017\",\n            \"articleIndex\": 17,\n            \"status\": \"CREATED\",\n            \"createdOn\": \"2024-03-19T09:48:12.815Z\",\n            \"modifiedOn\": \"2024-03-19T09:48:12.815Z\"\n        }\n    ]\n}"
+						},
+						{
+							"name": "success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Barear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MTA4NDA2NzksImV4cCI6MTcxMDg0NDI3OX0.oMxbJsUaoVR63yGJtBP4uMRGe318dtNPKnEMkbjIAag",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n   \"AWBId\": 1,\r\n   \"numArticlesToAdd\": 5\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/AWB/addAWBArticles",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"AWB",
+										"addAWBArticles"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "49"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"31-25bXkQUK1dc74bk/mgz26+mCpvw\""
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 12 Apr 2024 11:09:11 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Added AWB Articles\"\n}"
 						}
 					]
 				},
@@ -2307,7 +2638,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n   \"AWBId\": 3\r\n}",
+							"raw": "{\r\n   \"AWBId\": 1\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2414,7 +2745,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n   \"AWBId\": 4,\r\n   \"articleId\": 6\r\n}",
+							"raw": "{\r\n   \"AWBId\": 1,\r\n   \"articleId\": 10\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2505,6 +2836,76 @@
 							],
 							"cookie": [],
 							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"id\": 7,\n            \"AWBId\": 4,\n            \"articleCode\": \"INDUS1811903240020002\",\n            \"articleIndex\": 2,\n            \"status\": \"PRINTED\",\n            \"createdOn\": \"2024-03-19T09:34:24.513Z\",\n            \"modifiedOn\": \"2024-03-19T09:57:49.963Z\"\n        },\n        {\n            \"id\": 8,\n            \"AWBId\": 4,\n            \"articleCode\": \"INDUS1811903240020003\",\n            \"articleIndex\": 3,\n            \"status\": \"PRINTED\",\n            \"createdOn\": \"2024-03-19T09:34:24.513Z\",\n            \"modifiedOn\": \"2024-03-19T09:57:49.963Z\"\n        },\n        {\n            \"id\": 9,\n            \"AWBId\": 4,\n            \"articleCode\": \"INDUS1811903240020004\",\n            \"articleIndex\": 4,\n            \"status\": \"PRINTED\",\n            \"createdOn\": \"2024-03-19T09:34:24.513Z\",\n            \"modifiedOn\": \"2024-03-19T09:57:49.963Z\"\n        },\n        {\n            \"id\": 10,\n            \"AWBId\": 4,\n            \"articleCode\": \"INDUS1811903240020005\",\n            \"articleIndex\": 5,\n            \"status\": \"PRINTED\",\n            \"createdOn\": \"2024-03-19T09:34:24.513Z\",\n            \"modifiedOn\": \"2024-03-19T09:57:49.963Z\"\n        },\n        {\n            \"id\": 11,\n            \"AWBId\": 4,\n            \"articleCode\": \"INDUS1811903240020006\",\n            \"articleIndex\": 6,\n            \"status\": \"PRINTED\",\n            \"createdOn\": \"2024-03-19T09:34:24.513Z\",\n            \"modifiedOn\": \"2024-03-19T09:57:49.963Z\"\n        },\n        {\n            \"id\": 12,\n            \"AWBId\": 4,\n            \"articleCode\": \"INDUS1811903240020007\",\n            \"articleIndex\": 7,\n            \"status\": \"PRINTED\",\n            \"createdOn\": \"2024-03-19T09:34:24.513Z\",\n            \"modifiedOn\": \"2024-03-19T09:57:49.963Z\"\n        },\n        {\n            \"id\": 13,\n            \"AWBId\": 4,\n            \"articleCode\": \"INDUS1811903240020008\",\n            \"articleIndex\": 8,\n            \"status\": \"PRINTED\",\n            \"createdOn\": \"2024-03-19T09:34:24.513Z\",\n            \"modifiedOn\": \"2024-03-19T09:57:49.963Z\"\n        },\n        {\n            \"id\": 14,\n            \"AWBId\": 4,\n            \"articleCode\": \"INDUS1811903240020009\",\n            \"articleIndex\": 9,\n            \"status\": \"PRINTED\",\n            \"createdOn\": \"2024-03-19T09:34:24.513Z\",\n            \"modifiedOn\": \"2024-03-19T09:57:49.963Z\"\n        },\n        {\n            \"id\": 15,\n            \"AWBId\": 4,\n            \"articleCode\": \"INDUS1811903240020010\",\n            \"articleIndex\": 10,\n            \"status\": \"PRINTED\",\n            \"createdOn\": \"2024-03-19T09:34:24.513Z\",\n            \"modifiedOn\": \"2024-03-19T09:57:49.963Z\"\n        }\n    ]\n}"
+						},
+						{
+							"name": "success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "barear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MTA4NDA2NzksImV4cCI6MTcxMDg0NDI3OX0.oMxbJsUaoVR63yGJtBP4uMRGe318dtNPKnEMkbjIAag",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n   \"AWBId\": 1,\r\n   \"articleId\": 10\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/AWB/markAWBArticleAsDeleted",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"AWB",
+										"markAWBArticleAsDeleted"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "64"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"40-2dLyfD8YD/cMBkObdolV7R9EosY\""
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 12 Apr 2024 11:10:18 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"AWB Articles Deleted Successfully\"\n}"
 						}
 					]
 				}
