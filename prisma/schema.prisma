@@ -133,7 +133,12 @@ model Consignee {
   modifiedOn          DateTime?       @updatedAt
   AWBs                AirWayBill[]    @relation("AWBConsignee")
 }
-
+enum AWBStatus {
+ PickUp
+ InTransit 
+ atHub 
+ Delivered
+}
 model AirWayBill {
   id                 Int            @id @default(autoincrement())
   AWBCode            String         @db.VarChar(255)
@@ -153,6 +158,7 @@ model AirWayBill {
   rollupVolume       Float?         @db.Float
   rollupWeight       Float?         @db.Float
   grandTotal         Float?         @db.Float
+  AWBStatus          AWBStatus      @default(PickUp)
   createdOn          DateTime?      @default(now())
   modifiedOn         DateTime?      @updatedAt
   AWBLineItems       AwbLineItem[]
