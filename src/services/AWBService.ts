@@ -190,10 +190,10 @@ export const markAWBArticlesAsPrinted = async (AWBId: number) => {
         where: {
             AWBId: AWBId,
             status: {
-                not: ArticleStatus.DELETED
+                not: ArticleStatus.Deleted
             }
         },
-        data: { status: ArticleStatus.PRINTED }
+        data: { status: ArticleStatus.Printed }
     });
     // return printedArticles;
     return true;
@@ -203,14 +203,14 @@ export const markAWBArticleAsDeleted = async (articleId: number, AWBId: number) 
     prisma.awbArticle.update({
         where: { id: articleId, AWBId },
         data: {
-            status: ArticleStatus.DELETED,
+            status: ArticleStatus.Deleted,
         }
     });
     const deletedArticle = await prisma.awbArticle.findMany({
         where: {
             AWBId: AWBId,
             status: {
-                not: ArticleStatus.DELETED
+                not: ArticleStatus.Deleted
             }
         },
     });
