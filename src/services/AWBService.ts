@@ -1,9 +1,15 @@
 import { ArticleStatus } from '@prisma/client';
 import moment from 'moment';
 
-import prisma from '../client';
+// import prisma from '../client';
 import { AWBCreateData } from '../types/awbTypes';
 
+import { PrismaClient } from '@prisma/client';
+import { traceDeprecation } from 'process';
+
+const prisma = new PrismaClient({
+    log: ['query'],
+});
 
 export const generateBulkAWBForConsignor = async (consignorId: number, awbData: AWBCreateData[]) => {
 
@@ -87,57 +93,151 @@ export const generateBulkAWBForConsignor = async (consignorId: number, awbData: 
     });
 };
 
-export const getGeneratedAWB = async (consignorId: number) => {
+// export const getGeneratedAWB = async (consignorId: number,AWBStatus:any) => {
+//     if(consignorId){}
+//     const getGeneratedAWBQuery = await prisma.airWayBill.findMany({
+//         select: {
+//             id: true, 
+//             AWBCode:true,
+//             consignorId:true,
+//             consigneeId: true,
+//             fromBranchId:true,
+//             toBranchId:true,
+//             numOfArticles:true,
+//             consignor:{
+//                 select:{
+//                     consignorCode:true,
+//                     publicName:true,
+//                     legalName:true,
+//                     address1:true,
+//                 }
+//             },
+//             consignee: {
+//               select: {
+//                 consigneeCode: true,
+//                 consigneeName: true,
+//                 address1: true,
+//                 address2: true,
+//                 city: {
+//                   select: {
+//                     name: true,
+//                   },
+//                 },
+//                 district: {
+//                   select: {
+//                     name: true,
+//                   },
+//                 },
+//                 state: {
+//                   select: {
+//                     name: true,
+//                   },
+//                 },
+
+//               },
+//             },
+//             fromBranch: {
+//                 select: {
+//                     branchName: true
+//                 }
+//             },
+//             toBranch: {
+//                 select: {
+//                     branchName: true
+//                 }
+//             }
+//           },
+//           AWBIdTripLineItems:{
+//             select: {
+//                 id: true,
+//                 tripId: true,
+//         },
+//           where: {
+//             consignorId: consignorId !== null ? consignorId : undefined,
+//             AWBStatus:AWBStatus
+//           },
+//     });
+//     return getGeneratedAWBQuery;
+// };
+
+
+export const getGeneratedAWB = async (consignorId: number, AWBStatus: any) => {
+    if (consignorId) {}
     const getGeneratedAWBQuery = await prisma.airWayBill.findMany({
         select: {
             id: true, 
-            AWBCode:true,
-            consignorId:true,
+            AWBCode: true,
+            consignorId: true,
             consigneeId: true,
-            fromBranchId:true,
-            toBranchId:true,
-            numOfArticles:true,
+            fromBranchId: true,
+            toBranchId: true,
+            numOfArticles: true,
+            consignor: {
+                select: {
+                    consignorCode: true,
+                    publicName: true,
+                    legalName: true,
+                    address1: true,
+                }
+            },
             consignee: {
-              select: {
-                consigneeCode: true,
-                consigneeName: true,
-                address1: true,
-                address2: true,
-                city: {
-                  select: {
-                    name: true,
-                  },
+                select: {
+                    consigneeCode: true,
+                    consigneeName: true,
+                    address1: true,
+                    address2: true,
+                    city: {
+                        select: {
+                            name: true,
+                        },
+                    },
+                    district: {
+                        select: {
+                            name: true,
+                        },
+                    },
+                    state: {
+                        select: {
+                            name: true,
+                        },
+                    },
                 },
-                district: {
-                  select: {
-                    name: true,
-                  },
-                },
-                state: {
-                  select: {
-                    name: true,
-                  },
-                },
-
-              },
             },
             fromBranch: {
                 select: {
-                    branchName: true
+                    branchName: true,
                 }
             },
             toBranch: {
                 select: {
-                    branchName: true
+                    branchName: true,
                 }
-            }
-          },
-          where: {
-            consignorId: consignorId,
-          },
+            },
+            AWBIdTripLineItems: {
+                select: {
+                    id: true,
+                    tripId: true,
+                    nextDestinationId: true,
+                    finalDestinationId: true,
+                    status: true,
+                    ePODReceived: true,
+                    originalPODReceived: true,
+                    trip: {
+                        select: {
+                            route: true, // Include the route field from TripDetails
+                        },
+                    },
+                },
+            },
+        },
+        where: {
+            consignorId: consignorId !== null ? consignorId : undefined,
+            AWBStatus: AWBStatus,
+        },
     });
     return getGeneratedAWBQuery;
 };
+
 export const updateArticleCountForAWB = async (AWBId: number, newArticleCount: number) => {
     if (newArticleCount <= 0) {
         throw Error("New article count is non-positive.");
@@ -177,7 +277,7 @@ export const getAWBArticles = async (AWBId: number) => {
         where: {
             AWBId: AWBId,
             status: {
-                not: "DELETED"
+                not: "Deleted"
             }
         },
         select: {
@@ -286,10 +386,10 @@ export const markAWBArticlesAsPrinted = async (AWBId: number) => {
         where: {
             AWBId: AWBId,
             status: {
-                not: ArticleStatus.DELETED
+                not: ArticleStatus.Deleted
             }
         },
-        data: { status: ArticleStatus.PRINTED }
+        data: { status: ArticleStatus.Printed }
     });
     return printedArticles;
 };
@@ -297,14 +397,14 @@ export const markAWBArticleAsDeleted = async (articleId: number, AWBId: number) 
     await prisma.awbArticle.update({
         where: { id: articleId, AWBId },
         data: {
-            status: ArticleStatus.DELETED,
+            status: ArticleStatus.Deleted,
         }
     });
     const deletedArticle = await prisma.awbArticle.findMany({
         where: {
             AWBId: AWBId,
             status: {
-                not: ArticleStatus.DELETED
+                not: ArticleStatus.Deleted
             }
         },
     });

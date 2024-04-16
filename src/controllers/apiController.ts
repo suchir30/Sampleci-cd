@@ -215,10 +215,12 @@ export const createConsignees = async (req: Request, res: Response, next: NextFu
 export const getGeneratedAWB = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const consignorId: number = req.body.consignorId;
-    if (!consignorId) {
-      throwValidationError([{message: "No Consignor Id Provided."}]);
+    const AWBStatus: string = req.body.AWBStatus;
+    const validAWBStatusValues = ['PickUp', 'InTransit', 'atHub', 'Delivered'];
+    if (!AWBStatus || !validAWBStatusValues.includes(AWBStatus)) {
+      throwValidationError([{message: "Invalid AWBStatus provided."}]);
     }
-    const getGeneratedAWBRes = await AWBService.getGeneratedAWB(consignorId);
+    const getGeneratedAWBRes = await AWBService.getGeneratedAWB(consignorId,AWBStatus);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getGeneratedAWBRes));
   } catch (err) {
     console.error('Error retrieving consignees:', err);

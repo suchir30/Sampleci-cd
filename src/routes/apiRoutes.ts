@@ -19,7 +19,7 @@ router.get('/gstList', apiController.getGstList);
 // Model POST
 router.post('/getConsignorBranches', apiController.getConsignorBranches);
 router.post('/addConsignorBranch', apiController.addConsignorBranch);
-router.post('/consignee', apiController.getConsignees);
+router.post('/getConsignee', apiController.getConsignees);
 router.post('/consignor', apiController.createConsignors);
 router.post('/consignee', apiController.createConsignees);
 router.post('/AWB/getAWB', apiController.getGeneratedAWB);
