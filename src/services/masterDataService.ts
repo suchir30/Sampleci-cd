@@ -161,3 +161,74 @@ export const getGstList = async () => {
     throw error
   }
 }
+
+export const getConsignorBranches = async (consignorId:number) => {
+  try {
+    const consignorRateTables = await prisma.consignorRateTable.findMany({
+      where: {
+        consignorId: 1,
+      },
+      select: {
+        ratePerKg:true,
+        status:true,
+        consignorId:true,
+        branch: {
+          select: {
+            branchName: true,
+            branchCode: true,
+            address1: true,
+            address2: true,
+            city: {
+              select: {
+                name: true,
+              },
+            },
+            district: {
+              select: {
+                name: true,
+              },
+            },
+            state: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    return consignorRateTables;
+  } catch (error) {
+    console.log('Error retrieving districts', error);
+    throw error
+  }
+}
+
+export const addConsignorBranch = async (consignorId: number, branchId: number) => {
+  try {
+    const checkRes = await prisma.consignorRateTable.findMany({
+      where: {
+        consignorId: consignorId,
+        branchId:branchId
+      },
+    })
+
+    console.log(checkRes,"$$$$$$$$",checkRes.length)
+    if(checkRes.length>0){
+      return 'Already Exists'
+    }
+    else{
+      const consignorRateTable = await prisma.consignorRateTable.create({
+        data: {
+          consignorId: consignorId,
+          branchId: branchId,
+        },
+      });
+      return consignorRateTable;
+    }
+  
+  } catch (error) {
+    console.log('Error adding consignor branch:', error);
+    throw error;
+  }
+}

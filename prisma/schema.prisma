@@ -35,74 +35,74 @@ model User {
 }
 
 model Branch {
-  id              Int             @id @default(autoincrement())
-  branchCode      String          @unique @db.VarChar(255)
-  branchName      String          @db.VarChar(255)
-  address1        String?         @db.VarChar(255)
-  address2        String?         @db.VarChar(255)
-  cityId          Int?
-  city            CityMaster?     @relation("branchCity", fields: [cityId], references: [id])
-  districtId      Int?
-  district        DistrictMaster? @relation("branchDistrict", fields: [districtId], references: [id])
-  stateId         Int?
-  state           StateMaster?    @relation("branchState", fields: [stateId], references: [id])
-  phone1          String?         @db.VarChar(255)
-  phone2          String?         @db.VarChar(255)
-  isHub           Boolean
-  isActive        Boolean         @default(true)
-  createdOn       DateTime        @default(now())
-  consignors      Consignor[]     @relation("consignorBranch")
-  consignees      Consignee[]     @relation("consigneeBranch")
-  AWBfromBranches AirWayBill[]    @relation("AWBFromBranch")
-  AWBtoBranches   AirWayBill[]    @relation("AWBToBranch")
+  id                    Int                  @id @default(autoincrement())
+  branchCode            String               @unique @db.VarChar(255)
+  branchName            String               @db.VarChar(255)
+  address1              String?              @db.VarChar(255)
+  address2              String?              @db.VarChar(255)
+  cityId                Int?
+  city                  CityMaster?          @relation("branchCity", fields: [cityId], references: [id])
+  districtId            Int?
+  district              DistrictMaster?      @relation("branchDistrict", fields: [districtId], references: [id])
+  stateId               Int?
+  state                 StateMaster?         @relation("branchState", fields: [stateId], references: [id])
+  phone1                String?              @db.VarChar(255)
+  phone2                String?              @db.VarChar(255)
+  isHub                 Boolean
+  isActive              Boolean              @default(true)
+  createdOn             DateTime             @default(now())
+  consignors            Consignor[]          @relation("consignorBranch")
+  consignees            Consignee[]          @relation("consigneeBranch")
+  AWBfromBranches       AirWayBill[]         @relation("AWBFromBranch")
+  AWBtoBranches         AirWayBill[]         @relation("AWBToBranch")
   consignorRateBranches ConsignorRateTable[] @relation("consignorRateBranch")
 }
 
 model Consignor {
-  consignorId           Int                 @id @default(autoincrement())
-  consignorCode         String?             @db.VarChar(255)
-  publicName            String              @db.VarChar(255)
-  legalName             String              @db.VarChar(255)
+  consignorId           Int                  @id @default(autoincrement())
+  consignorCode         String?              @db.VarChar(255)
+  publicName            String               @db.VarChar(255)
+  legalName             String               @db.VarChar(255)
   industryTypeId        Int?
-  industryType          IndustryTypeMaster? @relation("consignorIndustryType", fields: [industryTypeId], references: [id])
+  industryType          IndustryTypeMaster?  @relation("consignorIndustryType", fields: [industryTypeId], references: [id])
   commodityId           Int?
-  commodity             CommodityMaster?    @relation("ConsignoreCommodity", fields: [commodityId], references: [id])
-  address1              String?             @db.VarChar(255)
-  address2              String?             @db.VarChar(255)
+  commodity             CommodityMaster?     @relation("ConsignoreCommodity", fields: [commodityId], references: [id])
+  address1              String?              @db.VarChar(255)
+  address2              String?              @db.VarChar(255)
   cityId                Int?
-  city                  CityMaster?         @relation("consignorCity", fields: [cityId], references: [id])
+  city                  CityMaster?          @relation("consignorCity", fields: [cityId], references: [id])
   districtId            Int?
-  disstrict             DistrictMaster?     @relation("consignorDistrict", fields: [districtId], references: [id])
+  disstrict             DistrictMaster?      @relation("consignorDistrict", fields: [districtId], references: [id])
   stateId               Int?
-  state                 StateMaster?        @relation("consignorState", fields: [stateId], references: [id])
-  gstNumber             String?             @db.VarChar(255)
-  panNumber             String?             @db.VarChar(255)
-  tanNumber             String?             @db.VarChar(255)
-  cinNumber             String?             @db.VarChar(255)
+  state                 StateMaster?         @relation("consignorState", fields: [stateId], references: [id])
+  gstNumber             String?              @db.VarChar(255)
+  panNumber             String?              @db.VarChar(255)
+  tanNumber             String?              @db.VarChar(255)
+  cinNumber             String?              @db.VarChar(255)
   gstId                 Int?
-  gst                   GstMaster?          @relation("ConsignorGstId", fields: [gstId], references: [id])
-  taxCategory           String?             @db.VarChar(255)
+  gst                   GstMaster?           @relation("ConsignorGstId", fields: [gstId], references: [id])
+  taxCategory           String?              @db.VarChar(255)
   parentConsignorId     Int?
-  parentConsignor       Consignor?          @relation("parentConsignor", fields: [parentConsignorId], references: [consignorId])
-  childConsignors       Consignor[]         @relation("parentConsignor")
+  parentConsignor       Consignor?           @relation("parentConsignor", fields: [parentConsignorId], references: [consignorId])
+  childConsignors       Consignor[]          @relation("parentConsignor")
   branchId              Int?
-  branch                Branch?             @relation("consignorBranch", fields: [branchId], references: [id])
-  keyContactName        String?             @db.VarChar(255)
-  keyContactDesignation String?             @db.VarChar(255)
-  keyContactAddress     String?             @db.VarChar(255)
+  branch                Branch?              @relation("consignorBranch", fields: [branchId], references: [id])
+  keyContactName        String?              @db.VarChar(255)
+  keyContactDesignation String?              @db.VarChar(255)
+  keyContactAddress     String?              @db.VarChar(255)
   distanceFromBranchKms Int?
-  createdOn             DateTime?           @default(now())
-  modifiedOn            DateTime?           @updatedAt
-  consignees            Consignee[]         @relation("consigneeConsignor")
-  AWBs                  AirWayBill[]        @relation("AWBConsignor")
-  consignorRate        ConsignorRateTable[]         @relation("rateTableConsignor")
+  createdOn             DateTime?            @default(now())
+  modifiedOn            DateTime?            @updatedAt
+  consignees            Consignee[]          @relation("consigneeConsignor")
+  AWBs                  AirWayBill[]         @relation("AWBConsignor")
+  consignorRate         ConsignorRateTable[] @relation("rateTableConsignor")
 }
 
 model Consignee {
   consigneeId         Int             @id @default(autoincrement())
   consignorId         Int
   consignor           Consignor       @relation("consigneeConsignor", fields: [consignorId], references: [consignorId])
-  consigneeCode       String?          @db.VarChar(255)
+  consigneeCode       String?         @db.VarChar(255)
   consigneeName       String          @db.VarChar(255)
   phone1              String?         @db.VarChar(255)
   phone2              String?         @db.VarChar(255)
@@ -188,16 +188,16 @@ enum RateConsignorStatus {
   PENDING_APPROVAL
 }
 
-model ConsignorRateTable{
-  id           Int           @id @default(autoincrement())
-  consignorId  Int
-  consignor    Consignor     @relation("rateTableConsignor", fields: [consignorId], references: [consignorId])
-  branchId     Int?
-  branch       Branch?       @relation("consignorRateBranch", fields: [branchId], references: [id])
-  ratePerKg    Int
-  status       RateConsignorStatus @default(PENDING_APPROVAL)
-  createdOn    DateTime?     @default(now())
-  modifiedOn   DateTime?     @updatedAt
+model ConsignorRateTable {
+  id          Int                 @id @default(autoincrement())
+  consignorId Int
+  consignor   Consignor           @relation("rateTableConsignor", fields: [consignorId], references: [consignorId])
+  branchId    Int?
+  branch      Branch?             @relation("consignorRateBranch", fields: [branchId], references: [id])
+  ratePerKg   Int?
+  status      RateConsignorStatus @default(PENDING_APPROVAL)
+  createdOn   DateTime?           @default(now())
+  modifiedOn  DateTime?           @updatedAt
 }
 
 //MASTER TABLES
@@ -259,9 +259,9 @@ model StateMaster {
 }
 
 model GstMaster {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique @db.VarChar(255)
-  isActive  Boolean  @default(true)
-  createdOn DateTime @default(now())
+  id        Int         @id @default(autoincrement())
+  name      String      @unique @db.VarChar(255)
+  isActive  Boolean     @default(true)
+  createdOn DateTime    @default(now())
   gstIds    Consignor[] @relation("ConsignorGstId")
 }
