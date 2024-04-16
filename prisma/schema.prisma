@@ -11,51 +11,59 @@ datasource db {
 }
 
 model User {
-  id             Int             @id @default(autoincrement())
-  employeeId     String          @unique @db.VarChar(255)
-  hashedPassword String          @db.VarChar(255)
-  firstName      String?         @db.VarChar(255)
-  lastName       String?         @db.VarChar(255)
-  email          String?         @db.VarChar(255)
-  phone1         String?         @db.VarChar(255)
-  phone2         String?         @db.VarChar(255)
-  title          String?         @db.VarChar(255)
-  role           String?         @db.VarChar(255)
-  profile        String?         @db.VarChar(255)
-  isActive       Boolean         @default(true)
-  address1       String?         @db.VarChar(255)
-  address2       String?         @db.VarChar(255)
-  cityId         Int?
-  city           CityMaster?     @relation("userCity", fields: [cityId], references: [id])
-  districtId     Int?
-  district       DistrictMaster? @relation("userDistrict", fields: [districtId], references: [id])
-  stateId        Int?
-  state          StateMaster?    @relation("userState", fields: [stateId], references: [id])
-  createdOn      DateTime        @default(now())
+  id                   Int             @id @default(autoincrement())
+  employeeId           String          @unique @db.VarChar(255)
+  hashedPassword       String          @db.VarChar(255)
+  firstName            String?         @db.VarChar(255)
+  lastName             String?         @db.VarChar(255)
+  email                String?         @db.VarChar(255)
+  phone1               String?         @db.VarChar(255)
+  phone2               String?         @db.VarChar(255)
+  title                String?         @db.VarChar(255)
+  role                 String?         @db.VarChar(255)
+  profile              String?         @db.VarChar(255)
+  isActive             Boolean         @default(true)
+  address1             String?         @db.VarChar(255)
+  address2             String?         @db.VarChar(255)
+  cityId               Int?
+  city                 CityMaster?     @relation("userCity", fields: [cityId], references: [id])
+  districtId           Int?
+  district             DistrictMaster? @relation("userDistrict", fields: [districtId], references: [id])
+  stateId              Int?
+  state                StateMaster?    @relation("userState", fields: [stateId], references: [id])
+  createdOn            DateTime        @default(now())
+  depsLoadingUserIds   DEPS[]          @relation("depsLoadingUserId")
+  depsUnloadingUserIds DEPS[]          @relation("depsUnloadingUserId")
 }
 
 model Branch {
-  id                    Int                  @id @default(autoincrement())
-  branchCode            String               @unique @db.VarChar(255)
-  branchName            String               @db.VarChar(255)
-  address1              String?              @db.VarChar(255)
-  address2              String?              @db.VarChar(255)
-  cityId                Int?
-  city                  CityMaster?          @relation("branchCity", fields: [cityId], references: [id])
-  districtId            Int?
-  district              DistrictMaster?      @relation("branchDistrict", fields: [districtId], references: [id])
-  stateId               Int?
-  state                 StateMaster?         @relation("branchState", fields: [stateId], references: [id])
-  phone1                String?              @db.VarChar(255)
-  phone2                String?              @db.VarChar(255)
-  isHub                 Boolean
-  isActive              Boolean              @default(true)
-  createdOn             DateTime             @default(now())
-  consignors            Consignor[]          @relation("consignorBranch")
-  consignees            Consignee[]          @relation("consigneeBranch")
-  AWBfromBranches       AirWayBill[]         @relation("AWBFromBranch")
-  AWBtoBranches         AirWayBill[]         @relation("AWBToBranch")
-  consignorRateBranches ConsignorRateTable[] @relation("consignorRateBranch")
+  id                       Int                  @id @default(autoincrement())
+  branchCode               String               @unique @db.VarChar(255)
+  branchName               String               @db.VarChar(255)
+  address1                 String?              @db.VarChar(255)
+  address2                 String?              @db.VarChar(255)
+  cityId                   Int?
+  city                     CityMaster?          @relation("branchCity", fields: [cityId], references: [id])
+  districtId               Int?
+  district                 DistrictMaster?      @relation("branchDistrict", fields: [districtId], references: [id])
+  stateId                  Int?
+  state                    StateMaster?         @relation("branchState", fields: [stateId], references: [id])
+  phone1                   String?              @db.VarChar(255)
+  phone2                   String?              @db.VarChar(255)
+  isHub                    Boolean
+  isActive                 Boolean              @default(true)
+  createdOn                DateTime             @default(now())
+  consignors               Consignor[]          @relation("consignorBranch")
+  consignees               Consignee[]          @relation("consigneeBranch")
+  AWBfromBranches          AirWayBill[]         @relation("AWBFromBranch")
+  AWBtoBranches            AirWayBill[]         @relation("AWBToBranch")
+  consignorRateBranches    ConsignorRateTable[] @relation("consignorRateBranch")
+  tripBranchIds            TripDetails[]        @relation("tripBranchId")
+  tripCheckinBranchIds     TripCheckIn[]        @relation("tripCheckinBranchId")
+  nextBranchTripLineItems  TripLineItem[]       @relation("nextBranchTripLineItem")
+  finalBranchTripLineItems TripLineItem[]       @relation("finalBranchTripLineItem")
+  hlfLineBranchIds         HLFLineItem[]        @relation("hlfLineBranchId")
+  depsBrnachIds            DEPS[]               @relation("depsBrnachId")
 }
 
 model Consignor {
@@ -96,6 +104,7 @@ model Consignor {
   consignees            Consignee[]          @relation("consigneeConsignor")
   AWBs                  AirWayBill[]         @relation("AWBConsignor")
   consignorRate         ConsignorRateTable[] @relation("rateTableConsignor")
+  odaConsignorIds       ODA[]                @relation("odaConsignorId")
 }
 
 model Consignee {
@@ -124,30 +133,39 @@ model Consignee {
   modifiedOn          DateTime?       @updatedAt
   AWBs                AirWayBill[]    @relation("AWBConsignee")
 }
-
+enum AWBStatus {
+ PickUp
+ InTransit 
+ atHub 
+ Delivered
+}
 model AirWayBill {
-  id            Int           @id @default(autoincrement())
-  AWBCode       String        @db.VarChar(255)
-  consignorId   Int
-  consignor     Consignor     @relation("AWBConsignor", fields: [consignorId], references: [consignorId])
-  consigneeId   Int?
-  consignee     Consignee?    @relation("AWBConsignee", fields: [consigneeId], references: [consigneeId])
-  fromBranchId  Int
-  toBranchId    Int
-  fromBranch    Branch        @relation("AWBFromBranch", fields: [fromBranchId], references: [id])
-  toBranch      Branch        @relation("AWBToBranch", fields: [toBranchId], references: [id])
-  numOfArticles Int
-  invoiceNumber Int?
-  invoiceValue  Float?        @db.Float
-  weightKgs     Float?        @db.Float
-  ratePerKg     Float?        @db.Float
-  rollupVolume  Float?        @db.Float
-  rollupWeight  Float?        @db.Float
-  grandTotal    Float?        @db.Float
-  createdOn     DateTime?     @default(now())
-  modifiedOn    DateTime?     @updatedAt
-  AWBLineItems  AwbLineItem[]
-  AWBArticles   AwbArticle[]
+  id                 Int            @id @default(autoincrement())
+  AWBCode            String         @db.VarChar(255)
+  consignorId        Int
+  consignor          Consignor      @relation("AWBConsignor", fields: [consignorId], references: [consignorId])
+  consigneeId        Int?
+  consignee          Consignee?     @relation("AWBConsignee", fields: [consigneeId], references: [consigneeId])
+  fromBranchId       Int
+  toBranchId         Int
+  fromBranch         Branch         @relation("AWBFromBranch", fields: [fromBranchId], references: [id])
+  toBranch           Branch         @relation("AWBToBranch", fields: [toBranchId], references: [id])
+  numOfArticles      Int
+  invoiceNumber      Int?
+  invoiceValue       Float?         @db.Float
+  weightKgs          Float?         @db.Float
+  ratePerKg          Float?         @db.Float
+  rollupVolume       Float?         @db.Float
+  rollupWeight       Float?         @db.Float
+  grandTotal         Float?         @db.Float
+  AWBStatus          AWBStatus      @default(PickUp)
+  createdOn          DateTime?      @default(now())
+  modifiedOn         DateTime?      @updatedAt
+  AWBLineItems       AwbLineItem[]
+  AWBArticles        AwbArticle[]
+  AWBIdTripLineItems TripLineItem[] @relation("AWBIdTripLineItem")
+  hlfLineAWBIds      HLFLineItem[]  @relation("hlfLineAWBId")
+  depsAWBIds         DEPS[]         @relation("depsAWBId")
 }
 
 model AwbLineItem {
@@ -167,9 +185,9 @@ model AwbLineItem {
 }
 
 enum ArticleStatus {
-  CREATED
-  PRINTED
-  DELETED
+  Created
+  Printed
+  Deleted
 }
 
 model AwbArticle {
@@ -178,14 +196,14 @@ model AwbArticle {
   AWB          AirWayBill    @relation(fields: [AWBId], references: [id])
   articleCode  String        @db.VarChar(255)
   articleIndex Int
-  status       ArticleStatus @default(CREATED)
+  status       ArticleStatus @default(Created)
   createdOn    DateTime?     @default(now())
   modifiedOn   DateTime?     @updatedAt
 }
 
 enum RateConsignorStatus {
-  APPROVED
-  PENDING_APPROVAL
+  Approved
+  PendingApproval
 }
 
 model ConsignorRateTable {
@@ -195,11 +213,177 @@ model ConsignorRateTable {
   branchId    Int?
   branch      Branch?             @relation("consignorRateBranch", fields: [branchId], references: [id])
   ratePerKg   Int?
-  status      RateConsignorStatus @default(PENDING_APPROVAL)
+  status      RateConsignorStatus @default(PendingApproval)
   createdOn   DateTime?           @default(now())
   modifiedOn  DateTime?           @updatedAt
 }
 
+model TripDetails {
+  id                  Int            @id @default(autoincrement())
+  tripCode            String         @unique @db.VarChar(255)
+  route               String?        @db.VarChar(255)
+  costPerKg           String?        @db.VarChar(255)
+  localTripNumber     String?        @db.VarChar(255)
+  vendorId            Int?
+  vendor              VendorMaster?  @relation("tripVendorCode", fields: [vendorId], references: [id])
+  vehicleId           Int?
+  vehicle             VehicleMaster? @relation("tripVehicleId", fields: [vehicleId], references: [id])
+  driverId            Int?
+  driver              DriverMaster?  @relation("tripDriverId", fields: [driverId], references: [id])
+  ftlLocalNumber      String?        @db.VarChar(255)
+  originBranchId      Int?
+  branch              Branch?        @relation("tripBranchId", fields: [originBranchId], references: [id])
+  numberOfAwb         Int?
+  numberOfArticles    Int?
+  chargedWeight       Float?         @db.Float
+  hireAmount          Float?         @db.Float
+  advanceAmount       Float?         @db.Float
+  tdsAmount           Float?         @db.Float
+  balance             Float?         @db.Float
+  openingKms          Float?         @db.Float
+  closingKms          Float?         @db.Float
+  totalKms            Float?         @db.Float
+  tripClosingTime     DateTime?
+  documentStatus      String?        @db.VarChar(255)
+  invoiceStatus       String?        @db.VarChar(255)
+  remarks             String?        @db.VarChar(255)
+  paymentReqDate      DateTime?
+  utrDetails          String?        @db.VarChar(255)
+  ePODsCleared        Boolean?
+  originalPODReceived Boolean?
+  createdOn           DateTime?      @default(now())
+  modifiedOn          DateTime?      @updatedAt
+  tripIdCheckins      TripCheckIn[]  @relation("tripIdCheckin")
+  tripIdTripLineItems TripLineItem[] @relation("tripIdTripLineItem")
+  depsTripRoutes      DEPS[]         @relation("depsTripRoute")
+}
+
+enum tripCheckinType {
+  Inward
+  Outward
+}
+
+model TripCheckIn {
+  id               Int             @id @default(autoincrement())
+  tripId           Int
+  trip             TripDetails     @relation("tripIdCheckin", fields: [tripId], references: [id])
+  type             tripCheckinType
+  locationBranchId Int
+  branch           Branch          @relation("tripCheckinBranchId", fields: [locationBranchId], references: [id])
+  odometerReading  Int
+  time             DateTime?
+  createdOn        DateTime?       @default(now())
+  modifiedOn       DateTime?       @updatedAt
+}
+
+enum TripLineItemStatus {
+  Assigned
+  Open
+  Closed
+  Delivered
+}
+
+model TripLineItem {
+  id                  Int                @id @default(autoincrement())
+  AWBId               Int
+  AirWayBill          AirWayBill         @relation("AWBIdTripLineItem", fields: [AWBId], references: [id])
+  tripId              Int
+  trip                TripDetails        @relation("tripIdTripLineItem", fields: [tripId], references: [id])
+  nextDestinationId   Int
+  nextBranch          Branch             @relation("nextBranchTripLineItem", fields: [nextDestinationId], references: [id])
+  finalDestinationId  Int
+  finalBranch         Branch             @relation("finalBranchTripLineItem", fields: [finalDestinationId], references: [id])
+  status              TripLineItemStatus @default(Assigned)
+  ePODReceived        Boolean
+  originalPODReceived Boolean
+  createdOn           DateTime?          @default(now())
+  modifiedOn          DateTime?          @updatedAt
+}
+
+model ODA {
+  id               Int       @id @default(autoincrement())
+  consignorId      Int
+  consignor        Consignor @relation("odaConsignorId", fields: [consignorId], references: [consignorId])
+  odaType          String    @db.VarChar(255)
+  odaKmLowerLimit  Float?    @db.Float
+  odaKmUpperLimit  Float?    @db.Float
+  weightLowerLimit Float?    @db.Float
+  weightUpperLimit Float?    @db.Float
+  charges          Float?    @db.Float
+  createdOn        DateTime? @default(now())
+  modifiedOn       DateTime? @updatedAt
+}
+
+enum HLFLineItemStatus {
+  ToBeInwarded
+  Inwarded
+  Outwarded
+}
+
+model HLFLineItem {
+  id               Int               @id @default(autoincrement())
+  hlfLineItemAWBId Int
+  AirWayBill       AirWayBill        @relation("hlfLineAWBId", fields: [hlfLineItemAWBId], references: [id])
+  hlfLineStatus    HLFLineItemStatus
+  branchId         Int
+  branch           Branch            @relation("hlfLineBranchId", fields: [branchId], references: [id])
+  AWBCWeightInKgs  Float?            @db.Float
+  AWBVolumeInKgs   Float?            @db.Float
+  createdOn        DateTime?         @default(now())
+  modifiedOn       DateTime?         @updatedAt
+  depsHLFLineIds   DEPS[]            @relation("depsHLFLineId")
+}
+
+enum DEPSTypeList {
+  Damage
+  Excess
+  Pilferage
+  Shorts
+}
+
+enum DEPSStatus {
+  Open
+  Cleared
+}
+
+model DEPS {
+  id                   Int           @id @default(autoincrement())
+  DEPSType             DEPSTypeList
+  DEPSSubType          String        @db.VarChar(255)
+  createdOn            DateTime?     @default(now())
+  AWBId                Int
+  AirWayBill           AirWayBill    @relation("depsAWBId", fields: [AWBId], references: [id])
+  loadingHubId         Int
+  HLFLineItem          HLFLineItem   @relation("depsHLFLineId", fields: [loadingHubId], references: [id])
+  numberOfDepsArticles Int
+  vehicleNumberId      Int
+  vehicle              VehicleMaster @relation("depsVehicleNumberId", fields: [vehicleNumberId], references: [id])
+  tripIdRoute          Int
+  trip                 TripDetails   @relation("depsTripRoute", fields: [tripIdRoute], references: [id])
+  connectedDate        DateTime
+  TicketRaisedBranchId Int
+  branch               Branch        @relation("depsBrnachId", fields: [TicketRaisedBranchId], references: [id])
+  loadingUserId        Int
+  loadUser             User          @relation("depsLoadingUserId", fields: [loadingUserId], references: [id])
+  unloadingUserId      Int
+  unloadUser           User          @relation("depsUnloadingUserId", fields: [unloadingUserId], references: [id])
+  sealNumber           String?       @db.VarChar(255)
+  depsStatus           DEPSStatus
+  caseComment          String        @db.VarChar(255)
+}
+
+enum ImageLinksType {
+  DEPS
+  AWB
+  GST
+  ShippingLabel
+}
+
+model ImageLinks {
+  id     Int            @id @default(autoincrement())
+  typeId ImageLinksType
+  path   String         @db.VarChar(255)
+}
 //MASTER TABLES
 
 model IndustryTypeMaster {
@@ -226,36 +410,41 @@ model PincodesMaster {
 }
 
 model CityMaster {
-  id         Int         @id @default(autoincrement())
-  name       String      @unique @db.VarChar(255)
-  isActive   Boolean     @default(true)
-  createdOn  DateTime    @default(now())
-  users      User[]      @relation("userCity")
-  branches   Branch[]    @relation("branchCity")
-  consignors Consignor[] @relation("consignorCity")
-  consignees Consignee[] @relation("consigneeCity")
+  id           Int            @id @default(autoincrement())
+  name         String         @unique @db.VarChar(255)
+  isActive     Boolean        @default(true)
+  createdOn    DateTime       @default(now())
+  users        User[]         @relation("userCity")
+  branches     Branch[]       @relation("branchCity")
+  consignors   Consignor[]    @relation("consignorCity")
+  consignees   Consignee[]    @relation("consigneeCity")
+  vendorCities VendorMaster[] @relation("vendorCity")
+  driverCities DriverMaster[] @relation("driverCity")
 }
 
 model DistrictMaster {
-  id         Int         @id @default(autoincrement())
-  name       String      @unique @db.VarChar(255)
-  isActive   Boolean     @default(true)
-  createdOn  DateTime    @default(now())
-  users      User[]      @relation("userDistrict")
-  branches   Branch[]    @relation("branchDistrict")
-  consignors Consignor[] @relation("consignorDistrict")
-  consignees Consignee[] @relation("consigneeDistrict")
+  id              Int            @id @default(autoincrement())
+  name            String         @unique @db.VarChar(255)
+  isActive        Boolean        @default(true)
+  createdOn       DateTime       @default(now())
+  users           User[]         @relation("userDistrict")
+  branches        Branch[]       @relation("branchDistrict")
+  consignors      Consignor[]    @relation("consignorDistrict")
+  consignees      Consignee[]    @relation("consigneeDistrict")
+  driverDistricts DriverMaster[] @relation("driverDistrict")
 }
 
 model StateMaster {
-  id         Int         @id @default(autoincrement())
-  name       String      @unique @db.VarChar(255)
-  isActive   Boolean     @default(true)
-  createdOn  DateTime    @default(now())
-  users      User[]      @relation("userState")
-  branches   Branch[]    @relation("branchState")
-  consignors Consignor[] @relation("consignorState")
-  consignees Consignee[] @relation("consigneeState")
+  id           Int            @id @default(autoincrement())
+  name         String         @unique @db.VarChar(255)
+  isActive     Boolean        @default(true)
+  createdOn    DateTime       @default(now())
+  users        User[]         @relation("userState")
+  branches     Branch[]       @relation("branchState")
+  consignors   Consignor[]    @relation("consignorState")
+  consignees   Consignee[]    @relation("consigneeState")
+  vendorStates VendorMaster[] @relation("vendorState")
+  driverStates DriverMaster[] @relation("driverState")
 }
 
 model GstMaster {
@@ -264,4 +453,72 @@ model GstMaster {
   isActive  Boolean     @default(true)
   createdOn DateTime    @default(now())
   gstIds    Consignor[] @relation("ConsignorGstId")
+}
+
+model VendorMaster {
+  id                Int             @id @default(autoincrement())
+  vendorCode        String          @unique @db.VarChar(255)
+  publicName        String?         @db.VarChar(255)
+  vendorName        String?         @db.VarChar(255)
+  address1          String?         @db.VarChar(255)
+  cityId            Int?
+  city              CityMaster?     @relation("vendorCity", fields: [cityId], references: [id])
+  stateId           Int?
+  state             StateMaster?    @relation("vendorState", fields: [stateId], references: [id])
+  Pincode           String?         @db.VarChar(255)
+  gstNumber         String?         @db.VarChar(255)
+  panNumber         String?         @db.VarChar(255)
+  contactPerson     String?         @db.VarChar(255)
+  phone1            String?         @db.VarChar(255)
+  phone2            String?         @db.VarChar(255)
+  email             String?         @db.VarChar(255)
+  accountHolderName String?         @db.VarChar(255)
+  bankName          String?         @db.VarChar(255)
+  branchName        String?         @db.VarChar(255)
+  bankAddress       String?         @db.VarChar(255)
+  branchPincode     Int?
+  accountNumber     Int?
+  ifscCode          String?         @db.VarChar(255)
+  tanNumber         String?         @db.VarChar(255)
+  servicesOffered   String?         @db.VarChar(255)
+  tdsPercentageSlab String?         @db.VarChar(255)
+  createdOn         DateTime        @default(now())
+  modifiedOn        DateTime?       @updatedAt
+  vendorIDs         VehicleMaster[] @relation("vendorID")
+  tripVendorCodes   TripDetails[]   @relation("tripVendorCode")
+}
+
+model VehicleMaster {
+  id                   Int           @id @default(autoincrement())
+  vehicleNum           String        @unique @db.VarChar(255)
+  vehicleType          String?       @db.VarChar(255)
+  vehicleCapacity      String?       @db.VarChar(255)
+  vehiclePermit        String?       @db.VarChar(255)
+  createdOn            DateTime      @default(now())
+  modifiedOn           DateTime?     @updatedAt
+  vendorId             Int?
+  vendor               VendorMaster? @relation("vendorID", fields: vendorId, references: [id])
+  tripVehicleIds       TripDetails[] @relation("tripVehicleId")
+  depsVehicleNumberIds DEPS[]        @relation("depsVehicleNumberId")
+}
+
+model DriverMaster {
+  id            Int             @id @default(autoincrement())
+  driverName    String          @db.VarChar(255)
+  phone1        String?         @db.VarChar(255)
+  licenseNumber String?         @db.VarChar(255)
+  panNumber     String?         @db.VarChar(255)
+  aadharNumber  String?         @db.VarChar(255)
+  address1      String?         @db.VarChar(255)
+  cityId        Int?
+  city          CityMaster?     @relation("driverCity", fields: [cityId], references: [id])
+  stateId       Int?
+  state         StateMaster?    @relation("driverState", fields: [stateId], references: [id])
+  districtId    Int?
+  district      DistrictMaster? @relation("driverDistrict", fields: [districtId], references: [id])
+  Pincode       Int?
+  phone2        Int?
+  createdOn     DateTime?       @default(now())
+  modifiedOn    DateTime?       @updatedAt
+  tripDriverIds TripDetails[]   @relation("tripDriverId")
 }
