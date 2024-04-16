@@ -11,6 +11,7 @@ import { Consignee, Consignor } from '@prisma/client';
 
 
 
+
 export const getIndustryTypes = async (_req: Request, res: Response, next: NextFunction) => {
   try {
     const industryTypes = await masterDataService.getIndustryTypes();
@@ -20,7 +21,6 @@ export const getIndustryTypes = async (_req: Request, res: Response, next: NextF
     next(err);
   }
 }
-
 export const getCommodities = async (_req: Request, res: Response, next: NextFunction) => {
   try {
     const commodities = await masterDataService.getCommodities();
@@ -90,7 +90,38 @@ export const getGstList = async (_req: Request, res: Response, next: NextFunctio
     next(err)
   }
 }
-
+export const getConsignorBranches = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const consignorId: number = req.body.consignorId;
+    if (!consignorId) {
+      throwValidationError([{message: "No Consignor Id Provided."}]);
+    }
+    const getConsignorBranchesRes = await masterDataService.getConsignorBranches(consignorId);
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getConsignorBranchesRes));
+  } catch (err) {
+    console.error('Error retrieving consignees:', err);
+    next(err)
+  }
+}
+export const addConsignorBranch = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const consignorId: number = req.body.consignorId;
+    const branchId:number=req.body.branchId;
+    if (!consignorId) {
+      throwValidationError([{message: "No Consignor Id Provided."}]);
+    }
+    const addConsignorBranchRes = await masterDataService.addConsignorBranch(consignorId,branchId);
+    if(addConsignorBranchRes=='Already Exists'){
+      throwValidationError([{message: "Branch Already Exists "}]);
+    }
+    else{
+      res.status(HttpStatusCode.OK).json(buildNoContentResponse("Added Successfully"));
+    }
+  } catch (err) {
+    console.error('Error retrieving consignees:', err);
+    next(err)
+  }
+}
 export const getConsignors = async (_req: Request, res: Response, next: NextFunction) => {
   try {
     const consignors = await consignorService.getConsignors();
@@ -134,7 +165,6 @@ export const createConsignors = async (req: Request, res: Response, next: NextFu
     next(err);
   }
 }
-
 export const getConsignees = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const consignorId: number = req.body.consignorId;
@@ -148,7 +178,6 @@ export const getConsignees = async (req: Request, res: Response, next: NextFunct
     next(err)
   }
 }
-
 
 export const createConsignees = async (req: Request, res: Response, next: NextFunction) => {
 
