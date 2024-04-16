@@ -212,6 +212,21 @@ export const createConsignees = async (req: Request, res: Response, next: NextFu
     next(err)
   }
 }
+export const getGeneratedAWB = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const consignorId: number = req.body.consignorId;
+    const AWBStatus: string = req.body.AWBStatus;
+    const validAWBStatusValues = ['PickUp', 'InTransit', 'atHub', 'Delivered'];
+    if (!AWBStatus || !validAWBStatusValues.includes(AWBStatus)) {
+      throwValidationError([{message: "Invalid AWBStatus provided."}]);
+    }
+    const getGeneratedAWBRes = await AWBService.getGeneratedAWB(consignorId,AWBStatus);
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getGeneratedAWBRes));
+  } catch (err) {
+    console.error('Error retrieving consignees:', err);
+    next(err)
+  }
+}
 
 export const generateBulkAWBForConsignor = async (req: Request, res: Response, next: NextFunction) => {
 
@@ -259,6 +274,20 @@ export const updateArticleCountForAWB = async (req: Request, res: Response, next
   }
 }
 
+export const getAWBArticles = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const AWBId: number = req.body.AWBId;
+    if (!AWBId) {
+      throwValidationError([{message: "No AWBId Provided."}]);
+    }
+    const getAWBArticlesRes = await AWBService.getAWBArticles(AWBId);
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getAWBArticlesRes));
+  } catch (err) {
+    console.error('Error retrieving consignees:', err);
+    next(err)
+  }
+}
+
 export const generateAWBArticles = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const AWBId: number = req.body.AWBId;
@@ -266,7 +295,7 @@ export const generateAWBArticles = async (req: Request, res: Response, next: Nex
       throwValidationError([{ message: `Mandatory field AWBid is missing` }]);
     }
     const result = await AWBService.generateAWBArticles(AWBId);
-    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(result));
+    res.status(HttpStatusCode.OK).json(buildNoContentResponse("Generated AWB Articles"));
   } catch (err) {
     console.error('Error generateAWBArticles', err);
     next(err)
@@ -286,7 +315,7 @@ export const addAWBArticles = async (req: Request, res: Response, next: NextFunc
       }
     }
     const result = await AWBService.addAWBArticles(AWBId, numArticlesToAdd);
-    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(result));
+    res.status(HttpStatusCode.OK).json(buildNoContentResponse("Added AWB Articles"));
   } catch (err) {
     console.error('Error addAWBArticles', err);
     next(err)
@@ -320,7 +349,7 @@ export const markAWBArticleAsDeleted = async (req: Request, res: Response, next:
       }
     }
     const result = await AWBService.markAWBArticleAsDeleted(articleId, AWBId);
-    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(result));
+    res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWB Articles Deleted Successfully"));
   } catch (err) {
     console.error('Error markAWBArticlesAsDeleted', err);
     next(err)
