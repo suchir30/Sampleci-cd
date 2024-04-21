@@ -36,3 +36,5 @@ ALTER TABLE `ConsignorRateTable` ADD CONSTRAINT `ConsignorRateTable_consignorId_
 
 -- AddForeignKey
 ALTER TABLE `ConsignorRateTable` ADD CONSTRAINT `ConsignorRateTable_branchId_fkey` FOREIGN KEY (`branchId`) REFERENCES `Branch`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+ALTER TABLE `consignorratetable` MODIFY `status` ENUM('Approved', 'PendingApproval') NOT NULL DEFAULT 'PendingApproval';

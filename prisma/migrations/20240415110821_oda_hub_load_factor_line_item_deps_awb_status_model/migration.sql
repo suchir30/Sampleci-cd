@@ -6,13 +6,10 @@
 
 */
 -- AlterTable
-ALTER TABLE `airwaybill` ADD COLUMN `AWBStatus` ENUM('PickUp', 'InTransit', 'atHub', 'Delivered') NOT NULL DEFAULT 'PickUp';
+ALTER TABLE `AirWayBill` ADD COLUMN `AWBStatus` ENUM('PickUp', 'InTransit', 'atHub', 'Delivered') NOT NULL DEFAULT 'PickUp';
 
 -- AlterTable
-ALTER TABLE `awbarticle` MODIFY `status` ENUM('Created', 'Printed', 'Deleted') NOT NULL DEFAULT 'Created';
-
--- AlterTable
-ALTER TABLE `consignorratetable` MODIFY `status` ENUM('Approved', 'PendingApproval') NOT NULL DEFAULT 'PendingApproval';
+ALTER TABLE `AwbArticle` MODIFY `status` ENUM('Created', 'Printed', 'Deleted') NOT NULL DEFAULT 'Created';
 
 -- CreateTable
 CREATE TABLE `ODA` (
