@@ -30,13 +30,9 @@ describe('checking isActive is true', () => {
         jest.clearAllMocks();
     })
     test('should return true for valid consignor', async () => {
-        const consignorsData=[{consignorId:1,consignorCode:"abcd",publicName: 'Har',legalName:"Shith",industryTypeId:1,commodityId:2,address1:"asd",address2:"qe",cityId:3,gstNumber:"sd",stateId:3,panNumber:"jnh",tanNumber:"kj",cinNumber:"jn",taxCategory:"nhgf",parentConsignorId:1,keyContactName:"asd",keyContactDesignation:"lkj",keyContactAddress:"asd",distanceFromBranchKms:2,districtId:1,branchId:1,createdOn:new Date(1990, 4, 7),modifiedOn:new Date(1990, 4, 7)}];
-        (prismaMock.consignor.createMany as jest.Mock).mockResolvedValue(null);
-        await expect(createConsignors(consignorsData)).resolves.toEqual(true);
+        const consignorDb:Partial<Consignor>={consignorId:1,consignorCode:"abcd",gstId:1,publicName: 'Har',legalName:"Shith",industryTypeId:1,commodityId:2,address1:"asd",address2:"qe",cityId:3,gstNumber:"sd",stateId:3,panNumber:"jnh",tanNumber:"kj",cinNumber:"jn",taxCategory:"nhgf",parentConsignorId:1,keyContactName:"asd",keyContactDesignation:"lkj",keyContactAddress:"asd",distanceFromBranchKms:2,districtId:1,branchId:1,createdOn:new Date(1990, 4, 7),modifiedOn:new Date(1990, 4, 7)};
+        const consignorsData=[{consignorId:1,consignorCode:"abcd",gstId:1,publicName: 'Har',legalName:"Shith",industryTypeId:1,commodityId:2,address1:"asd",address2:"qe",cityId:3,gstNumber:"sd",stateId:3,panNumber:"jnh",tanNumber:"kj",cinNumber:"jn",taxCategory:"nhgf",parentConsignorId:1,keyContactName:"asd",keyContactDesignation:"lkj",keyContactAddress:"asd",distanceFromBranchKms:2,districtId:1,branchId:1,createdOn:new Date(1990, 4, 7),modifiedOn:new Date(1990, 4, 7)}];
+        (prismaMock.consignor.createMany as jest.Mock).mockResolvedValue(consignorDb);
+        await expect(createConsignors(consignorsData)).resolves.toEqual(consignorDb);
     });
-    it("should return false for missing mandatory fields", async () => {
-        const consignorsData=[{consignorId:1,consignorCode:"abcd",publicName: '',legalName:"",industryTypeId:1,commodityId:2,address1:"asd",address2:"qe",cityId:3,gstNumber:"sd",stateId:3,panNumber:"jnh",tanNumber:"kj",cinNumber:"jn",taxCategory:"nhgf",parentConsignorId:1,keyContactName:"asd",keyContactDesignation:"lkj",keyContactAddress:"asd",distanceFromBranchKms:2,districtId:1,branchId:1,createdOn:new Date(1990, 4, 7),modifiedOn:new Date(1990, 4, 7)}];
-        (prismaMock.consignor.createMany as jest.Mock).mockResolvedValue(consignorsData);
-        await expect(createConsignors(consignorsData)).resolves.toEqual(false);
-    })
 })

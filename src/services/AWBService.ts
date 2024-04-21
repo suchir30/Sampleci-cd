@@ -3,10 +3,9 @@ import moment from 'moment';
 import prisma from '../client';
 import { AWBCreateData } from '../types/awbTypes';
 
+export const generateBulkAWBForConsignor = async (consignorId: number, awbData: AWBCreateData[]):Promise<boolean> => {
 
-export const generateBulkAWBForConsignor = async (consignorId: number, awbData: AWBCreateData[]) => {
-
-    return await prisma.$transaction(async prisma => {
+    const result=await prisma.$transaction(async prisma => {
         if (!awbData?.length) {
             throw Error("Create AWB list is empty.");
         }
@@ -84,7 +83,9 @@ export const generateBulkAWBForConsignor = async (consignorId: number, awbData: 
 
         return createdAWBs;
     });
+    return true;
 };
+
 export const getGeneratedAWB = async (consignorId: number, AWBStatus: any) => {
     const getGeneratedAWBQuery = await prisma.airWayBill.findMany({
         select: {
@@ -170,8 +171,8 @@ export const updateArticleCountForAWB = async (AWBId: number, newArticleCount: n
         where: { id: AWBId },
         data: { numOfArticles: newArticleCount },
     });
-    // return updateArticles;
-    return true;
+    return updateArticles;
+    // return true;
 };
 
 const createAWBArticlesHelper = async (prisma: any, AWBId: number, AWBCode: string, numArticlesToAdd: number, articleNumberStartAt: number = 1) => {
@@ -241,8 +242,8 @@ export const getAWBArticles = async (AWBId: number) => {
     return getAWBArticlesQuery;
 };
 
-export const generateAWBArticles = async (AWBId: number) => {
-    return prisma.$transaction(async prisma => {
+export const generateAWBArticles = async (AWBId: number):Promise<boolean> => {
+    const result=await prisma.$transaction(async prisma => {
         const awb = await prisma.airWayBill.findUniqueOrThrow({
             where: { id: AWBId },
             select: {
@@ -268,10 +269,11 @@ export const generateAWBArticles = async (AWBId: number) => {
         }
         return await createAWBArticlesHelper(prisma, AWBId, awb.AWBCode, awb.numOfArticles);
     });
+    return true;
 }
 
-export const addAWBArticles = async (AWBId: number, numArticlesToAdd: number) => {
-    return prisma.$transaction(async prisma => {
+export const addAWBArticles = async (AWBId: number, numArticlesToAdd: number):Promise<boolean> => {
+    const result=await prisma.$transaction(async prisma => {
         const awb = await prisma.airWayBill.findUniqueOrThrow({
             where: { id: AWBId },
             select: { numOfArticles: true, AWBCode: true }
@@ -302,6 +304,7 @@ export const addAWBArticles = async (AWBId: number, numArticlesToAdd: number) =>
         });
         return await createAWBArticlesHelper(prisma, AWBId, awb.AWBCode, numArticlesToAdd, lastArticle.articleIndex + 1);
     });
+    return true;
 }
 
 export const markAWBArticlesAsPrinted = async (AWBId: number) => {
@@ -314,7 +317,8 @@ export const markAWBArticlesAsPrinted = async (AWBId: number) => {
         },
         data: { status: ArticleStatus.Printed }
     });
-    return printedArticles;
+    // return printedArticles;
+    return true;
 };
 export const markAWBArticleAsDeleted = async (articleId: number, AWBId: number) => {
     await prisma.awbArticle.update({
