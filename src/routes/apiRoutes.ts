@@ -30,5 +30,12 @@ router.post('/AWB/generateAWBArticles', apiController.generateAWBArticles);
 router.post('/AWB/addAWBArticles', apiController.addAWBArticles);
 router.post('/AWB/markAWBArticlesAsPrinted', apiController.markAWBArticlesAsPrinted);
 router.post('/AWB/markAWBArticleAsDeleted', apiController.markAWBArticleAsDeleted);
+router.post('/AWB/assignedTriptoAWB',apiController.assignedTriptoAWB)
+router.post('/AWB/getAWBDetails',apiController.getUpdateAWB)
+router.post('/AWB/updateAWB',apiController.updateAWB)
+router.post('/AWB/updateAWBLineItem',apiController.updateAWBLineItem)
+router.post('/getTrips',apiController.getTrips)
+router.post('/addTripCheckin',apiController.addTripCheckin)
+router.post('/getTripCheckin',apiController.getTripCheckin)
 
 export default router;

@@ -3,10 +3,13 @@ import { generateRandomCode } from '../scripts/randomGenerator';
 
 import prisma from '../client';
 
-export const getConsignees = async (consignorId:number) => {
+export const getConsignees = async (consignorId:number,toBranchId:number) => {
   const consignees = await prisma.consignee.findMany({
     where: {
-      consignorId: consignorId
+      consignorId: consignorId,
+      branchId: {
+        equals: toBranchId !== null ? toBranchId : undefined,
+      },
     },
     include: {
       consignor: true,
@@ -19,13 +22,6 @@ export const getConsignees = async (consignorId:number) => {
   });
   return consignees;
 }
-
-// export const createConsignees = async (consigneesData: Consignee[]) => {
-//   const consignees = await prisma.consignee.createMany({
-//     data: consigneesData,
-//   });
-//   return consignees;
-// };
 
 export const createConsignees = async (consigneesData: Consignee[]) => {
   try {
@@ -68,4 +64,3 @@ export const createConsignees = async (consigneesData: Consignee[]) => {
     throw error;
   }
 };
-

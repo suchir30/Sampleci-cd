@@ -17,7 +17,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"employeeId\":\"vroomster22\",\r\n    \"password\": \"vroomster@2\"\r\n}",
+							"raw": "{\r\n    \"employeeId\":\"vroomster2\",\r\n    \"password\": \"vroomster@2\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1620,7 +1620,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"consignorId\":1,\r\n    \"branchId\":3\r\n}",
+							"raw": "{\r\n    \"consignorId\":1,\r\n    \"branchId\":1\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2026,7 +2026,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"consignorId\":1\r\n}",
+							"raw": "{\r\n    \"consignorId\":1,\r\n    \"toBranchId\":1\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2048,7 +2048,7 @@
 					},
 					"response": [
 						{
-							"name": "success",
+							"name": "success 1.1",
 							"originalRequest": {
 								"method": "POST",
 								"header": [
@@ -2115,6 +2115,75 @@
 							],
 							"cookie": [],
 							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"consigneeId\": 1,\n            \"consignorId\": 1,\n            \"consigneeCode\": \"A0001\",\n            \"consigneeName\": \"CHANDRAHASA AGENCIES\",\n            \"phone1\": \"7386647373\",\n            \"phone2\": \"7386647373\",\n            \"email\": \"abc@gmail.com\",\n            \"address1\": \"VENKATESHWARA TALKIES ROAD SATHUPALLI-507303,TS.\",\n            \"address2\": \"SATTUPALLI\",\n            \"cityId\": null,\n            \"districtId\": 9,\n            \"stateId\": 1,\n            \"branchId\": 1,\n            \"distanceToBranchKms\": 10,\n            \"odaType\": \"LOCAL\",\n            \"tatNumber\": 2,\n            \"createdOn\": \"2024-04-15T16:37:47.253Z\",\n            \"modifiedOn\": \"2024-04-15T16:37:47.253Z\",\n            \"consignor\": {\n                \"consignorId\": 1,\n                \"consignorCode\": \"CUST-A00174\",\n                \"publicName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"legalName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"industryTypeId\": 1,\n                \"commodityId\": 1,\n                \"address1\": \"GROUND, 5-283, ASWINI HOUSE, H P ROAD, MOOSAPET, RANGAREDDY, TELANGANA, 500018\",\n                \"address2\": null,\n                \"cityId\": 1,\n                \"districtId\": null,\n                \"stateId\": 1,\n                \"gstNumber\": \"36AACCA0062D1ZD\",\n                \"panNumber\": \"AACCA0062D\",\n                \"tanNumber\": \"HYDA01519A\",\n                \"cinNumber\": null,\n                \"gstId\": null,\n                \"taxCategory\": null,\n                \"parentConsignorId\": 1,\n                \"branchId\": 1,\n                \"keyContactName\": \"PARAKALA SRINIVAS\",\n                \"keyContactDesignation\": \"LOGISTICS MANAGER\",\n                \"keyContactAddress\": \"Ground, 5-283, Aswini House, H P Road, Mossapet, Rangaredy, Telangana, 500018.\",\n                \"distanceFromBranchKms\": 8,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\",\n                \"modifiedOn\": \"2024-04-15T16:37:47.253Z\"\n            },\n            \"city\": null,\n            \"district\": {\n                \"id\": 9,\n                \"name\": \"SATTUPALLI\",\n                \"isActive\": true,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\"\n            },\n            \"state\": {\n                \"id\": 1,\n                \"name\": \"TELANGANA\",\n                \"isActive\": true,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\"\n            },\n            \"branch\": {\n                \"id\": 1,\n                \"branchCode\": \"STUP\",\n                \"branchName\": \"SATHUPALLI\",\n                \"address1\": \"D.NO.6-41/A, D.B.R.COMPLEX,VENKATESWARA TAKIES ROA,OLD BUS STAND, SATTUPALLI, KHAMMAM DISTRICT\",\n                \"address2\": null,\n                \"cityId\": 7,\n                \"districtId\": 1,\n                \"stateId\": 1,\n                \"phone1\": \"8886679258\",\n                \"phone2\": null,\n                \"isHub\": true,\n                \"isActive\": true,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\"\n            }\n        },\n        {\n            \"consigneeId\": 2,\n            \"consignorId\": 1,\n            \"consigneeCode\": \"A0002\",\n            \"consigneeName\": \"JAI GURUDATTA AGENCIES\",\n            \"phone1\": \"9848795284\",\n            \"phone2\": \"9848795284\",\n            \"email\": \"abc@gmail.com\",\n            \"address1\": \"NEAR SATYA SAI TEMPLE, MANTHANI KARIMNAGAR DIST-505184\",\n            \"address2\": \"MANTHANI\",\n            \"cityId\": null,\n            \"districtId\": 10,\n            \"stateId\": 1,\n            \"branchId\": 2,\n            \"distanceToBranchKms\": 12,\n            \"odaType\": \"ODA1\",\n            \"tatNumber\": 3,\n            \"createdOn\": \"2024-04-15T16:37:47.253Z\",\n            \"modifiedOn\": \"2024-04-15T16:37:47.253Z\",\n            \"consignor\": {\n                \"consignorId\": 1,\n                \"consignorCode\": \"CUST-A00174\",\n                \"publicName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"legalName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"industryTypeId\": 1,\n                \"commodityId\": 1,\n                \"address1\": \"GROUND, 5-283, ASWINI HOUSE, H P ROAD, MOOSAPET, RANGAREDDY, TELANGANA, 500018\",\n                \"address2\": null,\n                \"cityId\": 1,\n                \"districtId\": null,\n                \"stateId\": 1,\n                \"gstNumber\": \"36AACCA0062D1ZD\",\n                \"panNumber\": \"AACCA0062D\",\n                \"tanNumber\": \"HYDA01519A\",\n                \"cinNumber\": null,\n                \"gstId\": null,\n                \"taxCategory\": null,\n                \"parentConsignorId\": 1,\n                \"branchId\": 1,\n                \"keyContactName\": \"PARAKALA SRINIVAS\",\n                \"keyContactDesignation\": \"LOGISTICS MANAGER\",\n                \"keyContactAddress\": \"Ground, 5-283, Aswini House, H P Road, Mossapet, Rangaredy, Telangana, 500018.\",\n                \"distanceFromBranchKms\": 8,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\",\n                \"modifiedOn\": \"2024-04-15T16:37:47.253Z\"\n            },\n            \"city\": null,\n            \"district\": {\n                \"id\": 10,\n                \"name\": \"MANTHANI\",\n                \"isActive\": true,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\"\n            },\n            \"state\": {\n                \"id\": 1,\n                \"name\": \"TELANGANA\",\n                \"isActive\": true,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\"\n            },\n            \"branch\": {\n                \"id\": 2,\n                \"branchCode\": \"MTNI\",\n                \"branchName\": \"MANTHANI\",\n                \"address1\": \"NEAR R T C BUS STAND RAGAVULU NAGAR LAND MARK,STO office opp DR no 2-90/4\",\n                \"address2\": null,\n                \"cityId\": 8,\n                \"districtId\": 2,\n                \"stateId\": 1,\n                \"phone1\": \"9963478183\",\n                \"phone2\": null,\n                \"isHub\": true,\n                \"isActive\": true,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\"\n            }\n        },\n        {\n            \"consigneeId\": 3,\n            \"consignorId\": 1,\n            \"consigneeCode\": \"A0003\",\n            \"consigneeName\": \"NAVEEN ENTERPRISES\",\n            \"phone1\": \"8125013357\",\n            \"phone2\": \"8125013357\",\n            \"email\": \"abc@gmail.com\",\n            \"address1\": \"H.NO.20-83 R B NAGAR,SHAMSHABAD RANGAREDDY,TS-501218,TS.\",\n            \"address2\": \"SHAMSHABAD\",\n            \"cityId\": null,\n            \"districtId\": 11,\n            \"stateId\": 1,\n            \"branchId\": 3,\n            \"distanceToBranchKms\": 38,\n            \"odaType\": \"ODA3\",\n            \"tatNumber\": 4,\n            \"createdOn\": \"2024-04-15T16:37:47.253Z\",\n            \"modifiedOn\": \"2024-04-15T16:37:47.253Z\",\n            \"consignor\": {\n                \"consignorId\": 1,\n                \"consignorCode\": \"CUST-A00174\",\n                \"publicName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"legalName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"industryTypeId\": 1,\n                \"commodityId\": 1,\n                \"address1\": \"GROUND, 5-283, ASWINI HOUSE, H P ROAD, MOOSAPET, RANGAREDDY, TELANGANA, 500018\",\n                \"address2\": null,\n                \"cityId\": 1,\n                \"districtId\": null,\n                \"stateId\": 1,\n                \"gstNumber\": \"36AACCA0062D1ZD\",\n                \"panNumber\": \"AACCA0062D\",\n                \"tanNumber\": \"HYDA01519A\",\n                \"cinNumber\": null,\n                \"gstId\": null,\n                \"taxCategory\": null,\n                \"parentConsignorId\": 1,\n                \"branchId\": 1,\n                \"keyContactName\": \"PARAKALA SRINIVAS\",\n                \"keyContactDesignation\": \"LOGISTICS MANAGER\",\n                \"keyContactAddress\": \"Ground, 5-283, Aswini House, H P Road, Mossapet, Rangaredy, Telangana, 500018.\",\n                \"distanceFromBranchKms\": 8,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\",\n                \"modifiedOn\": \"2024-04-15T16:37:47.253Z\"\n            },\n            \"city\": null,\n            \"district\": {\n                \"id\": 11,\n                \"name\": \"SHAMSHABAD\",\n                \"isActive\": true,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\"\n            },\n            \"state\": {\n                \"id\": 1,\n                \"name\": \"TELANGANA\",\n                \"isActive\": true,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\"\n            },\n            \"branch\": {\n                \"id\": 3,\n                \"branchCode\": \"SSBD\",\n                \"branchName\": \"HYDERABAD - SHAMSHABAD\",\n                \"address1\": \"D.NO.21-65/C, BACKSIDE OF SBI, INDIRA HOSPITAL,,KOTHWALGUDA ROAD, SHAMSHABAD, R.R.DIST.-501 218.\",\n                \"address2\": null,\n                \"cityId\": 9,\n                \"districtId\": 3,\n                \"stateId\": 1,\n                \"phone1\": \"8886679267\",\n                \"phone2\": null,\n                \"isHub\": true,\n                \"isActive\": true,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\"\n            }\n        },\n        {\n            \"consigneeId\": 4,\n            \"consignorId\": 1,\n            \"consigneeCode\": \"A0004\",\n            \"consigneeName\": \"CHANDRAHASA AGENCIES\",\n            \"phone1\": \"7386647373\",\n            \"phone2\": \"7386647373\",\n            \"email\": \"abc@gmail.com\",\n            \"address1\": \"VENKATESHWARA TALKIES ROAD SATHUPALLI-507303,TS.\",\n            \"address2\": \"SATTUPALLI\",\n            \"cityId\": null,\n            \"districtId\": 9,\n            \"stateId\": 1,\n            \"branchId\": 1,\n            \"distanceToBranchKms\": 25,\n            \"odaType\": \"ODA2\",\n            \"tatNumber\": 2,\n            \"createdOn\": \"2024-04-15T16:37:47.253Z\",\n            \"modifiedOn\": \"2024-04-15T16:37:47.253Z\",\n            \"consignor\": {\n                \"consignorId\": 1,\n                \"consignorCode\": \"CUST-A00174\",\n                \"publicName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"legalName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"industryTypeId\": 1,\n                \"commodityId\": 1,\n                \"address1\": \"GROUND, 5-283, ASWINI HOUSE, H P ROAD, MOOSAPET, RANGAREDDY, TELANGANA, 500018\",\n                \"address2\": null,\n                \"cityId\": 1,\n                \"districtId\": null,\n                \"stateId\": 1,\n                \"gstNumber\": \"36AACCA0062D1ZD\",\n                \"panNumber\": \"AACCA0062D\",\n                \"tanNumber\": \"HYDA01519A\",\n                \"cinNumber\": null,\n                \"gstId\": null,\n                \"taxCategory\": null,\n                \"parentConsignorId\": 1,\n                \"branchId\": 1,\n                \"keyContactName\": \"PARAKALA SRINIVAS\",\n                \"keyContactDesignation\": \"LOGISTICS MANAGER\",\n                \"keyContactAddress\": \"Ground, 5-283, Aswini House, H P Road, Mossapet, Rangaredy, Telangana, 500018.\",\n                \"distanceFromBranchKms\": 8,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\",\n                \"modifiedOn\": \"2024-04-15T16:37:47.253Z\"\n            },\n            \"city\": null,\n            \"district\": {\n                \"id\": 9,\n                \"name\": \"SATTUPALLI\",\n                \"isActive\": true,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\"\n            },\n            \"state\": {\n                \"id\": 1,\n                \"name\": \"TELANGANA\",\n                \"isActive\": true,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\"\n            },\n            \"branch\": {\n                \"id\": 1,\n                \"branchCode\": \"STUP\",\n                \"branchName\": \"SATHUPALLI\",\n                \"address1\": \"D.NO.6-41/A, D.B.R.COMPLEX,VENKATESWARA TAKIES ROA,OLD BUS STAND, SATTUPALLI, KHAMMAM DISTRICT\",\n                \"address2\": null,\n                \"cityId\": 7,\n                \"districtId\": 1,\n                \"stateId\": 1,\n                \"phone1\": \"8886679258\",\n                \"phone2\": null,\n                \"isHub\": true,\n                \"isActive\": true,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\"\n            }\n        },\n        {\n            \"consigneeId\": 5,\n            \"consignorId\": 1,\n            \"consigneeCode\": \"A0005\",\n            \"consigneeName\": \"NEW VENKATESHWARA AGENCIES\",\n            \"phone1\": \"9030609785\",\n            \"phone2\": \"9030609785\",\n            \"email\": \"abc@gmail.com\",\n            \"address1\": \"D NO.4-44/2,POTHAIGADDA,NALGONDA DIST,MOTHKUR-508277,TS\",\n            \"address2\": \"MOTHKUR\",\n            \"cityId\": null,\n            \"districtId\": 12,\n            \"stateId\": 1,\n            \"branchId\": 4,\n            \"distanceToBranchKms\": 15,\n            \"odaType\": \"ODA1\",\n            \"tatNumber\": 3,\n            \"createdOn\": \"2024-04-15T16:37:47.253Z\",\n            \"modifiedOn\": \"2024-04-15T16:37:47.253Z\",\n            \"consignor\": {\n                \"consignorId\": 1,\n                \"consignorCode\": \"CUST-A00174\",\n                \"publicName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"legalName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"industryTypeId\": 1,\n                \"commodityId\": 1,\n                \"address1\": \"GROUND, 5-283, ASWINI HOUSE, H P ROAD, MOOSAPET, RANGAREDDY, TELANGANA, 500018\",\n                \"address2\": null,\n                \"cityId\": 1,\n                \"districtId\": null,\n                \"stateId\": 1,\n                \"gstNumber\": \"36AACCA0062D1ZD\",\n                \"panNumber\": \"AACCA0062D\",\n                \"tanNumber\": \"HYDA01519A\",\n                \"cinNumber\": null,\n                \"gstId\": null,\n                \"taxCategory\": null,\n                \"parentConsignorId\": 1,\n                \"branchId\": 1,\n                \"keyContactName\": \"PARAKALA SRINIVAS\",\n                \"keyContactDesignation\": \"LOGISTICS MANAGER\",\n                \"keyContactAddress\": \"Ground, 5-283, Aswini House, H P Road, Mossapet, Rangaredy, Telangana, 500018.\",\n                \"distanceFromBranchKms\": 8,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\",\n                \"modifiedOn\": \"2024-04-15T16:37:47.253Z\"\n            },\n            \"city\": null,\n            \"district\": {\n                \"id\": 12,\n                \"name\": \"MOTHKUR\",\n                \"isActive\": true,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\"\n            },\n            \"state\": {\n                \"id\": 1,\n                \"name\": \"TELANGANA\",\n                \"isActive\": true,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\"\n            },\n            \"branch\": {\n                \"id\": 4,\n                \"branchCode\": \"MTKR\",\n                \"branchName\": \"MOTHKUR\",\n                \"address1\": \"D.NO.108, NEAR GANDHI STATUE,NEAR OLD BUS STAND,MOTHKUR-503277\",\n                \"address2\": null,\n                \"cityId\": 10,\n                \"districtId\": 4,\n                \"stateId\": 1,\n                \"phone1\": \"8886679260\",\n                \"phone2\": null,\n                \"isHub\": true,\n                \"isActive\": true,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\"\n            }\n        },\n        {\n            \"consigneeId\": 6,\n            \"consignorId\": 1,\n            \"consigneeCode\": \"A0006\",\n            \"consigneeName\": \"SAI SANJEETH AGENCIES\",\n            \"phone1\": \"9912742115\",\n            \"phone2\": \"9912742115\",\n            \"email\": \"abc@gmail.com\",\n            \"address1\": \"4-3-61/12/5, RAM NAGAR, BHAINSA DIST NIRMAL-504103,TS.\",\n            \"address2\": \"BHAINSA\",\n            \"cityId\": null,\n            \"districtId\": 13,\n            \"stateId\": 1,\n            \"branchId\": 5,\n            \"distanceToBranchKms\": 10,\n            \"odaType\": \"LOCAL\",\n            \"tatNumber\": 4,\n            \"createdOn\": \"2024-04-15T16:37:47.253Z\",\n            \"modifiedOn\": \"2024-04-15T16:37:47.253Z\",\n            \"consignor\": {\n                \"consignorId\": 1,\n                \"consignorCode\": \"CUST-A00174\",\n                \"publicName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"legalName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"industryTypeId\": 1,\n                \"commodityId\": 1,\n                \"address1\": \"GROUND, 5-283, ASWINI HOUSE, H P ROAD, MOOSAPET, RANGAREDDY, TELANGANA, 500018\",\n                \"address2\": null,\n                \"cityId\": 1,\n                \"districtId\": null,\n                \"stateId\": 1,\n                \"gstNumber\": \"36AACCA0062D1ZD\",\n                \"panNumber\": \"AACCA0062D\",\n                \"tanNumber\": \"HYDA01519A\",\n                \"cinNumber\": null,\n                \"gstId\": null,\n                \"taxCategory\": null,\n                \"parentConsignorId\": 1,\n                \"branchId\": 1,\n                \"keyContactName\": \"PARAKALA SRINIVAS\",\n                \"keyContactDesignation\": \"LOGISTICS MANAGER\",\n                \"keyContactAddress\": \"Ground, 5-283, Aswini House, H P Road, Mossapet, Rangaredy, Telangana, 500018.\",\n                \"distanceFromBranchKms\": 8,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\",\n                \"modifiedOn\": \"2024-04-15T16:37:47.253Z\"\n            },\n            \"city\": null,\n            \"district\": {\n                \"id\": 13,\n                \"name\": \"BHAINSA\",\n                \"isActive\": true,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\"\n            },\n            \"state\": {\n                \"id\": 1,\n                \"name\": \"TELANGANA\",\n                \"isActive\": true,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\"\n            },\n            \"branch\": {\n                \"id\": 5,\n                \"branchCode\": \"BNSA\",\n                \"branchName\": \"BHAINSA\",\n                \"address1\": \"D.NO.3-5-130/1D,ASADBABA NAGAR\",\n                \"address2\": null,\n                \"cityId\": 11,\n                \"districtId\": 5,\n                \"stateId\": 1,\n                \"phone1\": \"8886679250\",\n                \"phone2\": null,\n                \"isHub\": true,\n                \"isActive\": true,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\"\n            }\n        },\n        {\n            \"consigneeId\": 7,\n            \"consignorId\": 1,\n            \"consigneeCode\": \"A0007\",\n            \"consigneeName\": \"SAI SANJEETH AGENCIES\",\n            \"phone1\": \"9912742115\",\n            \"phone2\": \"9912742115\",\n            \"email\": \"abc@gmail.com\",\n            \"address1\": \"4-3-61/12/5 BHAINSA DIST NIRMAL-504103,TS.\",\n            \"address2\": \"BHAINSA\",\n            \"cityId\": null,\n            \"districtId\": 13,\n            \"stateId\": 1,\n            \"branchId\": 5,\n            \"distanceToBranchKms\": 12,\n            \"odaType\": \"ODA1\",\n            \"tatNumber\": 2,\n            \"createdOn\": \"2024-04-15T16:37:47.253Z\",\n            \"modifiedOn\": \"2024-04-15T16:37:47.253Z\",\n            \"consignor\": {\n                \"consignorId\": 1,\n                \"consignorCode\": \"CUST-A00174\",\n                \"publicName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"legalName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"industryTypeId\": 1,\n                \"commodityId\": 1,\n                \"address1\": \"GROUND, 5-283, ASWINI HOUSE, H P ROAD, MOOSAPET, RANGAREDDY, TELANGANA, 500018\",\n                \"address2\": null,\n                \"cityId\": 1,\n                \"districtId\": null,\n                \"stateId\": 1,\n                \"gstNumber\": \"36AACCA0062D1ZD\",\n                \"panNumber\": \"AACCA0062D\",\n                \"tanNumber\": \"HYDA01519A\",\n                \"cinNumber\": null,\n                \"gstId\": null,\n                \"taxCategory\": null,\n                \"parentConsignorId\": 1,\n                \"branchId\": 1,\n                \"keyContactName\": \"PARAKALA SRINIVAS\",\n                \"keyContactDesignation\": \"LOGISTICS MANAGER\",\n                \"keyContactAddress\": \"Ground, 5-283, Aswini House, H P Road, Mossapet, Rangaredy, Telangana, 500018.\",\n                \"distanceFromBranchKms\": 8,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\",\n                \"modifiedOn\": \"2024-04-15T16:37:47.253Z\"\n            },\n            \"city\": null,\n            \"district\": {\n                \"id\": 13,\n                \"name\": \"BHAINSA\",\n                \"isActive\": true,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\"\n            },\n            \"state\": {\n                \"id\": 1,\n                \"name\": \"TELANGANA\",\n                \"isActive\": true,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\"\n            },\n            \"branch\": {\n                \"id\": 5,\n                \"branchCode\": \"BNSA\",\n                \"branchName\": \"BHAINSA\",\n                \"address1\": \"D.NO.3-5-130/1D,ASADBABA NAGAR\",\n                \"address2\": null,\n                \"cityId\": 11,\n                \"districtId\": 5,\n                \"stateId\": 1,\n                \"phone1\": \"8886679250\",\n                \"phone2\": null,\n                \"isHub\": true,\n                \"isActive\": true,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\"\n            }\n        },\n        {\n            \"consigneeId\": 8,\n            \"consignorId\": 1,\n            \"consigneeCode\": \"A0008\",\n            \"consigneeName\": \"PAVAN TRADERS\",\n            \"phone1\": \"9849682712\",\n            \"phone2\": \"9849682712\",\n            \"email\": \"abc@gmail.com\",\n            \"address1\": \"B.C.COLONY ROAD RAMAYAMPET NEAR BUS STAND,MEDAK DIST-502101,TS.\",\n            \"address2\": \"RAMAYAMPET\",\n            \"cityId\": null,\n            \"districtId\": 14,\n            \"stateId\": 1,\n            \"branchId\": 6,\n            \"distanceToBranchKms\": 35,\n            \"odaType\": \"ODA3\",\n            \"tatNumber\": 3,\n            \"createdOn\": \"2024-04-15T16:37:47.253Z\",\n            \"modifiedOn\": \"2024-04-15T16:37:47.253Z\",\n            \"consignor\": {\n                \"consignorId\": 1,\n                \"consignorCode\": \"CUST-A00174\",\n                \"publicName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"legalName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"industryTypeId\": 1,\n                \"commodityId\": 1,\n                \"address1\": \"GROUND, 5-283, ASWINI HOUSE, H P ROAD, MOOSAPET, RANGAREDDY, TELANGANA, 500018\",\n                \"address2\": null,\n                \"cityId\": 1,\n                \"districtId\": null,\n                \"stateId\": 1,\n                \"gstNumber\": \"36AACCA0062D1ZD\",\n                \"panNumber\": \"AACCA0062D\",\n                \"tanNumber\": \"HYDA01519A\",\n                \"cinNumber\": null,\n                \"gstId\": null,\n                \"taxCategory\": null,\n                \"parentConsignorId\": 1,\n                \"branchId\": 1,\n                \"keyContactName\": \"PARAKALA SRINIVAS\",\n                \"keyContactDesignation\": \"LOGISTICS MANAGER\",\n                \"keyContactAddress\": \"Ground, 5-283, Aswini House, H P Road, Mossapet, Rangaredy, Telangana, 500018.\",\n                \"distanceFromBranchKms\": 8,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\",\n                \"modifiedOn\": \"2024-04-15T16:37:47.253Z\"\n            },\n            \"city\": null,\n            \"district\": {\n                \"id\": 14,\n                \"name\": \"RAMAYAMPET\",\n                \"isActive\": true,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\"\n            },\n            \"state\": {\n                \"id\": 1,\n                \"name\": \"TELANGANA\",\n                \"isActive\": true,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\"\n            },\n            \"branch\": {\n                \"id\": 6,\n                \"branchCode\": \"RMYP\",\n                \"branchName\": \"RAMAYAMPET\",\n                \"address1\": \"H.NO.1-11-54 NARSUPALLY STREET, MEDAK MANDAL, ,medak(district), pin code 502110\",\n                \"address2\": null,\n                \"cityId\": 12,\n                \"districtId\": 6,\n                \"stateId\": 1,\n                \"phone1\": \"8886679266\",\n                \"phone2\": null,\n                \"isHub\": true,\n                \"isActive\": true,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\"\n            }\n        },\n        {\n            \"consigneeId\": 9,\n            \"consignorId\": 1,\n            \"consigneeCode\": \"A0009\",\n            \"consigneeName\": \"SRIKANTH TRADERS\",\n            \"phone1\": \"9849225139\",\n            \"phone2\": \"9849225139\",\n            \"email\": \"abc@gmail.com\",\n            \"address1\": \"2-2-154,SUBHASH GUNJ,ZAHEERABAD-502220,TS.\",\n            \"address2\": \"ZAHEERABAD\",\n            \"cityId\": null,\n            \"districtId\": 15,\n            \"stateId\": 1,\n            \"branchId\": 7,\n            \"distanceToBranchKms\": 25,\n            \"odaType\": \"ODA2\",\n            \"tatNumber\": 4,\n            \"createdOn\": \"2024-04-15T16:37:47.253Z\",\n            \"modifiedOn\": \"2024-04-15T16:37:47.253Z\",\n            \"consignor\": {\n                \"consignorId\": 1,\n                \"consignorCode\": \"CUST-A00174\",\n                \"publicName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"legalName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"industryTypeId\": 1,\n                \"commodityId\": 1,\n                \"address1\": \"GROUND, 5-283, ASWINI HOUSE, H P ROAD, MOOSAPET, RANGAREDDY, TELANGANA, 500018\",\n                \"address2\": null,\n                \"cityId\": 1,\n                \"districtId\": null,\n                \"stateId\": 1,\n                \"gstNumber\": \"36AACCA0062D1ZD\",\n                \"panNumber\": \"AACCA0062D\",\n                \"tanNumber\": \"HYDA01519A\",\n                \"cinNumber\": null,\n                \"gstId\": null,\n                \"taxCategory\": null,\n                \"parentConsignorId\": 1,\n                \"branchId\": 1,\n                \"keyContactName\": \"PARAKALA SRINIVAS\",\n                \"keyContactDesignation\": \"LOGISTICS MANAGER\",\n                \"keyContactAddress\": \"Ground, 5-283, Aswini House, H P Road, Mossapet, Rangaredy, Telangana, 500018.\",\n                \"distanceFromBranchKms\": 8,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\",\n                \"modifiedOn\": \"2024-04-15T16:37:47.253Z\"\n            },\n            \"city\": null,\n            \"district\": {\n                \"id\": 15,\n                \"name\": \"ZAHEERABAD\",\n                \"isActive\": true,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\"\n            },\n            \"state\": {\n                \"id\": 1,\n                \"name\": \"TELANGANA\",\n                \"isActive\": true,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\"\n            },\n            \"branch\": {\n                \"id\": 7,\n                \"branchCode\": \"ZHB\",\n                \"branchName\": \"ZAHEERABAD\",\n                \"address1\": \"D.NO.2-3-222,BHAVANI MANDHIR ROAD,ZAHEERABAD\",\n                \"address2\": null,\n                \"cityId\": 13,\n                \"districtId\": 7,\n                \"stateId\": 1,\n                \"phone1\": \"8886679272\",\n                \"phone2\": null,\n                \"isHub\": true,\n                \"isActive\": true,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\"\n            }\n        },\n        {\n            \"consigneeId\": 10,\n            \"consignorId\": 1,\n            \"consigneeCode\": \"A0010\",\n            \"consigneeName\": \"THE VENKATESWARA AGENCIES\",\n            \"phone1\": \"9866193183\",\n            \"phone2\": \"9866193183\",\n            \"email\": \"abc@gmail.com\",\n            \"address1\": \"5-1-118,TRISUL COMPLEX YELLANDU,KHAMMAM DIST TS-507123\",\n            \"address2\": \"YELLANDU\",\n            \"cityId\": null,\n            \"districtId\": 16,\n            \"stateId\": 1,\n            \"branchId\": 8,\n            \"distanceToBranchKms\": 15,\n            \"odaType\": \"ODA1\",\n            \"tatNumber\": 5,\n            \"createdOn\": \"2024-04-15T16:37:47.253Z\",\n            \"modifiedOn\": \"2024-04-15T16:37:47.253Z\",\n            \"consignor\": {\n                \"consignorId\": 1,\n                \"consignorCode\": \"CUST-A00174\",\n                \"publicName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"legalName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"industryTypeId\": 1,\n                \"commodityId\": 1,\n                \"address1\": \"GROUND, 5-283, ASWINI HOUSE, H P ROAD, MOOSAPET, RANGAREDDY, TELANGANA, 500018\",\n                \"address2\": null,\n                \"cityId\": 1,\n                \"districtId\": null,\n                \"stateId\": 1,\n                \"gstNumber\": \"36AACCA0062D1ZD\",\n                \"panNumber\": \"AACCA0062D\",\n                \"tanNumber\": \"HYDA01519A\",\n                \"cinNumber\": null,\n                \"gstId\": null,\n                \"taxCategory\": null,\n                \"parentConsignorId\": 1,\n                \"branchId\": 1,\n                \"keyContactName\": \"PARAKALA SRINIVAS\",\n                \"keyContactDesignation\": \"LOGISTICS MANAGER\",\n                \"keyContactAddress\": \"Ground, 5-283, Aswini House, H P Road, Mossapet, Rangaredy, Telangana, 500018.\",\n                \"distanceFromBranchKms\": 8,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\",\n                \"modifiedOn\": \"2024-04-15T16:37:47.253Z\"\n            },\n            \"city\": null,\n            \"district\": {\n                \"id\": 16,\n                \"name\": \"YELLANDU\",\n                \"isActive\": true,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\"\n            },\n            \"state\": {\n                \"id\": 1,\n                \"name\": \"TELANGANA\",\n                \"isActive\": true,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\"\n            },\n            \"branch\": {\n                \"id\": 8,\n                \"branchCode\": \"YDU\",\n                \"branchName\": \"YELLANDU\",\n                \"address1\": \"D.NO.4-1-5, OPP.GOVT.HOSPITAL, YELLANDU, ,PIN CODE - 507 123\",\n                \"address2\": null,\n                \"cityId\": 14,\n                \"districtId\": 8,\n                \"stateId\": 1,\n                \"phone1\": \"8885577574\",\n                \"phone2\": null,\n                \"isHub\": true,\n                \"isActive\": true,\n                \"createdOn\": \"2024-04-15T16:37:47.253Z\"\n            }\n        }\n    ]\n}"
+						},
+						{
+							"name": "success with branch 1.2",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MTA4MzA4MTksImV4cCI6MTcxMDgzNDQxOX0.KXsDkAn9qv0isyp6DijdMO5p0a_4E3DCIjKFpFS6ej8",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"consignorId\":1,\r\n    \"toBranchId\":1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/getConsignee",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"getConsignee"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "3640"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"e38-cwSwr/EZxGJbQrm2FowIRthaiy0\""
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 26 Apr 2024 09:25:30 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"consigneeId\": 1,\n            \"consignorId\": 1,\n            \"consigneeCode\": \"A0001\",\n            \"consigneeName\": \"CHANDRAHASA AGENCIES\",\n            \"phone1\": \"7386647373\",\n            \"phone2\": \"7386647373\",\n            \"email\": \"abc@gmail.com\",\n            \"address1\": \"VENKATESHWARA TALKIES ROAD SATHUPALLI-507303,TS.\",\n            \"address2\": \"SATTUPALLI\",\n            \"cityId\": null,\n            \"districtId\": 9,\n            \"stateId\": 1,\n            \"branchId\": 1,\n            \"distanceToBranchKms\": 10,\n            \"odaType\": \"LOCAL\",\n            \"tatNumber\": 2,\n            \"createdOn\": \"2024-04-25T05:47:53.977Z\",\n            \"modifiedOn\": \"2024-04-25T05:47:53.977Z\",\n            \"consignor\": {\n                \"consignorId\": 1,\n                \"consignorCode\": \"CUST-A00174\",\n                \"publicName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"legalName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"industryTypeId\": 1,\n                \"commodityId\": 1,\n                \"address1\": \"GROUND, 5-283, ASWINI HOUSE, H P ROAD, MOOSAPET, RANGAREDDY, TELANGANA, 500018\",\n                \"address2\": null,\n                \"cityId\": 1,\n                \"districtId\": null,\n                \"stateId\": 1,\n                \"gstNumber\": \"36AACCA0062D1ZD\",\n                \"panNumber\": \"AACCA0062D\",\n                \"tanNumber\": \"HYDA01519A\",\n                \"cinNumber\": null,\n                \"gstId\": null,\n                \"taxCategory\": null,\n                \"parentConsignorId\": 1,\n                \"branchId\": 1,\n                \"keyContactName\": \"PARAKALA SRINIVAS\",\n                \"keyContactDesignation\": \"LOGISTICS MANAGER\",\n                \"keyContactAddress\": \"Ground, 5-283, Aswini House, H P Road, Mossapet, Rangaredy, Telangana, 500018.\",\n                \"distanceFromBranchKms\": 8,\n                \"createdOn\": \"2024-04-25T05:47:53.977Z\",\n                \"modifiedOn\": \"2024-04-25T05:47:53.977Z\"\n            },\n            \"city\": null,\n            \"district\": {\n                \"id\": 9,\n                \"name\": \"SATTUPALLI\",\n                \"isActive\": true,\n                \"createdOn\": \"2024-04-25T05:47:53.977Z\"\n            },\n            \"state\": {\n                \"id\": 1,\n                \"name\": \"TELANGANA\",\n                \"isActive\": true,\n                \"createdOn\": \"2024-04-25T05:47:53.977Z\"\n            },\n            \"branch\": {\n                \"id\": 1,\n                \"branchCode\": \"STUP\",\n                \"branchName\": \"SATHUPALLI\",\n                \"address1\": \"D.NO.6-41/A, D.B.R.COMPLEX,VENKATESWARA TAKIES ROA,OLD BUS STAND, SATTUPALLI, KHAMMAM DISTRICT\",\n                \"address2\": null,\n                \"cityId\": 7,\n                \"districtId\": 1,\n                \"stateId\": 1,\n                \"phone1\": \"8886679258\",\n                \"phone2\": null,\n                \"isHub\": true,\n                \"isActive\": true,\n                \"createdOn\": \"2024-04-25T05:47:53.977Z\"\n            }\n        },\n        {\n            \"consigneeId\": 4,\n            \"consignorId\": 1,\n            \"consigneeCode\": \"A0004\",\n            \"consigneeName\": \"CHANDRAHASA AGENCIES\",\n            \"phone1\": \"7386647373\",\n            \"phone2\": \"7386647373\",\n            \"email\": \"abc@gmail.com\",\n            \"address1\": \"VENKATESHWARA TALKIES ROAD SATHUPALLI-507303,TS.\",\n            \"address2\": \"SATTUPALLI\",\n            \"cityId\": null,\n            \"districtId\": 9,\n            \"stateId\": 1,\n            \"branchId\": 1,\n            \"distanceToBranchKms\": 25,\n            \"odaType\": \"ODA2\",\n            \"tatNumber\": 2,\n            \"createdOn\": \"2024-04-25T05:47:53.977Z\",\n            \"modifiedOn\": \"2024-04-25T05:47:53.977Z\",\n            \"consignor\": {\n                \"consignorId\": 1,\n                \"consignorCode\": \"CUST-A00174\",\n                \"publicName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"legalName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"industryTypeId\": 1,\n                \"commodityId\": 1,\n                \"address1\": \"GROUND, 5-283, ASWINI HOUSE, H P ROAD, MOOSAPET, RANGAREDDY, TELANGANA, 500018\",\n                \"address2\": null,\n                \"cityId\": 1,\n                \"districtId\": null,\n                \"stateId\": 1,\n                \"gstNumber\": \"36AACCA0062D1ZD\",\n                \"panNumber\": \"AACCA0062D\",\n                \"tanNumber\": \"HYDA01519A\",\n                \"cinNumber\": null,\n                \"gstId\": null,\n                \"taxCategory\": null,\n                \"parentConsignorId\": 1,\n                \"branchId\": 1,\n                \"keyContactName\": \"PARAKALA SRINIVAS\",\n                \"keyContactDesignation\": \"LOGISTICS MANAGER\",\n                \"keyContactAddress\": \"Ground, 5-283, Aswini House, H P Road, Mossapet, Rangaredy, Telangana, 500018.\",\n                \"distanceFromBranchKms\": 8,\n                \"createdOn\": \"2024-04-25T05:47:53.977Z\",\n                \"modifiedOn\": \"2024-04-25T05:47:53.977Z\"\n            },\n            \"city\": null,\n            \"district\": {\n                \"id\": 9,\n                \"name\": \"SATTUPALLI\",\n                \"isActive\": true,\n                \"createdOn\": \"2024-04-25T05:47:53.977Z\"\n            },\n            \"state\": {\n                \"id\": 1,\n                \"name\": \"TELANGANA\",\n                \"isActive\": true,\n                \"createdOn\": \"2024-04-25T05:47:53.977Z\"\n            },\n            \"branch\": {\n                \"id\": 1,\n                \"branchCode\": \"STUP\",\n                \"branchName\": \"SATHUPALLI\",\n                \"address1\": \"D.NO.6-41/A, D.B.R.COMPLEX,VENKATESWARA TAKIES ROA,OLD BUS STAND, SATTUPALLI, KHAMMAM DISTRICT\",\n                \"address2\": null,\n                \"cityId\": 7,\n                \"districtId\": 1,\n                \"stateId\": 1,\n                \"phone1\": \"8886679258\",\n                \"phone2\": null,\n                \"isHub\": true,\n                \"isActive\": true,\n                \"createdOn\": \"2024-04-25T05:47:53.977Z\"\n            }\n        }\n    ]\n}"
 						}
 					]
 				}
@@ -2130,7 +2199,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"consignorId\":1,\r\n    \"AWBStatus\":\"PickUp\"\r\n}",
+							"raw": "{\r\n    \"consignorId\":null,\r\n    \"AWBStatus\":\"PickUp\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2221,6 +2290,16 @@
 				{
 					"name": "generateAWB",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoidnJvb21zdGVyMiIsImlhdCI6MTcxMzMzODQ3NiwiZXhwIjoxNzEzMzQyMDc2fQ.KhxUjs_gFbqS_EHg0_hL5J4z9zLNk8YTEDmfbQTaxVk",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [
 							{
@@ -2231,7 +2310,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"consignorId\": 2,\r\n    \"awbData\":[\r\n        {\r\n            \"consigneeId\": 1,\r\n            \"fromBranchId\":1,\r\n            \"toBranchId\": 1,\r\n            \"AWBCode\":\"KARAHY\",\r\n            \"numOfArticles\":10\r\n        },\r\n        { \r\n            \"consigneeId\": 14,\r\n            \"fromBranchId\":1,\r\n            \"toBranchId\": 1,\r\n            \"AWBCode\":\"KARAHY\",\r\n            \"numOfArticles\":10\r\n        }\r\n    ]\r\n}",
+							"raw": "{\r\n    \"consignorId\": 1,\r\n    \"awbData\":[\r\n        {\r\n            \"consigneeId\": 1,\r\n            \"toBranchId\": 1,\r\n            \"numOfArticles\":10\r\n        },\r\n        { \r\n            \"consigneeId\": 14,\r\n            \"toBranchId\": 1,\r\n            \"numOfArticles\":10\r\n        }\r\n    ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2931,7 +3010,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n   \"AWBId\": 1,\r\n   \"articleId\": 10\r\n}",
+							"raw": "{\r\n   \"AWBId\": 1,\r\n   \"articleId\": 8\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3092,6 +3171,733 @@
 							],
 							"cookie": [],
 							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"AWB Articles Deleted Successfully\"\n}"
+						}
+					]
+				},
+				{
+					"name": "assignedTriptoAWB",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"AWBId\":1,\r\n    \"tripId\":1,\r\n    \"nextDestinationId\":null,\r\n    \"finalDestinationId\":1  // toBranchId(ConsigneeBranch)\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/AWB/assignedTriptoAWB",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"AWB",
+								"assignedTriptoAWB"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"AWBId\":1,\r\n    \"tripId\":1,\r\n    \"nextDestinationId\":null,\r\n    \"finalDestinationId\":1  // toBranchId(ConsigneeBranch)\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/AWB/assignedTriptoAWB",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"AWB",
+										"assignedTriptoAWB"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "51"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"33-qdr/3ZWgxqOiB7E/d9OWlG5k5H4\""
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 23 Apr 2024 07:49:06 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Trip Assigned to AWB\"\n}"
+						}
+					]
+				},
+				{
+					"name": "AWB/updateAWB",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"AWBId\":1,\r\n    \"consigneeId\":1,\r\n    \"appointmentDate\":\"2003-04-24\",\r\n    \"invoiceNumber\":\"123,456\",\r\n    \"invoiceValue\":3000,\r\n    \"ewayBillNumber\":\"A123456789BCDE\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/AWB/updateAWB",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"AWB",
+								"updateAWB"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"AWBId\":1,\r\n    \"consigneeId\":1,\r\n    \"appointmentDate\":\"2003-04-24\",\r\n    \"invoiceNumber\":\"123,456\",\r\n    \"invoiceValue\":3000,\r\n    \"ewayBillNumber\":\"A123456789BCDE\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/AWB/updateAWB",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"AWB",
+										"updateAWB"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "55"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"37-p+DgTcoX2Nzg/jl37y0lXL2YoOQ\""
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 29 Apr 2024 13:56:45 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"AWB Updated Successfully\"\n}"
+						}
+					]
+				},
+				{
+					"name": "/AWB/updateAWBLineItem",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"AWBId\":1,\r\n    \"awbLineItems\":[\r\n        {\r\n\r\n        \"ActualWeightKg\":18,\r\n        \"lengthCms\":1,\r\n        \"breadthCms\":1,\r\n        \"heightCms\":1,\r\n        \"numOfArticles\":5\r\n        },\r\n        {\r\n            \"id\":2,\r\n        \"ActualWeightKg\":19,\r\n        \"lengthCms\":1,\r\n        \"breadthCms\":2,\r\n        \"heightCms\":1,\r\n        \"numOfArticles\":3\r\n        },\r\n        {\r\n              \"id\":3,\r\n        \"ActualWeightKg\":20,\r\n        \"lengthCms\":1,\r\n        \"breadthCms\":1,\r\n        \"heightCms\":1,\r\n        \"numOfArticles\":2\r\n        }\r\n        ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/AWB/updateAWBLineItem",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"AWB",
+								"updateAWBLineItem"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"AWBId\":8,\r\n    \"awbLineItems\":[\r\n        {\r\n        \"ActualWeightKg\":20,\r\n        \"lengthCms\":1,\r\n        \"breadthCms\":1,\r\n        \"heightCms\":2,\r\n        \"numOfArticles\":5\r\n        },\r\n        {\r\n        \"ActualWeightKg\":20,\r\n        \"lengthCms\":1,\r\n        \"breadthCms\":3,\r\n        \"heightCms\":1,\r\n        \"numOfArticles\":3\r\n        },\r\n        {\r\n        \"ActualWeightKg\":20,\r\n        \"lengthCms\":1,\r\n        \"breadthCms\":2,\r\n        \"heightCms\":1,\r\n        \"numOfArticles\":2\r\n        }\r\n        ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/AWB/updateAWBLineItem",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"AWB",
+										"updateAWBLineItem"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "63"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"3f-98gfz0x3dK/8FnIF33eV/LH3sYw\""
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 29 Apr 2024 13:15:51 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"AWB Line ITem Added Successfully\"\n}"
+						}
+					]
+				},
+				{
+					"name": "AWB/getAWBDetails",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"AWBId\":1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/AWB/getAWBDetails",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"AWB",
+								"getAWBDetails"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"AWBId\":1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/AWB/getAWBDetails",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"AWB",
+										"getAWBDetails"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "809"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"329-HDN7u3mlsVxggV47HA6A7yl0eh4\""
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 29 Apr 2024 13:40:29 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"AWBCode\": \"CUST-A00174290424001\",\n            \"appointmentDate\": \"2003-04-24T00:00:00.000Z\",\n            \"invoiceNumber\": \"123,456\",\n            \"invoiceValue\": 3000,\n            \"ewayBillNumber\": \"A123456789BCDE\",\n            \"numOfArticles\": 10,\n            \"consignorId\": 1,\n            \"consigneeId\": 1,\n            \"AWBStatus\": \"PickUp\",\n            \"articleGenFlag\": true,\n            \"AWBLineItems\": [\n                {\n                    \"id\": 1,\n                    \"ActualWeightKg\": 20,\n                    \"lengthCms\": 1,\n                    \"breadthCms\": 1,\n                    \"heightCms\": 2,\n                    \"numOfArticles\": 5\n                },\n                {\n                    \"id\": 2,\n                    \"ActualWeightKg\": 20,\n                    \"lengthCms\": 1,\n                    \"breadthCms\": 3,\n                    \"heightCms\": 1,\n                    \"numOfArticles\": 3\n                },\n                {\n                    \"id\": 3,\n                    \"ActualWeightKg\": 20,\n                    \"lengthCms\": 1,\n                    \"breadthCms\": 2,\n                    \"heightCms\": 1,\n                    \"numOfArticles\": 2\n                }\n            ],\n            \"consignor\": {\n                \"publicName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\"\n            },\n            \"consignee\": {\n                \"consigneeName\": \"CHANDRAHASA AGENCIES\"\n            },\n            \"fromBranch\": {\n                \"branchName\": \"SATHUPALLI\"\n            },\n            \"toBranch\": {\n                \"branchName\": \"SATHUPALLI\"\n            }\n        }\n    ]\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "trips",
+			"item": [
+				{
+					"name": "getTrips",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"tripStatus\":\"Open\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/getTrips",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"getTrips"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "fail case",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"tripStatus\":\"OPEN\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/getTrips",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"getTrips"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "186"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"ba-vPYgyFOfDslrxIRWtlFNjeXWvSA\""
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 22 Apr 2024 11:30:07 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 400,\n    \"message\": \"Validation Error\",\n    \"errors\": [\n        {\n            \"errorType\": \"validation\",\n            \"message\": \"Invalid Trip Status provided\",\n            \"key\": \"Status Should be: Open,CompletedWithRemarks,Closed.\"\n        }\n    ]\n}"
+						},
+						{
+							"name": "success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"tripStatus\":\"Open\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/getTrips",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"getTrips"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "908"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"38c-7kXBN9J0ZnCIfjZ1ib2Fog8NXYE\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 25 Apr 2024 05:44:06 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"tripCode\": \"22042400001\",\n            \"route\": \"HYD-VZG\",\n            \"tripStatus\": \"Open\",\n            \"numberOfAwb\": null,\n            \"numberOfArticles\": null,\n            \"chargedWeight\": null,\n            \"openingKms\": null,\n            \"closingKms\": null,\n            \"totalKms\": null,\n            \"tripClosingTime\": null,\n            \"latestCheckinHubId\": 1,\n            \"latestCheckinTime\": \"2024-04-25T05:40:12.981Z\",\n            \"latestCheckinType\": \"Inwarded\",\n            \"driver\": {\n                \"id\": 1,\n                \"driverName\": \"Tej Sreeram\",\n                \"phone1\": \"78140\"\n            },\n            \"vehicle\": {\n                \"id\": 1,\n                \"vehicleNum\": \"AP07BX9876\",\n                \"vehicleType\": \"ISUZI DMAX\"\n            }\n        },\n        {\n            \"id\": 3,\n            \"tripCode\": \"22042400003\",\n            \"route\": \"VJZ-RJD\",\n            \"tripStatus\": \"Open\",\n            \"numberOfAwb\": null,\n            \"numberOfArticles\": null,\n            \"chargedWeight\": null,\n            \"openingKms\": null,\n            \"closingKms\": null,\n            \"totalKms\": null,\n            \"tripClosingTime\": null,\n            \"latestCheckinHubId\": null,\n            \"latestCheckinTime\": null,\n            \"latestCheckinType\": null,\n            \"driver\": {\n                \"id\": 2,\n                \"driverName\": \"Janardhan\",\n                \"phone1\": \"55668\"\n            },\n            \"vehicle\": {\n                \"id\": 2,\n                \"vehicleNum\": \"AP37MB9876\",\n                \"vehicleType\": \"BOLERO\"\n            }\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "getTripCheckin",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"tripType\":\"Inwarded\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/getTripCheckin",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"getTripCheckin"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"tripType\":\"Inwarded\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/getTripCheckin",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"getTripCheckin"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "358"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"166-oXbE759QCaw+cggtnWrxnwG3AbU\""
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 23 Apr 2024 11:41:47 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"id\": 2,\n            \"tripId\": 1,\n            \"type\": \"Inwarded\",\n            \"locationBranchId\": 1,\n            \"odometerReading\": 12345,\n            \"time\": \"14:34\",\n            \"trip\": {\n                \"id\": 1,\n                \"tripCode\": \"22042400001\",\n                \"route\": \"HYD-VZG\",\n                \"tripStatus\": \"Open\",\n                \"driver\": {\n                    \"id\": 1,\n                    \"driverName\": \"Tej Sreeram\",\n                    \"phone1\": \"78140\"\n                },\n                \"vehicle\": {\n                    \"id\": 1,\n                    \"vehicleNum\": \"AP07BX9876\",\n                    \"vehicleType\": \"ISUZI DMAX\"\n                }\n            }\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "addTripCheckin",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"tripId\":1,\r\n    \"tripType\":\"Inwarded\",\r\n    \"hubId\":1,\r\n    \"odometerReading\":12345,\r\n    \"inwardTime\":\"14:34\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/addTripCheckin",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"addTripCheckin"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"tripId\":1,\r\n    \"hubId\":1,\r\n    \"odometerReading\":12345,\r\n    \"inwardTime\":\"14:34\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/addTripCheckin",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"addTripCheckin"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "56"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"38-vFhWyQW1DpB+v16g17jMhV+mCAM\""
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 23 Apr 2024 11:31:09 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Trip Checkin Successfully\"\n}"
 						}
 					]
 				}

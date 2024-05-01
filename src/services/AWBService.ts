@@ -1,8 +1,7 @@
-import { ArticleStatus } from '@prisma/client';
+import { ArticleStatus,AwbLineItem} from '@prisma/client';
 import moment from 'moment';
 import prisma from '../client';
 import { AWBCreateData } from '../types/awbTypes';
-
 export const generateBulkAWBForConsignor = async (consignorId: number, awbData: AWBCreateData[]):Promise<boolean> => {
 
     const result=await prisma.$transaction(async prisma => {
@@ -51,6 +50,8 @@ export const generateBulkAWBForConsignor = async (consignorId: number, awbData: 
         let increment = 1;
         if (latestAWB) {
             const lastThreeChars = parseInt(latestAWB.AWBCode.slice(-3));
+            console.log(lastThreeChars,"LASTTHREE");
+            
             increment = lastThreeChars + 1;
         }
 
@@ -96,6 +97,8 @@ export const getGeneratedAWB = async (consignorId: number, AWBStatus: any) => {
             fromBranchId: true,
             toBranchId: true,
             numOfArticles: true,
+            AWBStatus:true,
+            articleGenFlag:true,
             consignor: {
                 select: {
                     consignorCode: true,
@@ -345,3 +348,192 @@ export const markAWBArticleAsDeleted = async (articleId: number, AWBId: number) 
     });
     return deletedArticle;
 };
+
+export const assignedTriptoAWB = async (AWBId:number,tripId:number,nextDestinationId:number,finalDestinationId:number) => {
+    const existingTripLineItem = await prisma.tripLineItem.findFirst({
+        where: {
+            AWBId: AWBId
+        }
+    });
+
+    if(existingTripLineItem) {
+        await prisma.tripLineItem.updateMany({
+            where: {
+                AWBId: AWBId,
+            },
+            data: {
+                tripId: tripId,
+                nextDestinationId: nextDestinationId,
+                finalDestinationId: finalDestinationId
+            }
+        });
+    } else {
+        await prisma.tripLineItem.create({
+            data: {
+                AWBId: AWBId,
+                tripId: tripId,
+                nextDestinationId: nextDestinationId,
+                finalDestinationId: finalDestinationId
+            }
+        });
+    }
+};
+
+export const getUpdateAWB = async (AWBId: number) => {
+    const getUpdateAWBRes = await prisma.airWayBill.findMany({
+        where: {
+          id: AWBId, 
+        },
+        select: {
+          id: true,
+          AWBCode: true,
+          appointmentDate: true,
+          invoiceNumber:true,
+          invoiceValue:true,
+          ewayBillNumber:true,
+          numOfArticles:true,
+          consignorId:true,
+          consigneeId:true,
+          AWBStatus:true,
+          articleGenFlag:true,
+          AWBLineItems: {
+            select: {
+              id: true,
+              ActualWeightKg: true,
+              lengthCms: true,
+              breadthCms: true,
+              heightCms: true,
+              numOfArticles: true,
+            },
+          },
+          consignor: {
+            select: {
+              publicName: true,
+            },
+          },
+          consignee: {
+            select: {
+              consigneeName: true,
+            },
+          },
+          fromBranch: {
+            select: {
+              branchName: true,
+            },
+          },
+          toBranch: {
+            select: {
+              branchName: true,
+            },
+          },
+        },
+      });
+      
+      return getUpdateAWBRes;
+      
+};
+
+export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem[]) => {
+    try {
+        const result = await prisma.$transaction(async (prisma) => {
+       
+
+            for (const item of awbLineItems) {
+                if (item.id) {
+                    // If item has an id, update existing awbLineItem
+                    await prisma.awbLineItem.update({
+                        where: { id: item.id },
+                        data: {
+                            ActualWeightKg: item.ActualWeightKg,
+                            lengthCms: item.lengthCms ?? 0,
+                            breadthCms: item.breadthCms ?? 0,
+                            heightCms: item.heightCms ?? 0,
+                            numOfArticles: item.numOfArticles,
+                            volume: (item.lengthCms ?? 0) * (item.breadthCms ?? 0) * (item.heightCms ?? 0)
+                        }
+                    });
+                } else {
+                    // If item does not have an id, create new awbLineItem
+                    await prisma.awbLineItem.create({
+                        data: {
+                            AWBId: AWBId,
+                            lineItemDescription: "",
+                            ActualWeightKg: item.ActualWeightKg,
+                            lengthCms: item.lengthCms ?? 0,
+                            breadthCms: item.breadthCms ?? 0,
+                            heightCms: item.heightCms ?? 0,
+                            numOfArticles: item.numOfArticles,
+                            volume: (item.lengthCms ?? 0) * (item.breadthCms ?? 0) * (item.heightCms ?? 0)
+                        }
+                    });
+                }
+            }
+
+
+        const aggregateResults = await prisma.awbLineItem.aggregate({
+            _sum: {
+                volume: true,
+                ActualWeightKg: true,
+                numOfArticles: true
+            },
+            where: {
+                AWBId: AWBId
+            }
+        })
+        const { volume, ActualWeightKg, numOfArticles } = aggregateResults._sum;
+        const updatedAirWayBill = await prisma.airWayBill.update({
+            where: {
+                id: AWBId
+            },
+            data: {
+                rollupArticleCnt: numOfArticles || 0,
+                rollupWeight: ActualWeightKg || 0,
+                rollupVolume: volume || 0
+            }
+        });
+        return true;
+      });
+    }
+    catch (error) {
+        console.error("Error in updateAWBLineItem", error);
+        throw error; 
+      
+     
+  };
+}
+  
+export const updateAWB = async (AWBId: number,consigneeId: number,appointmentDate: Date,invoiceNumber: string,invoiceValue: number,ewayBillNumber: string): Promise<string | boolean> => {
+    try {
+      const result = await prisma.$transaction(async (prisma) => {
+        const AWBRes = await prisma.airWayBill.findMany({
+          where: {
+            id: AWBId,
+          },
+        });
+  
+        if (AWBRes.length === 0) {
+          return "NotExists";
+        }
+  
+        await prisma.airWayBill.update({
+          where: {
+            id: AWBId,
+          },
+          data: {
+            consigneeId: consigneeId,
+            appointmentDate: appointmentDate,
+            invoiceNumber: invoiceNumber,
+            invoiceValue: invoiceValue,
+            ewayBillNumber: ewayBillNumber,
+          },
+        });
+        return true;
+      });
+  
+      return result;
+    } catch (error) {
+      console.error("Error in updateAWB", error);
+      throw error; 
+    }
+  };
+  
