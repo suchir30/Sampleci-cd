@@ -1,16 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
-
 import * as masterDataService from '../services/masterDataService';
 import * as consignorService from '../services/consignorService';
 import * as consigneeService from '../services/consigneeService';
 import * as AWBService from '../services/AWBService';
+import * as tripService from '../services/tripService';
 import { AWBCreateData } from '../types/awbTypes';
 import { HttpStatusCode } from '../types/apiTypes';
 import { buildNoContentResponse, buildObjectFetchResponse, throwValidationError } from '../utils/apiUtils';
-import { Consignee, Consignor } from '@prisma/client';
-
-
-
+import { Consignee, Consignor,AwbLineItem} from '@prisma/client';
 
 export const getIndustryTypes = async (_req: Request, res: Response, next: NextFunction) => {
   try {
@@ -168,10 +165,12 @@ export const createConsignors = async (req: Request, res: Response, next: NextFu
 export const getConsignees = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const consignorId: number = req.body.consignorId;
+    const toBranchId: number = req.body.toBranchId;
+    
     if (!consignorId) {
       throwValidationError([{message: "No Consignor Id Provided."}]);
     }
-    const consignees = await consigneeService.getConsignees(consignorId);
+    const consignees = await consigneeService.getConsignees(consignorId,toBranchId);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(consignees));
   } catch (err) {
     console.error('Error retrieving consignees:', err);
@@ -352,6 +351,139 @@ export const markAWBArticleAsDeleted = async (req: Request, res: Response, next:
     res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWB Articles Deleted Successfully"));
   } catch (err) {
     console.error('Error markAWBArticlesAsDeleted', err);
+    next(err)
+  }
+}
+export const assignedTriptoAWB = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const AWBId:number=req.body.AWBId
+    const tripId:number=req.body.tripId
+    const nextDestinationId:number=req.body.nextDestinationId
+    const finalDestinationId:number=req.body.finalDestinationId  //toBranch(ConsigneeBranch)
+
+    if (!AWBId || !tripId || !finalDestinationId) {
+      throwValidationError([{message: "Mandatory fields are missing"}]);
+    }
+    const assignedTriptoAWBResult = await AWBService.assignedTriptoAWB(AWBId,tripId,nextDestinationId,finalDestinationId);
+    res.status(HttpStatusCode.OK).json(buildNoContentResponse("Trip Assigned to AWB"));
+  } catch (err) {
+    console.error('Error assignedTriptoAWB', err);
+    next(err)
+  }
+}
+
+export const getUpdateAWB = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const AWBId: number = req.body.AWBId;
+    if (!AWBId) {
+      throwValidationError([{message: "No AWBId Provided."}]);
+    }
+    const getUpdateAWBRes = await AWBService.getUpdateAWB(AWBId);
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getUpdateAWBRes));
+  } catch (err) {
+    console.error('Error retrieving getUpdateAWB:', err);
+    next(err)
+  }
+}
+
+export const updateAWB = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const AWBId:number=req.body.AWBId
+    const consigneeId:number=req.body.consigneeId
+    const invoiceNumber:string=req.body.invoiceNumber;
+    const invoiceValue:number = req.body.invoiceValue;
+    const ewayBillNumber:string=req.body.ewayBillNumber;
+    const appointmentDate = new Date(req.body.appointmentDate);
+
+    if (isNaN(appointmentDate.getTime())) {
+      throwValidationError([{ message: "Invalid appointment date(YYYY/MM/DD)" }]);
+    }
+
+    if (!AWBId) {
+      throwValidationError([{ message: "AWB ID is required" }]);
+    }
+    const updateAWBRes = await AWBService.updateAWB(AWBId,consigneeId,appointmentDate,invoiceNumber,invoiceValue,ewayBillNumber);
+    if(updateAWBRes=="NotExists"){
+      throwValidationError([{message: "Invalid AWB ID"}]);
+    }
+    else{
+      res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWB Updated Successfully"));
+    }
+  
+  } catch (err) {
+    console.error('Error updateAWB', err);
+    next(err)
+  }
+}
+
+export const updateAWBLineItem = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const AWBId:number=req.body.AWBId
+    const awbLineItems: AwbLineItem[] = req.body.awbLineItems || [];
+   const updateAWBLineItemResult = await AWBService.updateAWBLineItem(AWBId,awbLineItems);
+    res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWB Line ITem Added Successfully"));
+  } catch (err) {
+    console.error('Error updateAWB', err);
+    next(err)
+  }
+}
+
+export const getTrips = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const tripStatus:string=req.body.tripStatus
+    const validtripStatus = ['Open','CompletedWithRemarks','Closed'];
+    if (!validtripStatus.includes(tripStatus)) {
+      throwValidationError([{message: "Invalid Trip Status provided",key:`Status Should be: ${validtripStatus}.`}]);
+    }
+    const getTripsResult = await tripService.getTrips(tripStatus);
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getTripsResult));
+  } catch (err) {
+    console.error('Error getTrips', err);
+    next(err)
+  }
+}
+
+export const addTripCheckin = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const inwardTime:string  =req.body.inwardTime;
+    const tripId:number  =req.body.tripId;
+    const hubId:number=req.body.hubId
+    const odometerReading:number=req.body.odometerReading
+    const tripType:string=req.body.tripType
+    if (!inwardTime) {
+      throwValidationError([{message: "inwardTime is Mandatory"}]);
+    }
+    if (!tripId) {
+      throwValidationError([{message: "tripId is Mandatory"}]);
+    }
+    if (!hubId) {
+      throwValidationError([{message: "hubId is Mandatory"}]);
+    }
+    if (!odometerReading) {
+      throwValidationError([{message: "odometerReading is Mandatory"}]);
+    }
+    if (!tripType) {
+      throwValidationError([{message: "tripType is Mandatory"}]);
+    }
+    const getTripsResult = await tripService.addTripCheckin(inwardTime,tripId,hubId,odometerReading,tripType);
+    res.status(HttpStatusCode.OK).json(buildNoContentResponse("Trip Checkin Successfully"));
+  } catch (err) {
+    console.error('Error addTripCheckin', err);
+    next(err)
+  }
+}
+
+export const getTripCheckin = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const tripType:string=req.body.tripType
+    const validtripType = ['Inwarded','Outwarded'];
+    if (!validtripType.includes(tripType)) {
+      throwValidationError([{message: "Invalid Trip Type provided",key:`Status Should be: ${validtripType}.`}]);
+    }
+    const getTripsResult = await tripService.getTripCheckin(tripType);
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getTripsResult));
+  } catch (err) {
+    console.error('Error getTripCheckin', err);
     next(err)
   }
 }

@@ -23,16 +23,6 @@ export const getConsignors = async () => {
   return consignors;
 }
 
-// export const createConsignors = async (consignorsData: Consignor[]) => {
-//   console.log(consignorsData[0].consignorCode,"%%%%%%%%%%%%%%%%%%%%%%%")
-//   const newConsignor = await prisma.consignor.createMany({
-//     data: consignorsData,
-//   });
-//   return newConsignor;
-// };
-
-
-
 export const createConsignors = async (consignorsData: Consignor[]) => {
   try {
   
