@@ -166,7 +166,7 @@ export const getConsignorBranches = async (consignorId:number) => {
   try {
     const consignorRateTables = await prisma.consignorRateTable.findMany({
       where: {
-        consignorId: 1,
+        consignorId: consignorId,
       },
       select: {
         ratePerKg:true,
@@ -174,6 +174,7 @@ export const getConsignorBranches = async (consignorId:number) => {
         consignorId:true,
         branch: {
           select: {
+            id:true,
             branchName: true,
             branchCode: true,
             address1: true,
