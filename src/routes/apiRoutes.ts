@@ -22,7 +22,7 @@ router.post('/addConsignorBranch', apiController.addConsignorBranch);
 router.post('/getConsignee', apiController.getConsignees);
 router.post('/consignor', apiController.createConsignors);
 router.post('/consignee', apiController.createConsignees);
-router.post('/AWB/getAWB', apiController.getGeneratedAWB);
+router.post('/AWB/getAWBs', apiController.getGeneratedAWB);
 router.post('/AWB/generateAWB', apiController.generateBulkAWBForConsignor);
 router.post('/AWB/updateArticleCount', apiController.updateArticleCountForAWB);
 router.post('/AWB/getAWBArticles', apiController.getAWBArticles);
@@ -30,12 +30,16 @@ router.post('/AWB/generateAWBArticles', apiController.generateAWBArticles);
 router.post('/AWB/addAWBArticles', apiController.addAWBArticles);
 router.post('/AWB/markAWBArticlesAsPrinted', apiController.markAWBArticlesAsPrinted);
 router.post('/AWB/markAWBArticleAsDeleted', apiController.markAWBArticleAsDeleted);
-router.post('/AWB/assignedTriptoAWB',apiController.assignedTriptoAWB)
+router.post('/AWB/addTripLineItems',apiController.assignedTriptoAWB)
 router.post('/AWB/getAWBDetails',apiController.getUpdateAWB)
 router.post('/AWB/updateAWB',apiController.updateAWB)
-router.post('/AWB/updateAWBLineItem',apiController.updateAWBLineItem)
+router.post('/AWB/addAWBLineItems',apiController.updateAWBLineItem)
 router.post('/getTrips',apiController.getTrips)
 router.post('/addTripCheckin',apiController.addTripCheckin)
 router.post('/getTripCheckin',apiController.getTripCheckin)
-
+router.post('/getTripCheckin',apiController.getTripCheckin)
+router.post('/unloadArticlesValidate',apiController.unloadArticlesValidate)
+router.post('/loadArticlesValidate',apiController.loadArticlesValidate)
+router.post('/getTripLineItems',apiController.getTripLineItems)
+router.post('/addAWBArticleLogs',apiController.addAWBArticleLogs)
 export default router;

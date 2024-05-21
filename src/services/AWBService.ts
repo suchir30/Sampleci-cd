@@ -99,6 +99,7 @@ export const getGeneratedAWB = async (consignorId: number, AWBStatus: any) => {
             numOfArticles: true,
             AWBStatus:true,
             articleGenFlag:true,
+            rollupArticleCnt:true,
             consignor: {
                 select: {
                     consignorCode: true,
@@ -349,30 +350,32 @@ export const markAWBArticleAsDeleted = async (articleId: number, AWBId: number) 
     return deletedArticle;
 };
 
-export const assignedTriptoAWB = async (AWBId:number,tripId:number,nextDestinationId:number,finalDestinationId:number) => {
+export const assignedTriptoAWB = async (AWBId:number,tripId:number,finalDestinationId:number,status:string) => {
     const existingTripLineItem = await prisma.tripLineItem.findFirst({
         where: {
             AWBId: AWBId
         }
     });
 
-    if(existingTripLineItem) {
+    if(existingTripLineItem?.status=="Assigned") {
         await prisma.tripLineItem.updateMany({
             where: {
                 AWBId: AWBId,
             },
             data: {
                 tripId: tripId,
-                nextDestinationId: nextDestinationId,
                 finalDestinationId: finalDestinationId
             }
         });
-    } else {
+    } 
+    else if(existingTripLineItem?.status=="Open" || existingTripLineItem?.status=="Closed" || existingTripLineItem?.status=="Delivered"){
+        return "Already EXists"
+    }
+    else {
         await prisma.tripLineItem.create({
             data: {
                 AWBId: AWBId,
                 tripId: tripId,
-                nextDestinationId: nextDestinationId,
                 finalDestinationId: finalDestinationId
             }
         });
@@ -436,37 +439,24 @@ export const getUpdateAWB = async (AWBId: number) => {
 export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem[]) => {
     try {
         const result = await prisma.$transaction(async (prisma) => {
-       
-
-            for (const item of awbLineItems) {
-                if (item.id) {
-                    // If item has an id, update existing awbLineItem
-                    await prisma.awbLineItem.update({
-                        where: { id: item.id },
-                        data: {
-                            ActualWeightKg: item.ActualWeightKg,
-                            lengthCms: item.lengthCms ?? 0,
-                            breadthCms: item.breadthCms ?? 0,
-                            heightCms: item.heightCms ?? 0,
-                            numOfArticles: item.numOfArticles,
-                            volume: (item.lengthCms ?? 0) * (item.breadthCms ?? 0) * (item.heightCms ?? 0)
+               
+                    await prisma.awbLineItem.deleteMany({
+                        where: {AWBId:AWBId}
+                        
+                    });
+                    for (const item of awbLineItems) {
+                        await prisma.awbLineItem.create({
+                            data: {
+                                AWBId: AWBId,
+                                lineItemDescription: item.lineItemDescription,
+                                ActualWeightKg: item.ActualWeightKg,
+                                lengthCms: item.lengthCms ?? 0,
+                                breadthCms: item.breadthCms ?? 0,
+                                heightCms: item.heightCms ?? 0,
+                                numOfArticles: item.numOfArticles,
+                                volume: (item.lengthCms ?? 0) * (item.breadthCms ?? 0) * (item.heightCms ?? 0)
                         }
                     });
-                } else {
-                    // If item does not have an id, create new awbLineItem
-                    await prisma.awbLineItem.create({
-                        data: {
-                            AWBId: AWBId,
-                            lineItemDescription: "",
-                            ActualWeightKg: item.ActualWeightKg,
-                            lengthCms: item.lengthCms ?? 0,
-                            breadthCms: item.breadthCms ?? 0,
-                            heightCms: item.heightCms ?? 0,
-                            numOfArticles: item.numOfArticles,
-                            volume: (item.lengthCms ?? 0) * (item.breadthCms ?? 0) * (item.heightCms ?? 0)
-                        }
-                    });
-                }
             }
 
 
