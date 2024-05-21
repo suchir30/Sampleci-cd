@@ -1,0 +1,10 @@
+DEPSType,DEPSSubType,AWBId,loadingHubId,numberOfDepsArticles,vehicleNumberId,tripIdRoute,TicketRaisedBranchId,sealNumber,depsStatus,caseComment
+Shorts,SHORT UNLOAD,1,1,1,1,1,1,,Cleared,Article traced at HYTR. Generated free waybill PTPA00625. Arranged delivery
+Damage,DAMAGE,2,1,14,2,1,2,,Open,"We have received the stock in damage condition in HYTR-RJTR-VSTR vehicle. Arranged the delivery, customer rejected 19 articles. As per KAO team confirmation generated freewaybill and connect the stock to HYTR."
+Damage,DAMAGE,1,1,5,3,1,2,,Open,"We have received the stock in damage condition in HYTR-RJTR-VSTR vehicle. Arranged the delivery, customer rejected 4 articles. As per KAO team confirmation generated freewaybill and connect the stock to HYTR."
+Damage,DAMAGE,3,1,3,1,1,2,,Open,"We have received the stock in damage condition in HYTR-RJTR-VSTR vehicle. Arranged the delivery, customer rejected 1 articles. As per KAO team confirmation generated freewaybill and connect the stock to HYTR."
+Damage,DAMAGE,2,1,1,1,1,2,,Open,"We have received the stock in damage condition in HYTR-RJTR-VSTR vehicle. Arranged the delivery, customer rejected 1 articles. As per KAO team confirmation generated freewaybill and connect the stock to HYTR."
+Excess,WET CONDITION,1,1,3,1,1,2,,Cleared,We have received 3 articles in wet condition in HYTR-RJTR-VSTR Vehicle. After it got dry we have arranged the delivery and we received clean POD.
+Excess,WET CONDITION,3,1,1,1,1,3,,Cleared,We have received 1 articles in wet condition in HYTR-RJTR-VSTR Vehicle. After it got dry we have arranged the delivery and we received clean POD.
+Damage,DAMAGE,4,1,1,1,1,4,,Cleared,We have received 1 articles in damage condition in HYTR-VZTR Vehicle. We have repacked it properly & arranged the delivery and we received clean POD.
+Damage,DAMAGE,1,1,1,1,1,4,,Cleared,We have received 1 articles in damage condition in HYTR-VZTR Vehicle. We have repacked it properly & arranged the delivery and we received clean POD.

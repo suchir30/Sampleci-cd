@@ -1,0 +1,7 @@
+AWBId,lineItemDescription,numOfArticles,ActualWeightKg,lengthCms,breadthCms,heightCms,chargedWeight
+1,a,24,114.72,318.5,230.5,193,145
+2,b,25,480,,,,480
+3,c,60,1616,,,,1620
+4,d,24,504,,,,528
+5,e,9,156,,,,180
+6,f,3,54,,,,55
