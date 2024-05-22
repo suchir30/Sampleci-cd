@@ -358,14 +358,29 @@ export const assignedTriptoAWB = async (req: Request, res: Response, next: NextF
   try {
     const AWBId:number=req.body.AWBId
     const tripId:number=req.body.tripId
-    const nextDestinationId:number=req.body.nextDestinationId
+    const status:string=req.body.status
+    if (!AWBId) {
+      throwValidationError([{ message: `Mandatory field AWBId is missing` }]);
+    }
+    if (!tripId) {
+      throwValidationError([{ message: `Mandatory field AWBId is missing` }]);
+    }
+    if (status=="Assigned") {
+      throwValidationError([{ message: `Please check the status, it should be Assigned` }]);
+    }
     const finalDestinationId:number=req.body.finalDestinationId  //toBranch(ConsigneeBranch)
 
     if (!AWBId || !tripId || !finalDestinationId) {
       throwValidationError([{message: "Mandatory fields are missing"}]);
     }
-    const assignedTriptoAWBResult = await AWBService.assignedTriptoAWB(AWBId,tripId,nextDestinationId,finalDestinationId);
-    res.status(HttpStatusCode.OK).json(buildNoContentResponse("Trip Assigned to AWB"));
+    const assignedTriptoAWBResult = await AWBService.assignedTriptoAWB(AWBId,tripId,finalDestinationId,status);
+    if(assignedTriptoAWBResult=="Already EXists"){
+      throwValidationError([{message: "Already Trip Assigned to AWB"}]);
+    }
+    else{
+      res.status(HttpStatusCode.OK).json(buildNoContentResponse("Trip Assigned to AWB"));
+    }
+   
   } catch (err) {
     console.error('Error assignedTriptoAWB', err);
     next(err)
@@ -482,6 +497,75 @@ export const getTripCheckin = async (req: Request, res: Response, next: NextFunc
     }
     const getTripsResult = await tripService.getTripCheckin(tripType);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getTripsResult));
+  } catch (err) {
+    console.error('Error getTripCheckin', err);
+    next(err)
+  }
+}
+export const unloadArticlesValidate = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const AWBId:number=req.body.AWBId
+    const AWBArticleId:number=req.body.AWBArticleId
+    const tripId:number=req.body.tripId
+    const unloadArticlesValidateResult = await tripService.unloadArticlesValidate(AWBId,AWBArticleId,tripId);
+    console.log(unloadArticlesValidateResult,"res")
+    if(unloadArticlesValidateResult=='Valid'){
+      res.status(HttpStatusCode.OK).json(buildNoContentResponse("Success"));
+    }
+    else if(unloadArticlesValidateResult=='AWBIDInvalid'){
+      res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWBID has no Trip Items,Please check the AWBID"));
+    }
+    else{
+      res.status(HttpStatusCode.OK).json(buildNoContentResponse(`AWBID next destination is ${unloadArticlesValidateResult}. Please do not unload.`));
+    }
+   
+  } catch (err) {
+    console.error('Error getTripCheckin', err);
+    next(err)
+  }
+}
+
+export const loadArticlesValidate = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const AWBId:number=req.body.AWBId
+    const AWBArticleId:number=req.body.AWBArticleId
+    const tripId:number=req.body.tripId
+    const loadArticlesValidateResult = await tripService.loadArticlesValidate(AWBId,AWBArticleId,tripId);
+    console.log(loadArticlesValidateResult,"res")
+    if(loadArticlesValidateResult=='Valid'){
+      res.status(HttpStatusCode.OK).json(buildNoContentResponse("Success"));
+    }
+    else if(loadArticlesValidateResult=='AWBIDInvalid'){
+      res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWBID has no Checkin Trips,Please check the AWBID and TripId"));
+    }
+    else{
+      res.status(HttpStatusCode.OK).json(buildNoContentResponse(`AWBID Should be on the ${loadArticlesValidateResult} TripCode. Please do not load.`));
+    }
+   
+  } catch (err) {
+    console.error('Error getTripCheckin', err);
+    next(err)
+  }
+}
+
+export const getTripLineItems = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const tripId:number=req.body.tripId
+    const scanType:string=req.body.scanType
+    const getTripsResult = await tripService.getTripLineItems(tripId,scanType);
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getTripsResult));
+  } catch (err) {
+    console.error('Error getTripCheckin', err);
+    next(err)
+  }
+}
+export const addAWBArticleLogs = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const AWBArticleId:number=req.body.AWBArticleId
+    const scanType:string=req.body.scanType
+    const tripId:number=req.body.tripId
+    const getTripsResult = await tripService.addAWBArticleLogs(AWBArticleId,scanType,tripId);
+    res.status(HttpStatusCode.OK).json(buildNoContentResponse("Success"));
   } catch (err) {
     console.error('Error getTripCheckin', err);
     next(err)

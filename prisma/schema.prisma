@@ -203,14 +203,15 @@ enum ArticleStatus {
 }
 
 model AwbArticle {
-  id           Int           @id @default(autoincrement())
+  id           Int                  @id @default(autoincrement())
   AWBId        Int
-  AWB          AirWayBill    @relation(fields: [AWBId], references: [id])
-  articleCode  String        @db.VarChar(255)
+  AWB          AirWayBill           @relation(fields: [AWBId], references: [id])
+  articleCode  String               @db.VarChar(255)
   articleIndex Int
-  status       ArticleStatus @default(Created)
-  createdOn    DateTime?     @default(now())
-  modifiedOn   DateTime?     @updatedAt
+  status       ArticleStatus        @default(Created)
+  createdOn    DateTime?            @default(now())
+  modifiedOn   DateTime?            @updatedAt
+  AWBArtIds    AwbArticleTripLogs[] @relation("AWBArtId")
 }
 
 enum RateConsignorStatus {
@@ -237,48 +238,49 @@ enum TripStatus {
 }
 
 model TripDetails {
-  id                  Int              @id @default(autoincrement())
-  tripCode            String           @unique @db.VarChar(255)
-  tripStatus          TripStatus       @default(Open)
-  latestCheckinType   tripCheckinType?
-  latestCheckinHubId  Int?
-  checkinBranch       Branch?          @relation("tripLatestCheckinHub", fields: [latestCheckinHubId], references: [id])
-  latestCheckinTime   DateTime?
-  route               String?          @db.VarChar(255)
-  costPerKg           String?          @db.VarChar(255)
-  localTripNumber     String?          @db.VarChar(255)
-  vendorId            Int?
-  vendor              VendorMaster?    @relation("tripVendorCode", fields: [vendorId], references: [id])
-  vehicleId           Int?
-  vehicle             VehicleMaster?   @relation("tripVehicleId", fields: [vehicleId], references: [id])
-  driverId            Int?
-  driver              DriverMaster?    @relation("tripDriverId", fields: [driverId], references: [id])
-  ftlLocalNumber      String?          @db.VarChar(255)
-  originBranchId      Int?
-  branch              Branch?          @relation("tripBranchId", fields: [originBranchId], references: [id])
-  numberOfAwb         Int?
-  numberOfArticles    Int?
-  chargedWeight       Float?           @db.Float
-  hireAmount          Float?           @db.Float
-  advanceAmount       Float?           @db.Float
-  tdsAmount           Float?           @db.Float
-  balance             Float?           @db.Float
-  openingKms          Float?           @db.Float
-  closingKms          Float?           @db.Float
-  totalKms            Float?           @db.Float
-  tripClosingTime     DateTime?
-  documentStatus      String?          @db.VarChar(255)
-  invoiceStatus       String?          @db.VarChar(255)
-  remarks             String?          @db.VarChar(255)
-  paymentReqDate      DateTime?
-  utrDetails          String?          @db.VarChar(255)
-  ePODsCleared        Boolean?
-  originalPODReceived Boolean?
-  createdOn           DateTime?        @default(now())
-  modifiedOn          DateTime?        @updatedAt
-  tripIdCheckins      TripCheckIn[]    @relation("tripIdCheckin")
-  tripIdTripLineItems TripLineItem[]   @relation("tripIdTripLineItem")
-  depsTripRoutes      DEPS[]           @relation("depsTripRoute")
+  id                    Int                  @id @default(autoincrement())
+  tripCode              String               @unique @db.VarChar(255)
+  tripStatus            TripStatus           @default(Open)
+  latestCheckinType     tripCheckinType?
+  latestCheckinHubId    Int?
+  checkinBranch         Branch?              @relation("tripLatestCheckinHub", fields: [latestCheckinHubId], references: [id])
+  latestCheckinTime     DateTime?
+  route                 String?              @db.VarChar(255)
+  costPerKg             String?              @db.VarChar(255)
+  localTripNumber       String?              @db.VarChar(255)
+  vendorId              Int?
+  vendor                VendorMaster?        @relation("tripVendorCode", fields: [vendorId], references: [id])
+  vehicleId             Int?
+  vehicle               VehicleMaster?       @relation("tripVehicleId", fields: [vehicleId], references: [id])
+  driverId              Int?
+  driver                DriverMaster?        @relation("tripDriverId", fields: [driverId], references: [id])
+  ftlLocalNumber        String?              @db.VarChar(255)
+  originBranchId        Int?
+  branch                Branch?              @relation("tripBranchId", fields: [originBranchId], references: [id])
+  numberOfAwb           Int?
+  numberOfArticles      Int?
+  chargedWeight         Float?               @db.Float
+  hireAmount            Float?               @db.Float
+  advanceAmount         Float?               @db.Float
+  tdsAmount             Float?               @db.Float
+  balance               Float?               @db.Float
+  openingKms            Float?               @db.Float
+  closingKms            Float?               @db.Float
+  totalKms              Float?               @db.Float
+  tripClosingTime       DateTime?
+  documentStatus        String?              @db.VarChar(255)
+  invoiceStatus         String?              @db.VarChar(255)
+  remarks               String?              @db.VarChar(255)
+  paymentReqDate        DateTime?
+  utrDetails            String?              @db.VarChar(255)
+  ePODsCleared          Boolean?
+  originalPODReceived   Boolean?
+  createdOn             DateTime?            @default(now())
+  modifiedOn            DateTime?            @updatedAt
+  tripIdCheckins        TripCheckIn[]        @relation("tripIdCheckin")
+  tripIdTripLineItems   TripLineItem[]       @relation("tripIdTripLineItem")
+  depsTripRoutes        DEPS[]               @relation("depsTripRoute")
+  AWBArticleLogsTripIds AwbArticleTripLogs[] @relation("AWBArticleLogsTripId")
 }
 
 enum tripCheckinType {
@@ -447,6 +449,21 @@ model Contract {
   createdOn                   DateTime              @default(now())
   modifiedOn                  DateTime?             @updatedAt
   AWBContractTypes            AirWayBill[]          @relation("AWBContractType")
+}
+
+enum ArticleLogsScanType {
+  Load
+  Unload
+}
+
+model AwbArticleTripLogs {
+  id           Int                 @id @default(autoincrement())
+  AWBArticleId Int
+  AwbArticle   AwbArticle          @relation("AWBArtId", fields: [AWBArticleId], references: [id])
+  tripId       Int
+  TripDetails  TripDetails         @relation("AWBArticleLogsTripId", fields: [tripId], references: [id])
+  scanType     ArticleLogsScanType
+  createdOn    DateTime            @default(now())
 }
 
 //MASTER TABLES

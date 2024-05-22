@@ -1,6 +1,6 @@
 import fs from 'fs';
 import csvParser from 'csv-parser';
-const { PrismaClient } = require('@prisma/client');
+const { PrismaClient,AWBStatus,ArticleStatus,ContractConsignorType,ContractType,DEPSStatus,DEPSTypeList,PTlRateType,TripLineItemStatus,HLFLineItemStatus} = require('@prisma/client');
 const prisma = new PrismaClient();
 import bcrypt from 'bcrypt';
 const models = [
@@ -14,9 +14,32 @@ const models = [
     'PincodesMaster',
     'Consignee',
     'User',
-    'GstMaster'
+    'GstMaster',
+    'DriverMaster',
+    'VehicleMaster',
+    'AirWayBill',
+    'AwbArticle',
+    'AwbLineItem',
+    'TripDetails',
+    'TripLineItem',
+    'HLFLineItem',
+    'DEPS',
+    'Contract',
+    'VendorMaster'
 ];
-
+const enum_lookup: { [key: string]: any } = {
+    AWBStatus,
+    ArticleStatus,
+    TripLineItemStatus,
+    DEPSTypeList,
+    DEPSStatus,
+    ContractConsignorType,
+    ContractType,
+    PTlRateType,
+    HLFLineItemStatus,
+    
+    // Add other enum types here...
+};
 async function processRow(row: any, modelName: string) {
     const promises = Object.keys(row).map(async (key) => {
         const prismaType = prisma[modelName]?.fields[key]?.typeName;
@@ -34,24 +57,37 @@ async function processRow(row: any, modelName: string) {
             delete row[key];
             return;
         }
-        switch (prismaType) {
-            case "String":
-            case "DateTime":
-                break; // keep as string
-            case "Int":
-                if (!/^\d+$/.test(row[key])) {
-                    throwTypeError();
-                }
-                row[key] = parseInt(row[key], 10);
-                break;
-            case "Boolean":
-                if (!/^[01]$/.test(row[key])) {
-                    throwTypeError();
-                }
-                row[key] = row[key] === "1";
-                break;
-            default:
-                throw Error(`Unhandled prisma type: "${prismaType}" found for key "${key}" of model "${modelName}"`);
+        if ((prisma[modelName]?.fields[key]?.isEnum)&& enum_lookup[prismaType]) {
+            const enumValues = Object.values(enum_lookup[prismaType]);
+            if (!enumValues.includes(row[key])) {
+                throwTypeError();
+            }
+            return;
+        }
+            switch (prismaType) {
+                case "String":
+                case "DateTime":
+                    break; // keep as string
+                case "Int":
+                    if (!/^\d+$/.test(row[key])) {
+                        throwTypeError();
+                    }
+                    row[key] = parseInt(row[key], 10);
+                    break;
+                case "Boolean":
+                    if (!/^[01]$/.test(row[key])) {
+                        throwTypeError();
+                    }
+                    row[key] = row[key] === "1";
+                    break;
+                case "Float":
+                    if (!/^\d+(\.\d+)?$/.test(row[key])) { 
+                        throwTypeError(); 
+                    }
+                    row[key] = parseFloat(row[key]);
+                    break;
+                default:
+                    throw Error(`Unhandled prisma type: "${prismaType}" found for key "${key}" of model "${modelName}"`);
         }
         return row;
     });
