@@ -3,8 +3,10 @@ import { generateRandomCode } from '../scripts/randomGenerator';
 
 import prisma from '../client';
 
-export const getConsignors = async () => {
+export const getConsignors = async (consignorId:number) => {
+  const whereClause = consignorId !== undefined ? { consignorId: consignorId } : {};
   const consignors = await prisma.consignor.findMany({
+    where:whereClause,
     include: {
       city: {
         select: { name: true }

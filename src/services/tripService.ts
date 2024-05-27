@@ -41,7 +41,7 @@ export const getTrips = async (tripStatus:any) => {
     return openTrips;
 };
 
-export const addTripCheckin = async (inwardTime:string, tripId:number, hubId:number, odometerReading:number,tripType:any) => {
+export const addTripCheckin = async (inwardTime:string, tripId:number, hubId:number, odometerReading:number,tripType:any,fileId:number) => {
     const today =moment().toISOString();  
     const result=await prisma.$transaction(async prisma => {
         await prisma.tripCheckIn.create({
@@ -50,7 +50,8 @@ export const addTripCheckin = async (inwardTime:string, tripId:number, hubId:num
                 locationBranchId: hubId,
                 odometerReading: odometerReading,
                 time: inwardTime,
-                type:tripType
+                type:tripType,
+                odometerImgId:fileId
             }
         })
         await prisma.tripDetails.update({
@@ -109,8 +110,12 @@ export const getTripCheckin = async (tripType:any) => {
     return openTrips;
 };
 
-export const unloadArticlesValidate = async (AWBId:number,AWBArticleId:number,tripId:number) => {
+export const unloadArticlesValidate = async (AWBId:string,AWBArticleId:string,tripId:number) => {
     const result=await prisma.$transaction(async prisma => {
+      const AWBIdRes=await prisma.airWayBill.findFirst({
+        where :{AWBCode:AWBId}
+      })
+      console.log(AWBIdRes?.id,"$$$$")
         const tripLineItemRes = await prisma.tripLineItem.findFirst({
             select:{
                 AWBId:true,
@@ -124,7 +129,7 @@ export const unloadArticlesValidate = async (AWBId:number,AWBArticleId:number,tr
                 }
             },
             where: {
-              AWBId: AWBId,
+              AWBId:AWBIdRes?.id,
               tripId:tripId
             }, 
             orderBy: {
@@ -143,7 +148,6 @@ export const unloadArticlesValidate = async (AWBId:number,AWBArticleId:number,tr
                 id: 'desc',
             },
           });
-
           if(tripDetailsRes?.latestCheckinHubId==tripLineItemRes?.nextDestinationId){
          
             console.log("valid")
@@ -158,8 +162,11 @@ export const unloadArticlesValidate = async (AWBId:number,AWBArticleId:number,tr
 };
 
 
-export const loadArticlesValidate = async (AWBId:number,AWBArticleId:number,tripId:number) => {
+export const loadArticlesValidate = async (AWBId:string,AWBArticleId:string,tripId:number) => {
     const result=await prisma.$transaction(async prisma => {
+      const AWBIdRes=await prisma.airWayBill.findFirst({
+        where :{AWBCode:AWBId}
+      })
         const tripLineItemRes = await prisma.tripLineItem.findFirst({
             select:{
                 AWBId:true,
@@ -182,7 +189,7 @@ export const loadArticlesValidate = async (AWBId:number,AWBArticleId:number,trip
 
             },
             where: {
-              AWBId: AWBId,
+              AWBId: AWBIdRes?.id,
               tripId:tripId
             }, 
             orderBy: {
@@ -213,7 +220,8 @@ interface TripDetails {
   vehicleNum?: string;
   numberOfArticles?: number;
   numOfScan: number;
-  AWBCode:string
+  AWBCode:string;
+  AWBCreatedOn?: Date;
 }
 
 
@@ -231,6 +239,7 @@ export const getTripLineItems = async (tripId: number,scanType:any) => {
           AWB: {
             select: {
               AWBCode: true,
+              createdOn:true
             },
           },
         },
@@ -259,7 +268,8 @@ export const getTripLineItems = async (tripId: number,scanType:any) => {
   const groupedResult: { [key: string]: TripDetails } = {};
 
   result.forEach(entry => {
-    const AWBCode = entry.AwbArticle?.AWB?.AWBCode || 'Unknown';
+   const AWBCode = entry.AwbArticle?.AWB?.AWBCode || 'Unknown';
+   const createdOn = entry.AwbArticle?.AWB?.createdOn ?? undefined;
 
     if (!groupedResult[AWBCode]) {
       groupedResult[AWBCode] = {
@@ -271,7 +281,8 @@ export const getTripLineItems = async (tripId: number,scanType:any) => {
         vehicleNum: entry.TripDetails?.vehicle?.vehicleNum,
         numberOfArticles: entry.TripDetails?.numberOfArticles ?? undefined,
         numOfScan: 0,
-        AWBCode: AWBCode
+        AWBCode:AWBCode,
+        AWBCreatedOn:createdOn
       };
     }
 
@@ -283,15 +294,135 @@ export const getTripLineItems = async (tripId: number,scanType:any) => {
   return formattedResult;
 };
 
-export const addAWBArticleLogs = async (AWBArticleId:number,scanType:any,tripId:number) => {
+export const addAWBArticleLogs = async (AWBArticleCode:any,scanType:any,tripId:number) => {
   const today =moment().toISOString();  
    const result=await prisma.$transaction(async prisma => {
+    const AWBArticleRes=await prisma.awbArticle.findFirst({
+      where :{articleCode:AWBArticleCode}
+    })
+
+    if(AWBArticleRes){
       const AWBArticleTripLogsRes=await prisma.awbArticleTripLogs.createMany({
-          data:{
-            AWBArticleId:AWBArticleId,
-            tripId:tripId,
-            scanType:scanType
+        data:{
+          AWBArticleId:AWBArticleRes?.id,
+          tripId:tripId,
+          scanType:scanType
+        }
+    })
+    }
+  
+  })
+};
+
+export const fileUploadRes = async (normalizedFilePaths: string[], type: string) => {
+  try {
+    const createdRecords = await prisma.$transaction(async (prisma) => {
+      const createPromises = normalizedFilePaths.map(async (filePath) => {
+        let data: any = {
+          path: filePath,
+          type: type,
+        };
+
+       
+        const result = await prisma.fileUpload.create({
+          data: data,
+        });
+
+        console.log(`Created ImageLinks record with ID: ${result.id}`);
+
+        return {
+          fileId: result.id,
+          filePath: result.path,
+          fileType: result.type,
+        }; 
+      });
+
+      const createdFiles = await Promise.all(createPromises);
+
+      return createdFiles; 
+     
+    });
+
+    return createdRecords;
+  } catch (error) {
+    console.error('Error creating or updating records:', error);
+    throw new Error('Failed to create or update records');
+  }
+};
+
+export const getDepsLists = async (AWBId: number) => {
+    const result = await prisma.dEPS.findMany({
+      where: {
+        AWBId: AWBId,
+      },
+      select:{
+        id:true,
+        AWBId:true,
+        DEPSType:true,
+        DEPSSubType:true,
+        loadingHubId:true,
+        numberOfDepsArticles:true,
+        connectedDate:true,
+        depsStatus:true,
+        caseComment:true,
+        TicketRaisedBranchId:true,
+        loadingUserId:true,
+        createdOn:true,
+        loadUser:{
+          select:{
+            firstName:true,
+            lastName:true
           }
+        },
+        unloadUser:{
+          select:{
+            firstName:true,
+            lastName:true
+          }
+        },
+        AirWayBill:{select:{AWBCode:true}},
+        depsImages: { 
+          select: {
+            id: true,
+            fileId: true,
+            depsId:true,
+            FileUpload: { 
+              select: {
+                path: true,
+                type:true
+              }
+            }
+          }
+        }
+       
+
+      }
+    })
+    return result;
+};
+
+export const addDeps = async (DEPSData:any,fileIds:any) => {
+   
+   const result=await prisma.$transaction(async prisma => {
+      const addDepsRes=await prisma.dEPS.createMany({
+          data:DEPSData
       })
+      if (addDepsRes.count !== undefined && addDepsRes.count > 0) {
+        const firstRecordId = (await prisma.dEPS.findFirst({
+            where: { AWBId: DEPSData.AWBId },
+            orderBy: { id: 'desc' },select: { id: true },
+            
+        }));
+        if (firstRecordId) {
+          for (const fileId of fileIds) {
+              await prisma.dEPSImages.create({
+                  data: {
+                      depsId: firstRecordId.id,
+                      fileId: fileId
+                  }
+              });
+          }
+      }
+    }
   })
 };

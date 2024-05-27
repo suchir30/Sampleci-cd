@@ -1,6 +1,9 @@
 import { Router } from 'express';
 import * as apiController from '../controllers/apiController';
-
+const multer = require('multer');
+const upload = multer({
+  storage: multer.memoryStorage() // Use memory storage instead of disk storage
+});
 const router = Router();
 
 // Master models
@@ -15,6 +18,7 @@ router.get('/pincode', apiController.getPincodes);
 router.get('/branch', apiController.getBranches);
 router.get('/consignor', apiController.getConsignors);
 router.get('/gstList', apiController.getGstList);
+router.get('/getEmployees', apiController.getEmployees);
 
 // Model POST
 router.post('/getConsignorBranches', apiController.getConsignorBranches);
@@ -42,4 +46,10 @@ router.post('/unloadArticlesValidate',apiController.unloadArticlesValidate)
 router.post('/loadArticlesValidate',apiController.loadArticlesValidate)
 router.post('/getTripLineItems',apiController.getTripLineItems)
 router.post('/addAWBArticleLogs',apiController.addAWBArticleLogs)
+router.post('/fileUpload',upload.fields([{name: 'file', maxCount: 6}]),apiController.fileUpload)
+router.post('/getDepsLists',apiController.getDepsLists)
+router.post('/addDeps',apiController.addDeps)
+
+
+
 export default router;

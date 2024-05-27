@@ -7,7 +7,7 @@
 
 */
 -- AlterTable
-ALTER TABLE `airwaybill` ADD COLUMN `appointmentDate` DATETIME(3) NULL,
+ALTER TABLE `AirWayBill` ADD COLUMN `appointmentDate` DATETIME(3) NULL,
     ADD COLUMN `articleGenFlag` BOOLEAN NOT NULL DEFAULT true,
     ADD COLUMN `contractTypeId` INTEGER NULL,
     ADD COLUMN `rollupArticleCnt` INTEGER NULL,
@@ -15,21 +15,21 @@ ALTER TABLE `airwaybill` ADD COLUMN `appointmentDate` DATETIME(3) NULL,
     ADD COLUMN `subTotal` FLOAT NULL;
 
 -- AlterTable
-ALTER TABLE `awblineitem` DROP COLUMN `AWBLineItemId`,
+ALTER TABLE `AwbLineItem` DROP COLUMN `AWBLineItemId`,
     MODIFY `lineItemDescription` VARCHAR(255) NULL;
 
 -- AlterTable
-ALTER TABLE `tripcheckin` MODIFY `type` ENUM('Inwarded', 'Outwarded') NOT NULL DEFAULT 'Inwarded',
+ALTER TABLE `TripCheckIn` MODIFY `type` ENUM('Inwarded', 'Outwarded') NOT NULL DEFAULT 'Inwarded',
     MODIFY `time` VARCHAR(191) NOT NULL;
 
 -- AlterTable
-ALTER TABLE `tripdetails` ADD COLUMN `latestCheckinHubId` INTEGER NULL,
+ALTER TABLE `TripDetails` ADD COLUMN `latestCheckinHubId` INTEGER NULL,
     ADD COLUMN `latestCheckinTime` DATETIME(3) NULL,
     ADD COLUMN `latestCheckinType` ENUM('Inwarded', 'Outwarded') NULL,
     ADD COLUMN `tripStatus` ENUM('Open', 'CompletedWithRemarks', 'Closed') NOT NULL DEFAULT 'Open';
 
 -- AlterTable
-ALTER TABLE `triplineitem` MODIFY `ePODReceived` BOOLEAN NOT NULL DEFAULT false,
+ALTER TABLE `TripLineItem` MODIFY `ePODReceived` BOOLEAN NOT NULL DEFAULT false,
     MODIFY `originalPODReceived` BOOLEAN NOT NULL DEFAULT false;
 
 -- AddForeignKey

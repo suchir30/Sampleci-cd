@@ -111,9 +111,11 @@ export const getPincodes = async () => {
 
 
 
-export const getBranches = async () => {
+export const getBranches = async (isHub:boolean) => {
   try {
+    const whereClause = isHub !== undefined ? { isHub: isHub } : {};
     const branches = await prisma.branch.findMany({
+      where: whereClause,
       select: {
         id: true,
         branchCode: true,
@@ -135,7 +137,7 @@ export const getBranches = async () => {
           }
         }
       }
-
+      
     });
     return branches;
   } catch (error) {
@@ -231,5 +233,17 @@ export const addConsignorBranch = async (consignorId: number, branchId: number) 
   } catch (error) {
     console.log('Error adding consignor branch:', error);
     throw error;
+  }
+}
+
+
+export const getEmployees = async () => {
+  try {
+    const gstList = await prisma.user.findMany({
+    });
+    return gstList;
+  } catch (error) {
+    console.log('Error retrieving getEmployees', error);
+    throw error
   }
 }

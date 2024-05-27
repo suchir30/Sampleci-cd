@@ -1,4 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
+import fs from 'fs';
+import path from 'path';
 import * as masterDataService from '../services/masterDataService';
 import * as consignorService from '../services/consignorService';
 import * as consigneeService from '../services/consigneeService';
@@ -6,8 +8,9 @@ import * as AWBService from '../services/AWBService';
 import * as tripService from '../services/tripService';
 import { AWBCreateData } from '../types/awbTypes';
 import { HttpStatusCode } from '../types/apiTypes';
+import { MulterFile } from '../types/multerTypes';
 import { buildNoContentResponse, buildObjectFetchResponse, throwValidationError } from '../utils/apiUtils';
-import { Consignee, Consignor,AwbLineItem} from '@prisma/client';
+import { Consignee, Consignor,AwbLineItem, DEPS} from '@prisma/client';
 
 export const getIndustryTypes = async (_req: Request, res: Response, next: NextFunction) => {
   try {
@@ -68,9 +71,10 @@ export const getPincodes = async (_req: Request, res: Response, next: NextFuncti
   }
 }
 
-export const getBranches = async (_req: Request, res: Response, next: NextFunction) => {
+export const getBranches = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const branches = await masterDataService.getBranches();
+    const isHub: boolean = req.body.isHub;
+    const branches = await masterDataService.getBranches(isHub);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(branches));
   } catch (err) {
     console.error('Error retrieving branches:', err);
@@ -87,6 +91,17 @@ export const getGstList = async (_req: Request, res: Response, next: NextFunctio
     next(err)
   }
 }
+
+export const getEmployees = async (_req: Request, res: Response, next: NextFunction) => {
+  try {
+    const getEmployeesRes = await masterDataService.getEmployees();
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getEmployeesRes));
+  } catch (err) {
+    console.error('Error retrieving consignees:', err);
+    next(err)
+  }
+}
+
 export const getConsignorBranches = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const consignorId: number = req.body.consignorId;
@@ -119,9 +134,10 @@ export const addConsignorBranch = async (req: Request, res: Response, next: Next
     next(err)
   }
 }
-export const getConsignors = async (_req: Request, res: Response, next: NextFunction) => {
+export const getConsignors = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const consignors = await consignorService.getConsignors();
+    const consignorId:number=req.body.consignorId
+    const consignors = await consignorService.getConsignors(consignorId);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(consignors));
   } catch (err) {
     console.error('ERROR retrieving consignors:', err);
@@ -365,7 +381,7 @@ export const assignedTriptoAWB = async (req: Request, res: Response, next: NextF
     if (!tripId) {
       throwValidationError([{ message: `Mandatory field AWBId is missing` }]);
     }
-    if (status=="Assigned") {
+    if (status!="Assigned") {
       throwValidationError([{ message: `Please check the status, it should be Assigned` }]);
     }
     const finalDestinationId:number=req.body.finalDestinationId  //toBranch(ConsigneeBranch)
@@ -465,6 +481,7 @@ export const addTripCheckin = async (req: Request, res: Response, next: NextFunc
     const hubId:number=req.body.hubId
     const odometerReading:number=req.body.odometerReading
     const tripType:string=req.body.tripType
+    const fileId:number=req.body.fileId
     if (!inwardTime) {
       throwValidationError([{message: "inwardTime is Mandatory"}]);
     }
@@ -480,7 +497,7 @@ export const addTripCheckin = async (req: Request, res: Response, next: NextFunc
     if (!tripType) {
       throwValidationError([{message: "tripType is Mandatory"}]);
     }
-    const getTripsResult = await tripService.addTripCheckin(inwardTime,tripId,hubId,odometerReading,tripType);
+    const getTripsResult = await tripService.addTripCheckin(inwardTime,tripId,hubId,odometerReading,tripType,fileId);
     res.status(HttpStatusCode.OK).json(buildNoContentResponse("Trip Checkin Successfully"));
   } catch (err) {
     console.error('Error addTripCheckin', err);
@@ -504,8 +521,8 @@ export const getTripCheckin = async (req: Request, res: Response, next: NextFunc
 }
 export const unloadArticlesValidate = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const AWBId:number=req.body.AWBId
-    const AWBArticleId:number=req.body.AWBArticleId
+    const AWBId:string=req.body.AWBCode
+    const AWBArticleId:string=req.body.AWBArticleCode
     const tripId:number=req.body.tripId
     const unloadArticlesValidateResult = await tripService.unloadArticlesValidate(AWBId,AWBArticleId,tripId);
     console.log(unloadArticlesValidateResult,"res")
@@ -527,8 +544,8 @@ export const unloadArticlesValidate = async (req: Request, res: Response, next: 
 
 export const loadArticlesValidate = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const AWBId:number=req.body.AWBId
-    const AWBArticleId:number=req.body.AWBArticleId
+    const AWBId:string=req.body.AWBCode
+    const AWBArticleId:string=req.body.AWBArticleCode
     const tripId:number=req.body.tripId
     const loadArticlesValidateResult = await tripService.loadArticlesValidate(AWBId,AWBArticleId,tripId);
     console.log(loadArticlesValidateResult,"res")
@@ -561,13 +578,90 @@ export const getTripLineItems = async (req: Request, res: Response, next: NextFu
 }
 export const addAWBArticleLogs = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const AWBArticleId:number=req.body.AWBArticleId
+    const AWBArticleCode:string=req.body.AWBArticleCode
     const scanType:string=req.body.scanType
     const tripId:number=req.body.tripId
-    const getTripsResult = await tripService.addAWBArticleLogs(AWBArticleId,scanType,tripId);
+    const getTripsResult = await tripService.addAWBArticleLogs(AWBArticleCode,scanType,tripId);
     res.status(HttpStatusCode.OK).json(buildNoContentResponse("Success"));
   } catch (err) {
     console.error('Error getTripCheckin', err);
+    next(err)
+  }
+}
+
+export const fileUpload = async (req: Request & { files?: { file: MulterFile[] } }, res: Response, next: NextFunction) => {
+  try {
+    if (!req.files || !req.files.file || req.files.file.length === 0) {
+      throwValidationError([{message: "No file uploaded"}]);
+      return 
+    }
+  
+    if (req.files.file.length > 6) {
+      throwValidationError([{ message: "Number of files exceeded. Maximum allowed: 6" }]);
+      return;
+    }
+    const type: string = req.body.type || 'defaultScreen'; 
+    const validType = ['DEPS','AWB','GST','ShippingLabel','TripCheckin'];
+    if (!validType.includes(type)) {
+      throwValidationError([{message: "Invalid type provided",key:`Type Should be: ${validType}.`}]);
+    }
+    const currentTimestamp: string = new Date().getTime().toString(); 
+    const fileUploadPromises: Promise<string>[] = [];
+
+    const uploadDir = path.join(__dirname, '..','..', process.env.UPLOAD_DIR ||'uploads', type);
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+
+    req.files.file.forEach((item: MulterFile) => {
+      const filePath = path.join( 'uploads', type, `${currentTimestamp}_${item.originalname}`);
+
+      fileUploadPromises.push(
+        new Promise((resolve, reject) => {
+          fs.writeFile(filePath, item.buffer, (err) => {
+            if (err) {
+              console.error('Error writing file:', err);
+              reject(err);
+            } else {
+              console.log(`File ${item.originalname} uploaded successfully`);
+              resolve(filePath); 
+            }
+          });
+        })
+      );
+    });
+    const filePaths = await Promise.all(fileUploadPromises);
+    const normalizedFilePaths = filePaths.map((filePath) => filePath.replace(/\\/g, '/'));
+    
+    const fileUploadRes = await tripService.fileUploadRes(normalizedFilePaths,type);
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(fileUploadRes));
+    return
+
+  } catch (error) {
+    console.error('Error in fileUpload:', error);
+    next(error); 
+  }
+};
+
+export const getDepsLists = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const AWBId:number=req.body.AWBId
+    const getDepsListsResult = await tripService.getDepsLists(AWBId);
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getDepsListsResult));
+  } catch (err) {
+    console.error('Error getDepsLists', err);
+    next(err)
+  }
+}
+
+export const addDeps = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const DEPSData:DEPS[]=req.body.DEPSData
+    const fileIds:any=req.body.fileIds
+    const addDepsResult = await tripService.addDeps(DEPSData,fileIds);
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(addDepsResult));
+  } catch (err) {
+    console.error('Error getDepsLists', err);
     next(err)
   }
 }

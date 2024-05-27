@@ -22,7 +22,7 @@ model User {
   title                String?         @db.VarChar(255)
   role                 String?         @db.VarChar(255)
   profile              String?         @db.VarChar(255)
-  isActive             Boolean         @default(true)
+  isActiveUser         Boolean         @default(true)
   address1             String?         @db.VarChar(255)
   address2             String?         @db.VarChar(255)
   cityId               Int?
@@ -90,6 +90,8 @@ model Consignor {
   cinNumber             String?              @db.VarChar(255)
   gstId                 Int?
   gst                   GstMaster?           @relation("ConsignorGstId", fields: [gstId], references: [id])
+  gstExemptFileId       Int?
+  FileUpload            FileUpload?          @relation("consignorGstFile",fields:[gstExemptFileId],references:[id])
   taxCategory           String?              @db.VarChar(255)
   parentConsignorId     Int?
   parentConsignor       Consignor?           @relation("parentConsignor", fields: [parentConsignorId], references: [consignorId])
@@ -171,6 +173,8 @@ model AirWayBill {
   contractTypeId       Int?
   contract             Contract?      @relation("AWBContractType", fields: [contractTypeId], references: [id])
   appointmentDate      DateTime?
+  AWBPdf               Int?
+  FileUpload           FileUpload?    @relation("AWBFileAirWayBill", fields: [AWBPdf], references: [id])
   createdOn            DateTime?      @default(now())
   modifiedOn           DateTime?      @updatedAt
   AWBLineItems         AwbLineItem[]
@@ -296,6 +300,8 @@ model TripCheckIn {
   locationBranchId Int?
   branch           Branch?         @relation("tripCheckinBranchId", fields: [locationBranchId], references: [id])
   odometerReading  Int
+  odometerImgId    Int?
+  FileUpload       FileUpload?     @relation("odometerImageTripCheckInRecord", fields: [odometerImgId], references: [id])
   time             String          @map("time")
   createdOn        DateTime?       @default(now())
   modifiedOn       DateTime?       @updatedAt
@@ -395,20 +401,39 @@ model DEPS {
   sealNumber           String?        @db.VarChar(255)
   depsStatus           DEPSStatus?
   caseComment          String         @db.VarChar(255)
+  depsImages           DEPSImages[]   @relation("depsImage")
 }
 
-enum ImageLinksType {
+model DEPSImages {
+  id      Int   @id @default(autoincrement())
+  depsId  Int
+  DEPS    DEPS  @relation("depsImage", fields: [depsId], references: [id])
+  fileId Int
+  FileUpload   FileUpload @relation("DEPSFiles", fields: [fileId], references: [id])
+}
+
+
+
+enum FilesType {
   DEPS
   AWB
   GST
   ShippingLabel
+  TripCheckin
 }
 
-model ImageLinks {
-  id     Int            @id @default(autoincrement())
-  typeId ImageLinksType
-  path   String         @db.VarChar(255)
+model FileUpload{
+  id                Int           @id @default(autoincrement())
+  type              FilesType?
+  path              String        @db.VarChar(255)
+  sourceId          String?       @db.VarChar(255)
+  isDeleted         Boolean       @default(false)
+  odometerImageTripCheckInRecords  TripCheckIn[] @relation("odometerImageTripCheckInRecord")
+  AWBFileAirWayBills          AirWayBill[]  @relation("AWBFileAirWayBill")
+  DEPSFiles       DEPSImages[]  @relation("DEPSFiles")
+  consignorGstFiles Consignor[]   @relation("consignorGstFile")
 }
+
 
 enum ContractConsignorType {
   Actual

@@ -106,6 +106,21 @@ export const getGeneratedAWB = async (consignorId: number, AWBStatus: any) => {
                     publicName: true,
                     legalName: true,
                     address1: true,
+                    disstrict: {
+                        select: {
+                            name: true,
+                        },
+                    },
+                    state: {
+                        select: {
+                            name: true,
+                        },
+                    },
+                    city: {
+                        select: {
+                            name: true,
+                        },
+                    }
                 }
             },
             consignee: {
@@ -293,12 +308,18 @@ export const addAWBArticles = async (AWBId: number, numArticlesToAdd: number):Pr
                 articleIndex: true,
             },
         });
+        const count = await prisma.awbArticle.count({
+            where: {
+              AWBId: AWBId,
+              status: 'Created',
+            },
+          });
         if (numArticlesToAdd <= 0) {
             throw Error(`Article count should be positive. Got ${numArticlesToAdd}`);
         } else if (lastArticle === null) {
             throw Error(`Add AWB articles is only allowed if some articles have already been generated for AWB=${AWBId}`);
-        } else if (lastArticle.articleIndex !== awb.numOfArticles) {
-            throw Error(`Data integrity check failed. AWB->numOfArticles=${awb.numOfArticles} is not equal to latest articleIndex=${lastArticle.articleIndex}.`);
+        } else if (count !== awb.numOfArticles) {
+            throw Error(`Data integrity check failed. AWB->numOfArticles=${awb.numOfArticles} is not equal to latest No.of articleIndex count=${count}.`);
         }
         await prisma.airWayBill.update({
             where: { id: AWBId },

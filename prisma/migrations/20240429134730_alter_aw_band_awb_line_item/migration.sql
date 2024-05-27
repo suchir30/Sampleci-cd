@@ -1,6 +1,6 @@
 -- AlterTable
-ALTER TABLE `airwaybill` ADD COLUMN `ewayBillNumber` VARCHAR(255) NULL,
+ALTER TABLE `AirWayBill` ADD COLUMN `ewayBillNumber` VARCHAR(255) NULL,
     MODIFY `invoiceNumber` VARCHAR(255) NULL;
 
 -- AlterTable
-ALTER TABLE `awblineitem` ADD COLUMN `volume` FLOAT NULL;
+ALTER TABLE `AwbLineItem` ADD COLUMN `volume` FLOAT NULL;
