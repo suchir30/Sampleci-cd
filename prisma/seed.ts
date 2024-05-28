@@ -127,12 +127,9 @@ async function seedModelFromCSV(prisma: any, modelName: string) {
 }
 
 async function main() {
-    prisma.$transaction(async (prisma: any) => {
-        for (const modelName of models) {
-            await seedModelFromCSV(prisma, modelName);
-        }
-    });
-
+    for (const modelName of models) {
+        await seedModelFromCSV(prisma, modelName);
+    }
 }
 
 main()
