@@ -14,7 +14,7 @@ ALTER TABLE `Consignor` ADD COLUMN `gstExemptFileId` INTEGER NULL;
 ALTER TABLE `TripCheckIn` ADD COLUMN `odometerImgId` INTEGER NULL;
 
 -- DropTable
-DROP TABLE `imagelinks`;
+DROP TABLE `ImageLinks`;
 
 -- CreateTable
 CREATE TABLE `DEPSImages` (
