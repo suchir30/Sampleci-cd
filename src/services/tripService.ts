@@ -222,6 +222,10 @@ interface TripDetails {
   numOfScan: number;
   AWBCode:string;
   AWBCreatedOn?: Date;
+  AWBId:number;
+  VehicleId?:number,
+  DriverId?:number,
+
 }
 
 
@@ -238,24 +242,29 @@ export const getTripLineItems = async (tripId: number,scanType:any) => {
         select: {
           AWB: {
             select: {
+              id:true,
               AWBCode: true,
-              createdOn:true
+              createdOn:true,
+              numOfArticles:true
             },
           },
         },
       },
       TripDetails: {
         select: {
+          id:true,
           tripCode: true,
           route: true,
           driver: {
             select: {
+              id:true,
               driverName: true,
               phone1: true,
             },
           },
           vehicle: {
             select: {
+              id:true,
               vehicleNum: true,
             },
           },
@@ -270,6 +279,10 @@ export const getTripLineItems = async (tripId: number,scanType:any) => {
   result.forEach(entry => {
    const AWBCode = entry.AwbArticle?.AWB?.AWBCode || 'Unknown';
    const createdOn = entry.AwbArticle?.AWB?.createdOn ?? undefined;
+   const AWBId = entry.AwbArticle?.AWB?.id ?? undefined;
+   const VehicleId = entry.TripDetails?.vehicle?.id || undefined;
+   const DriverId = entry.TripDetails?.driver?.id ?? undefined;
+   const numberOfArticles = entry.TripDetails?.id ?? undefined;
 
     if (!groupedResult[AWBCode]) {
       groupedResult[AWBCode] = {
@@ -279,10 +292,13 @@ export const getTripLineItems = async (tripId: number,scanType:any) => {
         driverName: entry.TripDetails?.driver?.driverName,
         phone1: entry.TripDetails?.driver?.phone1 ?? undefined,
         vehicleNum: entry.TripDetails?.vehicle?.vehicleNum,
-        numberOfArticles: entry.TripDetails?.numberOfArticles ?? undefined,
+        numberOfArticles:numberOfArticles,
         numOfScan: 0,
         AWBCode:AWBCode,
-        AWBCreatedOn:createdOn
+        AWBCreatedOn:createdOn,
+        AWBId:AWBId,
+        VehicleId:VehicleId,
+        DriverId:DriverId,
       };
     }
 

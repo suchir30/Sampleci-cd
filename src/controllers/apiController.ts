@@ -524,6 +524,12 @@ export const unloadArticlesValidate = async (req: Request, res: Response, next: 
     const AWBId:string=req.body.AWBCode
     const AWBArticleId:string=req.body.AWBArticleCode
     const tripId:number=req.body.tripId
+    if (!AWBId) {
+      throwValidationError([{message: "AWBCode is mandatoryq"}]);
+    }
+    if (!AWBArticleId) {
+      throwValidationError([{message: "AWBArticeCode is mandatory"}]);
+    }
     const unloadArticlesValidateResult = await tripService.unloadArticlesValidate(AWBId,AWBArticleId,tripId);
     console.log(unloadArticlesValidateResult,"res")
     if(unloadArticlesValidateResult=='Valid'){
@@ -547,6 +553,12 @@ export const loadArticlesValidate = async (req: Request, res: Response, next: Ne
     const AWBId:string=req.body.AWBCode
     const AWBArticleId:string=req.body.AWBArticleCode
     const tripId:number=req.body.tripId
+    if (!AWBId) {
+      throwValidationError([{message: "AWBCode is mandatory"}]);
+    }
+    if (!AWBArticleId) {
+      throwValidationError([{message: "AWBArticeCode is mandatory"}]);
+    }
     const loadArticlesValidateResult = await tripService.loadArticlesValidate(AWBId,AWBArticleId,tripId);
     console.log(loadArticlesValidateResult,"res")
     if(loadArticlesValidateResult=='Valid'){
@@ -569,6 +581,12 @@ export const getTripLineItems = async (req: Request, res: Response, next: NextFu
   try {
     const tripId:number=req.body.tripId
     const scanType:string=req.body.scanType
+    if (!tripId) {
+      throwValidationError([{message: "tripId is mandatory"}]);
+    }
+    if (!scanType) {
+      throwValidationError([{message: "scanType is mandatory"}]);
+    }
     const getTripsResult = await tripService.getTripLineItems(tripId,scanType);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getTripsResult));
   } catch (err) {
@@ -581,6 +599,15 @@ export const addAWBArticleLogs = async (req: Request, res: Response, next: NextF
     const AWBArticleCode:string=req.body.AWBArticleCode
     const scanType:string=req.body.scanType
     const tripId:number=req.body.tripId
+    if (!scanType) {
+      throwValidationError([{message: "scanType is mandatory"}]);
+    }
+    if (!tripId) {
+      throwValidationError([{message: "tripId is mandatory"}]);
+    }
+    if (!AWBArticleCode) {
+      throwValidationError([{message: "AWBArticleCode is mandatory"}]);
+    }
     const getTripsResult = await tripService.addAWBArticleLogs(AWBArticleCode,scanType,tripId);
     res.status(HttpStatusCode.OK).json(buildNoContentResponse("Success"));
   } catch (err) {
@@ -646,6 +673,9 @@ export const fileUpload = async (req: Request & { files?: { file: MulterFile[] }
 export const getDepsLists = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const AWBId:number=req.body.AWBId
+    if (!AWBId) {
+      throwValidationError([{message: "AWBCode is mandatory"}]);
+    }
     const getDepsListsResult = await tripService.getDepsLists(AWBId);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getDepsListsResult));
   } catch (err) {
@@ -658,6 +688,9 @@ export const addDeps = async (req: Request, res: Response, next: NextFunction) =
   try {
     const DEPSData:DEPS[]=req.body.DEPSData
     const fileIds:any=req.body.fileIds
+    if (!DEPSData || DEPSData.length==0) {
+      throwValidationError([{message: "DEPSData is mandatory"}]);
+    }
     const addDepsResult = await tripService.addDeps(DEPSData,fileIds);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(addDepsResult));
   } catch (err) {
