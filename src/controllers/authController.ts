@@ -23,7 +23,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     }
     
     const token = jwt.sign({ employeeId }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    const expirationTime = Date.now() + 3600000; // 1 hour in milliseconds
+    const expirationTime = Date.now() + (2*24*60*60*1000); // 2 days in milliseconds
 
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse({ token, expirationTime      }));
   } catch (err) {
