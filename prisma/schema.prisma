@@ -229,7 +229,7 @@ model ConsignorRateTable {
   consignor   Consignor           @relation("rateTableConsignor", fields: [consignorId], references: [consignorId])
   branchId    Int?
   branch      Branch?             @relation("consignorRateBranch", fields: [branchId], references: [id])
-  ratePerKg   Int?
+  ratePerKg   Float?
   status      RateConsignorStatus @default(PendingApproval)
   createdOn   DateTime?           @default(now())
   modifiedOn  DateTime?           @updatedAt
