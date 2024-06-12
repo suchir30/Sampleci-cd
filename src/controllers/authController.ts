@@ -22,7 +22,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       throw new Error('JWT_SECRET is not set in the environment');
     }
     
-    const token = jwt.sign({ employeeId }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ employeeId }, process.env.JWT_SECRET, { expiresIn: '2d' });
     const expirationTime = Date.now() + (2*24*60*60*1000); // 2 days in milliseconds
 
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse({ token, expirationTime      }));
