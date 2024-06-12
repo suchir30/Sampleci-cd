@@ -149,11 +149,13 @@ export const getGeneratedAWB = async (consignorId: number, AWBStatus: any) => {
             fromBranch: {
                 select: {
                     branchName: true,
+                    branchCode:true,
                 }
             },
             toBranch: {
                 select: {
                     branchName: true,
+                    branchCode:true,
                 }
             },
             AWBIdTripLineItems: {
@@ -246,12 +248,14 @@ export const getAWBArticles = async (AWBId: number) => {
                     },   
                     fromBranch: {
                         select: {
-                            branchName: true
+                            branchName: true,
+                            branchCode:true,
                         }
                     },
                     toBranch: {
                         select: {
-                            branchName: true
+                            branchName: true,
+                            branchCode:true,
                         }
                     }
                 }
@@ -443,11 +447,13 @@ export const getUpdateAWB = async (AWBId: number) => {
           fromBranch: {
             select: {
               branchName: true,
+              branchCode:true,
             },
           },
           toBranch: {
             select: {
               branchName: true,
+              branchCode:true,
             },
           },
         },
