@@ -278,6 +278,15 @@ export const generateAWBArticles = async (AWBId: number):Promise<boolean> => {
                 articleIndex: true,
             },
         });
+        const genFlagUpdate = await prisma.airWayBill.update({
+            where: {
+              id: AWBId,
+            },
+            data: {
+              articleGenFlag:true,
+            },
+          });
+     
         if (anyArticle !== null) {
             const generateArticles = await prisma.awbArticle.findMany({
                 where: {
@@ -443,11 +452,13 @@ export const getUpdateAWB = async (AWBId: number) => {
           fromBranch: {
             select: {
               branchName: true,
+              branchCode:true,
             },
           },
           toBranch: {
             select: {
               branchName: true,
+              branchCode:true,
             },
           },
         },

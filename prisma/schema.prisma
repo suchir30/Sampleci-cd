@@ -169,7 +169,7 @@ model AirWayBill {
   grandTotal           Float?         @db.Float
   subTotal             Float?         @db.Float
   AWBStatus            AWBStatus      @default(PickUp)
-  articleGenFlag       Boolean        @default(true)
+  articleGenFlag       Boolean        @default(false)
   contractTypeId       Int?
   contract             Contract?      @relation("AWBContractType", fields: [contractTypeId], references: [id])
   appointmentDate      DateTime?
