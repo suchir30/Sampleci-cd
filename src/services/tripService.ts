@@ -165,6 +165,7 @@ export const unloadArticlesValidate = async (AWBId:string,AWBArticleId:string,tr
             },
           });
           if(tripLineItemRes==null){
+            console.log("AWBIDInvalid",tripLineItemRes,AWBIdRes?.id)
             return 'AWBIDInvalid'
           }
 
@@ -176,7 +177,7 @@ export const unloadArticlesValidate = async (AWBId:string,AWBArticleId:string,tr
                 id: 'desc',
             },
           });
-          console.log(tripDetailsRes?.latestCheckinHubId,"validCondition",tripLineItemRes?.nextDestinationId)
+          console.log(tripDetailsRes?.latestCheckinHubId,"validConditionss",tripLineItemRes?.nextDestinationId)
           if(tripDetailsRes?.latestCheckinHubId==tripLineItemRes?.nextDestinationId){
          
             console.log("valid")
@@ -260,6 +261,9 @@ export const loadArticlesValidate = async (AWBId:string,AWBArticleId:string,trip
         return result
 };
 
+
+
+
 interface TripDetails {
   tripId: number;
   tripCode?: string;
@@ -275,11 +279,13 @@ interface TripDetails {
   VehicleId?: number;
   DriverId?: number;
   tripLineItemId?: number;
-  latestCheckinHub?:number;
+  latestCheckinHub?: number;
+  nextDestinationCode?:string;
+  finalDestinationCode?:string;
   TripLineItemStatus?: string;
 }
 
-export const getTripLineItems = async (tripId: number, scanType: any,tripLineItemStatus:any) => {
+export const getTripLineItems = async (tripId: number, scanType: any, tripLineItemStatus: any) => {
   const LogsRes = await prisma.awbArticleTripLogs.findMany({
     where: {
       tripId: tripId,
@@ -287,7 +293,7 @@ export const getTripLineItems = async (tripId: number, scanType: any,tripLineIte
     },
   });
 
-  if (LogsRes.length == 0) {
+  if (LogsRes.length === 0) {
     const tripDetails = await prisma.tripDetails.findMany({
       where: {
         id: tripId,
@@ -316,6 +322,7 @@ export const getTripLineItems = async (tripId: number, scanType: any,tripLineIte
       vehicleNum: trip.vehicle?.vehicleNum,
       driverName: trip.driver?.driverName,
       phone1: trip.driver?.phone1,
+      numOfScan: 0, // Since no logs found, set numOfScan to 0
     }));
 
     return modifiedTripDetails;
@@ -325,9 +332,13 @@ export const getTripLineItems = async (tripId: number, scanType: any,tripLineIte
         tripId: tripId,
         scanType: scanType,
       },
+      orderBy: {
+        createdOn: 'desc'
+      },
       select: {
         id: true,
         tripId: true,
+        scanType: true,
         AwbArticle: {
           select: {
             AWB: {
@@ -345,7 +356,7 @@ export const getTripLineItems = async (tripId: number, scanType: any,tripLineIte
             id: true,
             tripCode: true,
             route: true,
-           
+
             driver: {
               select: {
                 id: true,
@@ -360,21 +371,56 @@ export const getTripLineItems = async (tripId: number, scanType: any,tripLineIte
               },
             },
             numberOfArticles: true,
-            latestCheckinHubId:true,   
+            latestCheckinHubId: true,
             tripIdTripLineItems: {
               select: {
                 id: true,
                 AWBId: true,
-                status:true,
+                status: true,
+                nextDestinationId:true,
+                finalDestinationId:true,
+                nextBranch:{
+                  select:{
+                    id:true,
+                    branchName:true,
+                    branchCode:true
+                }
               },
+              finalBranch:{
+                select:{
+                  id:true,
+                  branchCode:true,
+                  branchName:true
+                }
+              }
+              }
             },
           },
         },
       },
+    })
+
+    // Group by AWBArticleId and get the latest createdOn date for each AWBCode
+    const latestLogs = await prisma.awbArticleTripLogs.groupBy({
+      by: ['AWBArticleId'], 
+      where: {
+        tripId: tripId,
+        scanType: scanType,
+      },
+      _max: {
+        createdOn: true
+      }
     });
 
-    const groupedResult: { [key: string]: TripDetails } = {};
-
+   
+    const latestCreatedOnMap: { [key: string]: Date | null } = {};
+    latestLogs.forEach(log => {
+      const AWBCode = log.AWBArticleId; 
+      const latestCreatedOn = log._max?.createdOn;
+      latestCreatedOnMap[AWBCode] = latestCreatedOn ?? null;
+    });
+    const groupedResult: TripDetails[] = [];
+    // const groupedResult: { [key: string]: TripDetails } = {};
     result.forEach(entry => {
       const AWBCode = entry.AwbArticle?.AWB?.AWBCode || 'Unknown';
       const createdOn = entry.AwbArticle?.AWB?.createdOn ?? undefined;
@@ -385,33 +431,37 @@ export const getTripLineItems = async (tripId: number, scanType: any,tripLineIte
       const tripLineItem = entry.TripDetails?.tripIdTripLineItems?.find(item => item.AWBId === AWBId);
       const tripLineItemId = tripLineItem?.id;
       const TripLineItemStatus = tripLineItem?.status ?? undefined;
-      if (!groupedResult[AWBCode]) {
-        groupedResult[AWBCode] = {
+      const nextDestinationCode = tripLineItem?.nextBranch?.branchCode ?? undefined;
+      const finalDestinationCode = tripLineItem?.finalBranch?.branchCode ?? undefined;
+
+      if (!groupedResult.find(item => item.AWBCode === AWBCode)) {
+        groupedResult.push({
           tripId: entry.tripId,
           tripCode: entry.TripDetails?.tripCode,
-          latestCheckinHub:entry.TripDetails?.latestCheckinHubId?? undefined,
+          latestCheckinHub: entry.TripDetails?.latestCheckinHubId ?? undefined,
           route: entry.TripDetails?.route ?? undefined,
           driverName: entry.TripDetails?.driver?.driverName,
           phone1: entry.TripDetails?.driver?.phone1 ?? undefined,
           vehicleNum: entry.TripDetails?.vehicle?.vehicleNum,
           numberOfArticles: numberOfArticles,
-          numOfScan: 0,
+          numOfScan: 0, // Initialize numOfScan to 0 for each AWBCode
           AWBCode: AWBCode,
           AWBCreatedOn: createdOn,
           AWBId: AWBId,
           VehicleId: VehicleId,
           DriverId: DriverId,
           tripLineItemId: tripLineItemId,
-          TripLineItemStatus:TripLineItemStatus
-        };
-      }
+          nextDestinationCode:nextDestinationCode,
+          finalDestinationCode:finalDestinationCode,
+          TripLineItemStatus: TripLineItemStatus
+        
+      })
+    }
 
-      groupedResult[AWBCode].numOfScan += 1;
+    groupedResult.find(item => item.AWBCode === AWBCode)!.numOfScan += 1;
     });
 
-    const formattedResult = Object.values(groupedResult);
-
-    return formattedResult;
+    return groupedResult;
   }
 };
 
