@@ -91,7 +91,7 @@ model Consignor {
   gstId                 Int?
   gst                   GstMaster?           @relation("ConsignorGstId", fields: [gstId], references: [id])
   gstExemptFileId       Int?
-  FileUpload            FileUpload?          @relation("consignorGstFile",fields:[gstExemptFileId],references:[id])
+  FileUpload            FileUpload?          @relation("consignorGstFile", fields: [gstExemptFileId], references: [id])
   taxCategory           String?              @db.VarChar(255)
   parentConsignorId     Int?
   parentConsignor       Consignor?           @relation("parentConsignor", fields: [parentConsignorId], references: [consignorId])
@@ -315,20 +315,21 @@ enum TripLineItemStatus {
 }
 
 model TripLineItem {
-  id                  Int                @id @default(autoincrement())
-  AWBId               Int
-  AirWayBill          AirWayBill         @relation("AWBIdTripLineItem", fields: [AWBId], references: [id])
-  tripId              Int
-  trip                TripDetails        @relation("tripIdTripLineItem", fields: [tripId], references: [id])
-  nextDestinationId   Int?
-  nextBranch          Branch?            @relation("nextBranchTripLineItem", fields: [nextDestinationId], references: [id])
-  finalDestinationId  Int?
-  finalBranch         Branch?            @relation("finalBranchTripLineItem", fields: [finalDestinationId], references: [id])
-  status              TripLineItemStatus @default(Assigned)
-  ePODReceived        Boolean            @default(false)
-  originalPODReceived Boolean            @default(false)
-  createdOn           DateTime?          @default(now())
-  modifiedOn          DateTime?          @updatedAt
+  id                       Int                  @id @default(autoincrement())
+  AWBId                    Int
+  AirWayBill               AirWayBill           @relation("AWBIdTripLineItem", fields: [AWBId], references: [id])
+  tripId                   Int
+  trip                     TripDetails          @relation("tripIdTripLineItem", fields: [tripId], references: [id])
+  nextDestinationId        Int?
+  nextBranch               Branch?              @relation("nextBranchTripLineItem", fields: [nextDestinationId], references: [id])
+  finalDestinationId       Int?
+  finalBranch              Branch?              @relation("finalBranchTripLineItem", fields: [finalDestinationId], references: [id])
+  status                   TripLineItemStatus   @default(Assigned)
+  ePODReceived             Boolean              @default(false)
+  originalPODReceived      Boolean              @default(false)
+  createdOn                DateTime?            @default(now())
+  modifiedOn               DateTime?            @updatedAt
+  AwbArticleTripLogsTLIIds AwbArticleTripLogs[] @relation("AwbArticleTripLogsTLIId")
 }
 
 model ODA {
@@ -405,14 +406,12 @@ model DEPS {
 }
 
 model DEPSImages {
-  id      Int   @id @default(autoincrement())
-  depsId  Int
-  DEPS    DEPS  @relation("depsImage", fields: [depsId], references: [id])
-  fileId Int
-  FileUpload   FileUpload @relation("DEPSFiles", fields: [fileId], references: [id])
+  id         Int        @id @default(autoincrement())
+  depsId     Int
+  DEPS       DEPS       @relation("depsImage", fields: [depsId], references: [id])
+  fileId     Int
+  FileUpload FileUpload @relation("DEPSFiles", fields: [fileId], references: [id])
 }
-
-
 
 enum FilesType {
   DEPS
@@ -422,18 +421,17 @@ enum FilesType {
   TripCheckin
 }
 
-model FileUpload{
-  id                Int           @id @default(autoincrement())
-  type              FilesType?
-  path              String        @db.VarChar(255)
-  sourceId          String?       @db.VarChar(255)
-  isDeleted         Boolean       @default(false)
-  odometerImageTripCheckInRecords  TripCheckIn[] @relation("odometerImageTripCheckInRecord")
-  AWBFileAirWayBills          AirWayBill[]  @relation("AWBFileAirWayBill")
-  DEPSFiles       DEPSImages[]  @relation("DEPSFiles")
-  consignorGstFiles Consignor[]   @relation("consignorGstFile")
+model FileUpload {
+  id                              Int           @id @default(autoincrement())
+  type                            FilesType?
+  path                            String        @db.VarChar(255)
+  sourceId                        String?       @db.VarChar(255)
+  isDeleted                       Boolean       @default(false)
+  odometerImageTripCheckInRecords TripCheckIn[] @relation("odometerImageTripCheckInRecord")
+  AWBFileAirWayBills              AirWayBill[]  @relation("AWBFileAirWayBill")
+  DEPSFiles                       DEPSImages[]  @relation("DEPSFiles")
+  consignorGstFiles               Consignor[]   @relation("consignorGstFile")
 }
-
 
 enum ContractConsignorType {
   Actual
@@ -482,13 +480,15 @@ enum ArticleLogsScanType {
 }
 
 model AwbArticleTripLogs {
-  id           Int                 @id @default(autoincrement())
-  AWBArticleId Int
-  AwbArticle   AwbArticle          @relation("AWBArtId", fields: [AWBArticleId], references: [id])
-  tripId       Int
-  TripDetails  TripDetails         @relation("AWBArticleLogsTripId", fields: [tripId], references: [id])
-  scanType     ArticleLogsScanType
-  createdOn    DateTime            @default(now())
+  id             Int                 @id @default(autoincrement())
+  AWBArticleId   Int
+  AwbArticle     AwbArticle          @relation("AWBArtId", fields: [AWBArticleId], references: [id])
+  tripId         Int
+  TripDetails    TripDetails         @relation("AWBArticleLogsTripId", fields: [tripId], references: [id])
+  tripLineItemId Int?
+  TripLineItem   TripLineItem?       @relation("AwbArticleTripLogsTLIId", fields: [tripLineItemId], references: [id])
+  scanType       ArticleLogsScanType
+  createdOn      DateTime            @default(now())
 }
 
 //MASTER TABLES
