@@ -442,6 +442,12 @@ export const getUpdateAWB = async (AWBId: number) => {
           consignor: {
             select: {
               publicName: true,
+              contractConsignorIds:{
+                select:{
+                    consignorContractType:true,
+                    ContractType:true
+                }
+              }
             },
           },
           consignee: {
