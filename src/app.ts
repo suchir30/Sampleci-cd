@@ -9,7 +9,7 @@ app.use('/uploads', express.static(path.join(__dirname,'..','uploads')));
 
 app.use(express.json());
 app.use('/auth', authRoutes);
-app.use('/api',tokenAuth, apiRoutes);
+app.use('/api', apiRoutes);
 app.use(handleErrors);
 
 const PORT = process.env.PORT || 3000;

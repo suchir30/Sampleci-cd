@@ -9,7 +9,8 @@ import * as tripService from '../services/tripService';
 import { AWBCreateData } from '../types/awbTypes';
 import { HttpStatusCode } from '../types/apiTypes';
 import { MulterFile } from '../types/multerTypes';
-import { buildNoContentResponse, buildObjectFetchResponse, throwValidationError } from '../utils/apiUtils';
+import { Inwarded, Outwarded } from '../types/outwardInwardTypes';
+import { buildNoContentResponse, buildObjectFetchResponse, throwValidationError} from '../utils/apiUtils';
 import { Consignee, Consignor,AwbLineItem, DEPS} from '@prisma/client';
 
 export const getIndustryTypes = async (_req: Request, res: Response, next: NextFunction) => {
@@ -461,12 +462,15 @@ export const updateAWBLineItem = async (req: Request, res: Response, next: NextF
 
 export const getTrips = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const tripStatus:string=req.body.tripStatus
+    const tripStatus:string=req.body.tripStatus;
+    const latestCheckinHubId:number=req.body.latestCheckinHubId;
+    const latestCheckinType:string=req.body.latestCheckinType;
+    
     const validtripStatus = ['Open','CompletedWithRemarks','Closed'];
     if (!validtripStatus.includes(tripStatus)) {
       throwValidationError([{message: "Invalid Trip Status provided",key:`Status Should be: ${validtripStatus}.`}]);
     }
-    const getTripsResult = await tripService.getTrips(tripStatus);
+    const getTripsResult = await tripService.getTrips(tripStatus,latestCheckinHubId,latestCheckinType);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getTripsResult));
   } catch (err) {
     console.error('Error getTrips', err);
@@ -538,12 +542,21 @@ export const unloadArticlesValidate = async (req: Request, res: Response, next: 
     else if(unloadArticlesValidateResult=='AWBIDInvalid'){
       res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWBID has no Trip Items,Please check the AWBID"));
     }
+    else if(unloadArticlesValidateResult=='Duplicate'){
+      res.status(HttpStatusCode.OK).json(buildNoContentResponse(`Article ${AWBArticleId} Already Scanned`));
+    }
+    else if(unloadArticlesValidateResult=='InvalidAWB'){
+      res.status(HttpStatusCode.OK).json(buildNoContentResponse(`Invalid AirWayBill,Please check the AWB.`));
+    }
+    else if(unloadArticlesValidateResult=='InvalidArticle'){
+      res.status(HttpStatusCode.OK).json(buildNoContentResponse(`Invalid AWB Article,Please check the Article.`));
+    }
     else{
       res.status(HttpStatusCode.OK).json(buildNoContentResponse(`AWBID next destination is ${unloadArticlesValidateResult}. Please do not unload.`));
     }
    
   } catch (err) {
-    console.error('Error getTripCheckin', err);
+    console.error('Error unloadArticlesValidate', err);
     next(err)
   }
 }
@@ -567,12 +580,32 @@ export const loadArticlesValidate = async (req: Request, res: Response, next: Ne
     else if(loadArticlesValidateResult=='AWBIDInvalid'){
       res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWBID has no Checkin Trips,Please check the AWBID and TripId"));
     }
+    else if(loadArticlesValidateResult=='Duplicate'){
+      res.status(HttpStatusCode.OK).json(buildNoContentResponse(`Article ${AWBArticleId} Already Scanned`));
+    }
+    else if(loadArticlesValidateResult=='InvalidAWB'){
+      res.status(HttpStatusCode.OK).json(buildNoContentResponse(`Invalid AirWayBill,Please check the AWB.`));
+    }
+    else if(loadArticlesValidateResult=='InvalidArticle'){
+      res.status(HttpStatusCode.OK).json(buildNoContentResponse(`Invalid AWB Article,Please check the Article.`));
+    }
     else{
-      res.status(HttpStatusCode.OK).json(buildNoContentResponse(`AWBID Should be on the ${loadArticlesValidateResult} TripCode. Please do not load.`));
+      res.status(HttpStatusCode.OK).json(buildNoContentResponse(`TripCode ${loadArticlesValidateResult} not in Assigned Status. Please do not load.`));
+
     }
    
   } catch (err) {
-    console.error('Error getTripCheckin', err);
+    console.error('Error loadArticlesValidate', err);
+    next(err)
+  }
+}
+export const getTripDetails = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const tripId:number=req.body.tripId
+    const getTripsResult = await tripService.getTripDetails(tripId);
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getTripsResult));
+  } catch (err) {
+    console.error('Error getTripDetails', err);
     next(err)
   }
 }
@@ -581,24 +614,27 @@ export const getTripLineItems = async (req: Request, res: Response, next: NextFu
   try {
     const tripId:number=req.body.tripId
     const scanType:string=req.body.scanType
+    const tripLineItemStatus:string=req.body.tripLineItemStatus;
     if (!tripId) {
       throwValidationError([{message: "tripId is mandatory"}]);
     }
     if (!scanType) {
       throwValidationError([{message: "scanType is mandatory"}]);
     }
-    const getTripsResult = await tripService.getTripLineItems(tripId,scanType);
+    const getTripsResult = await tripService.getTripLineItems(tripId,scanType,tripLineItemStatus);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getTripsResult));
   } catch (err) {
-    console.error('Error getTripCheckin', err);
+    console.error('Error getTripLineItems', err);
     next(err)
   }
 }
+
 export const addAWBArticleLogs = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const AWBArticleCode:string=req.body.AWBArticleCode
     const scanType:string=req.body.scanType
     const tripId:number=req.body.tripId
+    const tripLineItemId:number=req.body.tripLineItemId
     if (!scanType) {
       throwValidationError([{message: "scanType is mandatory"}]);
     }
@@ -608,13 +644,66 @@ export const addAWBArticleLogs = async (req: Request, res: Response, next: NextF
     if (!AWBArticleCode) {
       throwValidationError([{message: "AWBArticleCode is mandatory"}]);
     }
-    const getTripsResult = await tripService.addAWBArticleLogs(AWBArticleCode,scanType,tripId);
+    if (!tripLineItemId) {
+      throwValidationError([{message: "tripLineItemId is mandatory"}]);
+    }
+    const getTripsResult = await tripService.addAWBArticleLogs(AWBArticleCode,scanType,tripId,tripLineItemId);
     res.status(HttpStatusCode.OK).json(buildNoContentResponse("Success"));
   } catch (err) {
-    console.error('Error getTripCheckin', err);
+    console.error('Error addAWBArticleLogs', err);
     next(err)
   }
 }
+
+export const getScannedArticles = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const AWBId:number=req.body.AWBId
+    const tripId:number=req.body.tripId
+    const scanType:string=req.body.scanType
+    if (!AWBId) {
+      throwValidationError([{message: "AWBCode is mandatory"}]);
+    }
+    if (!tripId) {
+      throwValidationError([{message: "TripId is mandatory"}]);
+    }
+    if (!scanType) {
+      throwValidationError([{message: "scanType is mandatory"}]);
+    }
+    const validScanType = ['Load','Unload'];
+    if (!validScanType.includes(scanType)) {
+      throwValidationError([{message: "Invalid scanType provided",key:`scanType Should be: ${validScanType}.`}]);
+    }
+    const getScannedArticlesResult = await tripService.getScannedArticles(AWBId,tripId,scanType);
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getScannedArticlesResult));
+  } catch (err) {
+    console.error('Error getScannedArticles', err);
+    next(err)
+  }
+}
+1
+export const outwardedAWB = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { tripId, data }: { tripId: number, data: Outwarded[] } = req.body;
+    const getScannedArticlesResult = await tripService.outwardedAWB(tripId,data);
+    res.status(HttpStatusCode.OK).json(buildNoContentResponse("success"));
+  } catch (err) {
+    console.error('Error getScannedArticles', err);
+    next(err)
+  }
+}
+
+export const inwardedAWB = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { tripId, data }: { tripId: number, data: Inwarded[] } = req.body;
+    const getScannedArticlesResult = await tripService.inwardedAWB(tripId,data);
+    res.status(HttpStatusCode.OK).json(buildNoContentResponse("success"));
+  } catch (err) {
+    console.error('Error getScannedArticles', err);
+    next(err)
+  }
+}
+
+
 
 export const fileUpload = async (req: Request & { files?: { file: MulterFile[] } }, res: Response, next: NextFunction) => {
   try {

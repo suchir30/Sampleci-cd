@@ -16,7 +16,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"employeeId\":\"vroomster2\",\r\n    \"password\": \"vroomster@2\"\r\n}",
+							"raw": "{\r\n    \"employeeId\":\"vroomster1\",\r\n    \"password\": \"vroomster@1\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -24,10 +24,13 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:3000/auth/login",
+							"raw": "http://13.200.144.182:3000/auth/login",
 							"protocol": "http",
 							"host": [
-								"localhost"
+								"13",
+								"200",
+								"144",
+								"182"
 							],
 							"port": "3000",
 							"path": [
@@ -782,10 +785,13 @@
 							}
 						],
 						"url": {
-							"raw": "http://localhost:3000/api/industryType",
+							"raw": "http://65.0.179.135:3000/api/industryType",
 							"protocol": "http",
 							"host": [
-								"localhost"
+								"65",
+								"0",
+								"179",
+								"135"
 							],
 							"port": "3000",
 							"path": [
@@ -2432,10 +2438,16 @@
 					"name": "getAWBs",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bAREAR eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoidnJvb21zdGVyMSIsImlhdCI6MTcxODE3ODIyNCwiZXhwIjoxNzE4MTgxODI0fQ.-Efnj3z6Gp779lya6_NHCWm2qrK2ytWXOXooC-xFlWM",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"consignorId\":null,\r\n    \"AWBStatus\":\"PickUp\"\r\n}",
+							"raw": "{\r\n    \"consignorId\":1,\r\n    \"AWBStatus\":\"PickUp\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2461,10 +2473,16 @@
 							"name": "success",
 							"originalRequest": {
 								"method": "POST",
-								"header": [],
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "bAREAR eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoidnJvb21zdGVyMSIsImlhdCI6MTcxODE3ODIyNCwiZXhwIjoxNzE4MTgxODI0fQ.-Efnj3z6Gp779lya6_NHCWm2qrK2ytWXOXooC-xFlWM",
+										"type": "text"
+									}
+								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"consignorId\":null,\r\n    \"AWBStatus\":\"PickUp\"\r\n}",
+									"raw": "{\r\n    \"consignorId\":1,\r\n    \"AWBStatus\":\"PickUp\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -2499,15 +2517,15 @@
 								},
 								{
 									"key": "Content-Length",
-									"value": "3567"
+									"value": "1261"
 								},
 								{
 									"key": "ETag",
-									"value": "W/\"def-fnD8NjOkw1p7eAWDFzcupWb/tDU\""
+									"value": "W/\"4ed-/XJ9PNqSNLpkiCkim/WAP85Pgaw\""
 								},
 								{
 									"key": "Date",
-									"value": "Mon, 20 May 2024 11:28:16 GMT"
+									"value": "Wed, 12 Jun 2024 11:28:32 GMT"
 								},
 								{
 									"key": "Connection",
@@ -2519,7 +2537,7 @@
 								}
 							],
 							"cookie": [],
-							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"AWBCode\": \"CUST-A00174160524001\",\n            \"consignorId\": 1,\n            \"consigneeId\": 1,\n            \"fromBranchId\": 1,\n            \"toBranchId\": 1,\n            \"numOfArticles\": 10,\n            \"AWBStatus\": \"PickUp\",\n            \"articleGenFlag\": true,\n            \"rollupArticleCnt\": 10,\n            \"consignor\": {\n                \"consignorCode\": \"CUST-A00174\",\n                \"publicName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"legalName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"address1\": \"GROUND, 5-283, ASWINI HOUSE, H P ROAD, MOOSAPET, RANGAREDDY, TELANGANA, 500018\"\n            },\n            \"consignee\": {\n                \"consigneeCode\": \"A0001\",\n                \"consigneeName\": \"CHANDRAHASA AGENCIES\",\n                \"address1\": \"VENKATESHWARA TALKIES ROAD SATHUPALLI-507303,TS.\",\n                \"address2\": \"SATTUPALLI\",\n                \"city\": null,\n                \"district\": {\n                    \"name\": \"SATTUPALLI\"\n                },\n                \"state\": {\n                    \"name\": \"TELANGANA\"\n                }\n            },\n            \"fromBranch\": {\n                \"branchName\": \"SATHUPALLI\"\n            },\n            \"toBranch\": {\n                \"branchName\": \"SATHUPALLI\"\n            },\n            \"AWBIdTripLineItems\": [\n                {\n                    \"id\": 1,\n                    \"tripId\": 1,\n                    \"nextDestinationId\": null,\n                    \"finalDestinationId\": 2,\n                    \"status\": \"Assigned\",\n                    \"ePODReceived\": false,\n                    \"originalPODReceived\": false,\n                    \"trip\": {\n                        \"route\": \"vjd-hyd\"\n                    }\n                }\n            ]\n        },\n        {\n            \"id\": 2,\n            \"AWBCode\": \"CUST-A00174160524002\",\n            \"consignorId\": 1,\n            \"consigneeId\": 14,\n            \"fromBranchId\": 1,\n            \"toBranchId\": 1,\n            \"numOfArticles\": 10,\n            \"AWBStatus\": \"PickUp\",\n            \"articleGenFlag\": true,\n            \"rollupArticleCnt\": null,\n            \"consignor\": {\n                \"consignorCode\": \"CUST-A00174\",\n                \"publicName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"legalName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"address1\": \"GROUND, 5-283, ASWINI HOUSE, H P ROAD, MOOSAPET, RANGAREDDY, TELANGANA, 500018\"\n            },\n            \"consignee\": {\n                \"consigneeCode\": \"B0004\",\n                \"consigneeName\": \"SRI RAJA RAJESHWARA  AGENCIES \",\n                \"address1\": \"8-17/693, MUBARAKNAGAR, NIZAMABAD\",\n                \"address2\": \"NIZAMABAD\",\n                \"city\": null,\n                \"district\": {\n                    \"name\": \"NIZAMABAD\"\n                },\n                \"state\": {\n                    \"name\": \"TELANGANA\"\n                }\n            },\n            \"fromBranch\": {\n                \"branchName\": \"SATHUPALLI\"\n            },\n            \"toBranch\": {\n                \"branchName\": \"SATHUPALLI\"\n            },\n            \"AWBIdTripLineItems\": [\n                {\n                    \"id\": 2,\n                    \"tripId\": 1,\n                    \"nextDestinationId\": null,\n                    \"finalDestinationId\": 2,\n                    \"status\": \"Assigned\",\n                    \"ePODReceived\": false,\n                    \"originalPODReceived\": false,\n                    \"trip\": {\n                        \"route\": \"vjd-hyd\"\n                    }\n                }\n            ]\n        },\n        {\n            \"id\": 3,\n            \"AWBCode\": \"CUST-A00174170524001\",\n            \"consignorId\": 1,\n            \"consigneeId\": 1,\n            \"fromBranchId\": 1,\n            \"toBranchId\": 1,\n            \"numOfArticles\": 10,\n            \"AWBStatus\": \"PickUp\",\n            \"articleGenFlag\": true,\n            \"rollupArticleCnt\": null,\n            \"consignor\": {\n                \"consignorCode\": \"CUST-A00174\",\n                \"publicName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"legalName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"address1\": \"GROUND, 5-283, ASWINI HOUSE, H P ROAD, MOOSAPET, RANGAREDDY, TELANGANA, 500018\"\n            },\n            \"consignee\": {\n                \"consigneeCode\": \"A0001\",\n                \"consigneeName\": \"CHANDRAHASA AGENCIES\",\n                \"address1\": \"VENKATESHWARA TALKIES ROAD SATHUPALLI-507303,TS.\",\n                \"address2\": \"SATTUPALLI\",\n                \"city\": null,\n                \"district\": {\n                    \"name\": \"SATTUPALLI\"\n                },\n                \"state\": {\n                    \"name\": \"TELANGANA\"\n                }\n            },\n            \"fromBranch\": {\n                \"branchName\": \"SATHUPALLI\"\n            },\n            \"toBranch\": {\n                \"branchName\": \"SATHUPALLI\"\n            },\n            \"AWBIdTripLineItems\": []\n        },\n        {\n            \"id\": 4,\n            \"AWBCode\": \"CUST-A00174170524002\",\n            \"consignorId\": 1,\n            \"consigneeId\": 14,\n            \"fromBranchId\": 1,\n            \"toBranchId\": 1,\n            \"numOfArticles\": 10,\n            \"AWBStatus\": \"PickUp\",\n            \"articleGenFlag\": true,\n            \"rollupArticleCnt\": null,\n            \"consignor\": {\n                \"consignorCode\": \"CUST-A00174\",\n                \"publicName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"legalName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"address1\": \"GROUND, 5-283, ASWINI HOUSE, H P ROAD, MOOSAPET, RANGAREDDY, TELANGANA, 500018\"\n            },\n            \"consignee\": {\n                \"consigneeCode\": \"B0004\",\n                \"consigneeName\": \"SRI RAJA RAJESHWARA  AGENCIES \",\n                \"address1\": \"8-17/693, MUBARAKNAGAR, NIZAMABAD\",\n                \"address2\": \"NIZAMABAD\",\n                \"city\": null,\n                \"district\": {\n                    \"name\": \"NIZAMABAD\"\n                },\n                \"state\": {\n                    \"name\": \"TELANGANA\"\n                }\n            },\n            \"fromBranch\": {\n                \"branchName\": \"SATHUPALLI\"\n            },\n            \"toBranch\": {\n                \"branchName\": \"SATHUPALLI\"\n            },\n            \"AWBIdTripLineItems\": []\n        }\n    ]\n}"
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"AWBCode\": \"SA-HY-A0649\",\n            \"consignorId\": 1,\n            \"consigneeId\": 1,\n            \"fromBranchId\": 1,\n            \"toBranchId\": 7,\n            \"numOfArticles\": 50,\n            \"AWBStatus\": \"PickUp\",\n            \"articleGenFlag\": true,\n            \"rollupArticleCnt\": 50,\n            \"consignor\": {\n                \"consignorCode\": \"CUST-A00174\",\n                \"publicName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"legalName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"address1\": \"GROUND, 5-283, ASWINI HOUSE, H P ROAD, MOOSAPET, RANGAREDDY, TELANGANA, 500018\",\n                \"disstrict\": null,\n                \"state\": {\n                    \"name\": \"TELANGANA\"\n                },\n                \"city\": {\n                    \"name\": \"HYDERABAD\"\n                }\n            },\n            \"consignee\": {\n                \"consigneeCode\": \"A0001\",\n                \"consigneeName\": \"CHANDRAHASA AGENCIES\",\n                \"address1\": \"VENKATESHWARA TALKIES ROAD SATHUPALLI-507303,TS.\",\n                \"address2\": \"SATTUPALLI\",\n                \"city\": null,\n                \"district\": {\n                    \"name\": \"SATTUPALLI\"\n                },\n                \"state\": {\n                    \"name\": \"TELANGANA\"\n                }\n            },\n            \"fromBranch\": {\n                \"branchName\": \"SATHUPALLI\",\n                \"branchCode\": \"STUP\"\n            },\n            \"toBranch\": {\n                \"branchName\": \"ZAHEERABAD\",\n                \"branchCode\": \"ZHB\"\n            },\n            \"AWBIdTripLineItems\": [\n                {\n                    \"id\": 1,\n                    \"tripId\": 1,\n                    \"nextDestinationId\": 3,\n                    \"finalDestinationId\": 3,\n                    \"status\": \"Open\",\n                    \"ePODReceived\": true,\n                    \"originalPODReceived\": true,\n                    \"trip\": {\n                        \"route\": \"123\"\n                    }\n                },\n                {\n                    \"id\": 7,\n                    \"tripId\": 2,\n                    \"nextDestinationId\": 2,\n                    \"finalDestinationId\": 6,\n                    \"status\": \"Delivered\",\n                    \"ePODReceived\": true,\n                    \"originalPODReceived\": true,\n                    \"trip\": {\n                        \"route\": \"VJD-HYD\"\n                    }\n                }\n            ]\n        }\n    ]\n}"
 						}
 					]
 				},
@@ -2818,15 +2836,15 @@
 								},
 								{
 									"key": "Content-Length",
-									"value": "1272"
+									"value": "2937"
 								},
 								{
 									"key": "ETag",
-									"value": "W/\"4f8-mSvkJEW4MTRPdP+fK1KjXLbVzRk\""
+									"value": "W/\"b79-w1RDiCV3lRu63PajHFfrPouL3iU\""
 								},
 								{
 									"key": "Date",
-									"value": "Fri, 12 Apr 2024 10:05:11 GMT"
+									"value": "Wed, 12 Jun 2024 11:28:15 GMT"
 								},
 								{
 									"key": "Connection",
@@ -2838,7 +2856,7 @@
 								}
 							],
 							"cookie": [],
-							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"AWBId\": 1,\n            \"articleCode\": \"CUST-A001831004240010001\",\n            \"articleIndex\": 1,\n            \"status\": \"PRINTED\",\n            \"createdOn\": \"2024-04-10T13:17:02.592Z\",\n            \"modifiedOn\": \"2024-04-12T06:32:49.618Z\"\n        },\n        {\n            \"id\": 2,\n            \"AWBId\": 1,\n            \"articleCode\": \"CUST-A001831004240010002\",\n            \"articleIndex\": 2,\n            \"status\": \"PRINTED\",\n            \"createdOn\": \"2024-04-10T13:17:02.592Z\",\n            \"modifiedOn\": \"2024-04-12T06:32:49.618Z\"\n        },\n        {\n            \"id\": 3,\n            \"AWBId\": 1,\n            \"articleCode\": \"CUST-A001831004240010003\",\n            \"articleIndex\": 3,\n            \"status\": \"PRINTED\",\n            \"createdOn\": \"2024-04-10T13:17:02.592Z\",\n            \"modifiedOn\": \"2024-04-12T06:32:49.618Z\"\n        },\n        {\n            \"id\": 4,\n            \"AWBId\": 1,\n            \"articleCode\": \"CUST-A001831004240010004\",\n            \"articleIndex\": 4,\n            \"status\": \"PRINTED\",\n            \"createdOn\": \"2024-04-10T13:17:02.592Z\",\n            \"modifiedOn\": \"2024-04-12T06:32:49.618Z\"\n        },\n        {\n            \"id\": 5,\n            \"AWBId\": 1,\n            \"articleCode\": \"CUST-A001831004240010005\",\n            \"articleIndex\": 5,\n            \"status\": \"PRINTED\",\n            \"createdOn\": \"2024-04-10T13:17:02.592Z\",\n            \"modifiedOn\": \"2024-04-12T06:32:49.618Z\"\n        },\n        {\n            \"id\": 8,\n            \"AWBId\": 1,\n            \"articleCode\": \"CUST-A001831004240010008\",\n            \"articleIndex\": 8,\n            \"status\": \"PRINTED\",\n            \"createdOn\": \"2024-04-10T13:17:02.592Z\",\n            \"modifiedOn\": \"2024-04-12T06:32:49.618Z\"\n        },\n        {\n            \"id\": 9,\n            \"AWBId\": 1,\n            \"articleCode\": \"CUST-A001831004240010009\",\n            \"articleIndex\": 9,\n            \"status\": \"PRINTED\",\n            \"createdOn\": \"2024-04-10T13:17:02.592Z\",\n            \"modifiedOn\": \"2024-04-12T06:32:49.618Z\"\n        }\n    ]\n}"
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"articleCode\": \"SM-BL-A0919-103\",\n            \"AWB\": {\n                \"id\": 1,\n                \"fromBranchId\": 1,\n                \"toBranchId\": 7,\n                \"numOfArticles\": 50,\n                \"consignee\": {\n                    \"consigneeName\": \"CHANDRAHASA AGENCIES\",\n                    \"consigneeCode\": \"A0001\"\n                },\n                \"consignor\": {\n                    \"publicName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                    \"consignorCode\": \"CUST-A00174\"\n                },\n                \"fromBranch\": {\n                    \"branchName\": \"SATHUPALLI\",\n                    \"branchCode\": \"STUP\"\n                },\n                \"toBranch\": {\n                    \"branchName\": \"ZAHEERABAD\",\n                    \"branchCode\": \"ZHB\"\n                }\n            }\n        },\n        {\n            \"id\": 2,\n            \"articleCode\": \"MYK-VZ-A0339-126\",\n            \"AWB\": {\n                \"id\": 1,\n                \"fromBranchId\": 1,\n                \"toBranchId\": 7,\n                \"numOfArticles\": 50,\n                \"consignee\": {\n                    \"consigneeName\": \"CHANDRAHASA AGENCIES\",\n                    \"consigneeCode\": \"A0001\"\n                },\n                \"consignor\": {\n                    \"publicName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                    \"consignorCode\": \"CUST-A00174\"\n                },\n                \"fromBranch\": {\n                    \"branchName\": \"SATHUPALLI\",\n                    \"branchCode\": \"STUP\"\n                },\n                \"toBranch\": {\n                    \"branchName\": \"ZAHEERABAD\",\n                    \"branchCode\": \"ZHB\"\n                }\n            }\n        },\n        {\n            \"id\": 3,\n            \"articleCode\": \"KarA12024-5\",\n            \"AWB\": {\n                \"id\": 1,\n                \"fromBranchId\": 1,\n                \"toBranchId\": 7,\n                \"numOfArticles\": 50,\n                \"consignee\": {\n                    \"consigneeName\": \"CHANDRAHASA AGENCIES\",\n                    \"consigneeCode\": \"A0001\"\n                },\n                \"consignor\": {\n                    \"publicName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                    \"consignorCode\": \"CUST-A00174\"\n                },\n                \"fromBranch\": {\n                    \"branchName\": \"SATHUPALLI\",\n                    \"branchCode\": \"STUP\"\n                },\n                \"toBranch\": {\n                    \"branchName\": \"ZAHEERABAD\",\n                    \"branchCode\": \"ZHB\"\n                }\n            }\n        },\n        {\n            \"id\": 4,\n            \"articleCode\": \"KarA12021-98\",\n            \"AWB\": {\n                \"id\": 1,\n                \"fromBranchId\": 1,\n                \"toBranchId\": 7,\n                \"numOfArticles\": 50,\n                \"consignee\": {\n                    \"consigneeName\": \"CHANDRAHASA AGENCIES\",\n                    \"consigneeCode\": \"A0001\"\n                },\n                \"consignor\": {\n                    \"publicName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                    \"consignorCode\": \"CUST-A00174\"\n                },\n                \"fromBranch\": {\n                    \"branchName\": \"SATHUPALLI\",\n                    \"branchCode\": \"STUP\"\n                },\n                \"toBranch\": {\n                    \"branchName\": \"ZAHEERABAD\",\n                    \"branchCode\": \"ZHB\"\n                }\n            }\n        },\n        {\n            \"id\": 5,\n            \"articleCode\": \"RF-HY-A1358-58\",\n            \"AWB\": {\n                \"id\": 1,\n                \"fromBranchId\": 1,\n                \"toBranchId\": 7,\n                \"numOfArticles\": 50,\n                \"consignee\": {\n                    \"consigneeName\": \"CHANDRAHASA AGENCIES\",\n                    \"consigneeCode\": \"A0001\"\n                },\n                \"consignor\": {\n                    \"publicName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                    \"consignorCode\": \"CUST-A00174\"\n                },\n                \"fromBranch\": {\n                    \"branchName\": \"SATHUPALLI\",\n                    \"branchCode\": \"STUP\"\n                },\n                \"toBranch\": {\n                    \"branchName\": \"ZAHEERABAD\",\n                    \"branchCode\": \"ZHB\"\n                }\n            }\n        },\n        {\n            \"id\": 7,\n            \"articleCode\": \"TTK-LC-09662-16\",\n            \"AWB\": {\n                \"id\": 1,\n                \"fromBranchId\": 1,\n                \"toBranchId\": 7,\n                \"numOfArticles\": 50,\n                \"consignee\": {\n                    \"consigneeName\": \"CHANDRAHASA AGENCIES\",\n                    \"consigneeCode\": \"A0001\"\n                },\n                \"consignor\": {\n                    \"publicName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                    \"consignorCode\": \"CUST-A00174\"\n                },\n                \"fromBranch\": {\n                    \"branchName\": \"SATHUPALLI\",\n                    \"branchCode\": \"STUP\"\n                },\n                \"toBranch\": {\n                    \"branchName\": \"ZAHEERABAD\",\n                    \"branchCode\": \"ZHB\"\n                }\n            }\n        },\n        {\n            \"id\": 8,\n            \"articleCode\": \"TTK-AP-17012-4\",\n            \"AWB\": {\n                \"id\": 1,\n                \"fromBranchId\": 1,\n                \"toBranchId\": 7,\n                \"numOfArticles\": 50,\n                \"consignee\": {\n                    \"consigneeName\": \"CHANDRAHASA AGENCIES\",\n                    \"consigneeCode\": \"A0001\"\n                },\n                \"consignor\": {\n                    \"publicName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                    \"consignorCode\": \"CUST-A00174\"\n                },\n                \"fromBranch\": {\n                    \"branchName\": \"SATHUPALLI\",\n                    \"branchCode\": \"STUP\"\n                },\n                \"toBranch\": {\n                    \"branchName\": \"ZAHEERABAD\",\n                    \"branchCode\": \"ZHB\"\n                }\n            }\n        }\n    ]\n}"
 						}
 					]
 				},
@@ -3417,7 +3435,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"AWBId\":1,\r\n    \"tripId\":1 ,\r\n    \"status\":\"Assigned\",\r\n    \"finalDestinationId\":2  // toBranchId(ConsigneeBranch)\r\n}",
+							"raw": "{\r\n    \"AWBId\":3,\r\n    \"tripId\":1 ,\r\n    \"status\":\"Assigned\",\r\n    \"finalDestinationId\":9  // toBranchId(ConsigneeBranch)\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3766,15 +3784,15 @@
 								},
 								{
 									"key": "Content-Length",
-									"value": "809"
+									"value": "739"
 								},
 								{
 									"key": "ETag",
-									"value": "W/\"329-HDN7u3mlsVxggV47HA6A7yl0eh4\""
+									"value": "W/\"2e3-wVGspg7pImeM4RVFe4UzJD9QQjA\""
 								},
 								{
 									"key": "Date",
-									"value": "Mon, 29 Apr 2024 13:40:29 GMT"
+									"value": "Wed, 12 Jun 2024 11:22:54 GMT"
 								},
 								{
 									"key": "Connection",
@@ -3786,7 +3804,7 @@
 								}
 							],
 							"cookie": [],
-							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"AWBCode\": \"CUST-A00174290424001\",\n            \"appointmentDate\": \"2003-04-24T00:00:00.000Z\",\n            \"invoiceNumber\": \"123,456\",\n            \"invoiceValue\": 3000,\n            \"ewayBillNumber\": \"A123456789BCDE\",\n            \"numOfArticles\": 10,\n            \"consignorId\": 1,\n            \"consigneeId\": 1,\n            \"AWBStatus\": \"PickUp\",\n            \"articleGenFlag\": true,\n            \"AWBLineItems\": [\n                {\n                    \"id\": 1,\n                    \"ActualWeightKg\": 20,\n                    \"lengthCms\": 1,\n                    \"breadthCms\": 1,\n                    \"heightCms\": 2,\n                    \"numOfArticles\": 5\n                },\n                {\n                    \"id\": 2,\n                    \"ActualWeightKg\": 20,\n                    \"lengthCms\": 1,\n                    \"breadthCms\": 3,\n                    \"heightCms\": 1,\n                    \"numOfArticles\": 3\n                },\n                {\n                    \"id\": 3,\n                    \"ActualWeightKg\": 20,\n                    \"lengthCms\": 1,\n                    \"breadthCms\": 2,\n                    \"heightCms\": 1,\n                    \"numOfArticles\": 2\n                }\n            ],\n            \"consignor\": {\n                \"publicName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\"\n            },\n            \"consignee\": {\n                \"consigneeName\": \"CHANDRAHASA AGENCIES\"\n            },\n            \"fromBranch\": {\n                \"branchName\": \"SATHUPALLI\"\n            },\n            \"toBranch\": {\n                \"branchName\": \"SATHUPALLI\"\n            }\n        }\n    ]\n}"
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"AWBCode\": \"SA-HY-A0649\",\n            \"appointmentDate\": null,\n            \"invoiceNumber\": \"2184\",\n            \"invoiceValue\": 40380,\n            \"ewayBillNumber\": null,\n            \"numOfArticles\": 50,\n            \"consignorId\": 1,\n            \"consigneeId\": 1,\n            \"AWBStatus\": \"PickUp\",\n            \"articleGenFlag\": true,\n            \"AWBLineItems\": [\n                {\n                    \"id\": 1,\n                    \"ActualWeightKg\": 114.72,\n                    \"lengthCms\": 318.5,\n                    \"breadthCms\": 230.5,\n                    \"heightCms\": 193,\n                    \"numOfArticles\": 25\n                },\n                {\n                    \"id\": 2,\n                    \"ActualWeightKg\": 480,\n                    \"lengthCms\": null,\n                    \"breadthCms\": null,\n                    \"heightCms\": null,\n                    \"numOfArticles\": 25\n                }\n            ],\n            \"consignor\": {\n                \"publicName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\"\n            },\n            \"consignee\": {\n                \"consigneeName\": \"CHANDRAHASA AGENCIES\"\n            },\n            \"fromBranch\": {\n                \"branchName\": \"SATHUPALLI\",\n                \"branchCode\": \"STUP\"\n            },\n            \"toBranch\": {\n                \"branchName\": \"ZAHEERABAD\",\n                \"branchCode\": \"ZHB\"\n            }\n        }\n    ]\n}"
 						}
 					]
 				}
@@ -3802,7 +3820,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"tripStatus\":\"Open\"\r\n}",
+							"raw": "{\r\n    \"tripStatus\":\"Open\"\r\n   \r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3824,64 +3842,19 @@
 					},
 					"response": [
 						{
-							"name": "fail case",
+							"name": "getTrips",
 							"originalRequest": {
-								"method": "GET",
+								"method": "POST",
 								"header": [],
-								"url": {
-									"raw": "http://localhost:3000/api/getTrips",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "3000",
-									"path": [
-										"api",
-										"getTrips"
-									]
-								}
-							},
-							"status": "Bad Request",
-							"code": 400,
-							"_postman_previewlanguage": "json",
-							"header": [
-								{
-									"key": "X-Powered-By",
-									"value": "Express"
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"tripStatus\":\"Open\"\r\n   \r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
 								},
-								{
-									"key": "Content-Type",
-									"value": "application/json; charset=utf-8"
-								},
-								{
-									"key": "Content-Length",
-									"value": "186"
-								},
-								{
-									"key": "ETag",
-									"value": "W/\"ba-vPYgyFOfDslrxIRWtlFNjeXWvSA\""
-								},
-								{
-									"key": "Date",
-									"value": "Mon, 22 Apr 2024 11:30:07 GMT"
-								},
-								{
-									"key": "Connection",
-									"value": "keep-alive"
-								},
-								{
-									"key": "Keep-Alive",
-									"value": "timeout=5"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"statusCode\": 400,\n    \"message\": \"Validation Error\",\n    \"errors\": [\n        {\n            \"errorType\": \"validation\",\n            \"message\": \"Invalid Trip Status provided\",\n            \"key\": \"Status Should be: Open,CompletedWithRemarks,Closed.\"\n        }\n    ]\n}"
-						},
-						{
-							"name": "success",
-							"originalRequest": {
-								"method": "GET",
-								"header": [],
 								"url": {
 									"raw": "http://localhost:3000/api/getTrips",
 									"protocol": "http",
@@ -3909,15 +3882,15 @@
 								},
 								{
 									"key": "Content-Length",
-									"value": "908"
+									"value": "2177"
 								},
 								{
 									"key": "ETag",
-									"value": "W/\"38c-7kXBN9J0ZnCIfjZ1ib2Fog8NXYE\""
+									"value": "W/\"881-9WjFgTNfUct8xg2Dh0XceWt9Uj8\""
 								},
 								{
 									"key": "Date",
-									"value": "Thu, 25 Apr 2024 05:44:06 GMT"
+									"value": "Fri, 14 Jun 2024 09:18:00 GMT"
 								},
 								{
 									"key": "Connection",
@@ -3929,7 +3902,70 @@
 								}
 							],
 							"cookie": [],
-							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"tripCode\": \"22042400001\",\n            \"route\": \"HYD-VZG\",\n            \"tripStatus\": \"Open\",\n            \"numberOfAwb\": null,\n            \"numberOfArticles\": null,\n            \"chargedWeight\": null,\n            \"openingKms\": null,\n            \"closingKms\": null,\n            \"totalKms\": null,\n            \"tripClosingTime\": null,\n            \"latestCheckinHubId\": 1,\n            \"latestCheckinTime\": \"2024-04-25T05:40:12.981Z\",\n            \"latestCheckinType\": \"Inwarded\",\n            \"driver\": {\n                \"id\": 1,\n                \"driverName\": \"Tej Sreeram\",\n                \"phone1\": \"78140\"\n            },\n            \"vehicle\": {\n                \"id\": 1,\n                \"vehicleNum\": \"AP07BX9876\",\n                \"vehicleType\": \"ISUZI DMAX\"\n            }\n        },\n        {\n            \"id\": 3,\n            \"tripCode\": \"22042400003\",\n            \"route\": \"VJZ-RJD\",\n            \"tripStatus\": \"Open\",\n            \"numberOfAwb\": null,\n            \"numberOfArticles\": null,\n            \"chargedWeight\": null,\n            \"openingKms\": null,\n            \"closingKms\": null,\n            \"totalKms\": null,\n            \"tripClosingTime\": null,\n            \"latestCheckinHubId\": null,\n            \"latestCheckinTime\": null,\n            \"latestCheckinType\": null,\n            \"driver\": {\n                \"id\": 2,\n                \"driverName\": \"Janardhan\",\n                \"phone1\": \"55668\"\n            },\n            \"vehicle\": {\n                \"id\": 2,\n                \"vehicleNum\": \"AP37MB9876\",\n                \"vehicleType\": \"BOLERO\"\n            }\n        }\n    ]\n}"
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"tripCode\": \"123\",\n            \"route\": \"123\",\n            \"tripStatus\": \"Open\",\n            \"numberOfAwb\": null,\n            \"numberOfArticles\": null,\n            \"chargedWeight\": null,\n            \"openingKms\": null,\n            \"closingKms\": null,\n            \"totalKms\": null,\n            \"tripClosingTime\": null,\n            \"latestCheckinHubId\": 2,\n            \"latestCheckinTime\": null,\n            \"latestCheckinType\": null,\n            \"driver\": {\n                \"id\": 1,\n                \"driverName\": \"Nadiminti Satyanarayana\",\n                \"phone1\": \"9949908731\"\n            },\n            \"vehicle\": {\n                \"id\": 1,\n                \"vehicleNum\": \"AP39UE5863\",\n                \"vehicleType\": \"BOLLERO\"\n            }\n        },\n        {\n            \"id\": 2,\n            \"tripCode\": \"456\",\n            \"route\": \"VJD-HYD\",\n            \"tripStatus\": \"Open\",\n            \"numberOfAwb\": null,\n            \"numberOfArticles\": 10,\n            \"chargedWeight\": null,\n            \"openingKms\": null,\n            \"closingKms\": null,\n            \"totalKms\": null,\n            \"tripClosingTime\": null,\n            \"latestCheckinHubId\": 1,\n            \"latestCheckinTime\": null,\n            \"latestCheckinType\": \"Inwarded\",\n            \"driver\": {\n                \"id\": 1,\n                \"driverName\": \"Nadiminti Satyanarayana\",\n                \"phone1\": \"9949908731\"\n            },\n            \"vehicle\": {\n                \"id\": 1,\n                \"vehicleNum\": \"AP39UE5863\",\n                \"vehicleType\": \"BOLLERO\"\n            }\n        },\n        {\n            \"id\": 3,\n            \"tripCode\": \"789\",\n            \"route\": \"BANG-DEL\",\n            \"tripStatus\": \"Open\",\n            \"numberOfAwb\": null,\n            \"numberOfArticles\": null,\n            \"chargedWeight\": null,\n            \"openingKms\": null,\n            \"closingKms\": null,\n            \"totalKms\": null,\n            \"tripClosingTime\": null,\n            \"latestCheckinHubId\": 1,\n            \"latestCheckinTime\": null,\n            \"latestCheckinType\": \"Inwarded\",\n            \"driver\": {\n                \"id\": 1,\n                \"driverName\": \"Nadiminti Satyanarayana\",\n                \"phone1\": \"9949908731\"\n            },\n            \"vehicle\": {\n                \"id\": 1,\n                \"vehicleNum\": \"AP39UE5863\",\n                \"vehicleType\": \"BOLLERO\"\n            }\n        },\n        {\n            \"id\": 4,\n            \"tripCode\": \"1122\",\n            \"route\": \"HYD-DEL\",\n            \"tripStatus\": \"Open\",\n            \"numberOfAwb\": null,\n            \"numberOfArticles\": null,\n            \"chargedWeight\": null,\n            \"openingKms\": null,\n            \"closingKms\": null,\n            \"totalKms\": null,\n            \"tripClosingTime\": null,\n            \"latestCheckinHubId\": 1,\n            \"latestCheckinTime\": null,\n            \"latestCheckinType\": null,\n            \"driver\": {\n                \"id\": 1,\n                \"driverName\": \"Nadiminti Satyanarayana\",\n                \"phone1\": \"9949908731\"\n            },\n            \"vehicle\": {\n                \"id\": 1,\n                \"vehicleNum\": \"AP39UE5863\",\n                \"vehicleType\": \"BOLLERO\"\n            }\n        },\n        {\n            \"id\": 5,\n            \"tripCode\": \"2233\",\n            \"route\": \"DEL-PUNJ\",\n            \"tripStatus\": \"Open\",\n            \"numberOfAwb\": null,\n            \"numberOfArticles\": null,\n            \"chargedWeight\": null,\n            \"openingKms\": null,\n            \"closingKms\": null,\n            \"totalKms\": null,\n            \"tripClosingTime\": null,\n            \"latestCheckinHubId\": 2,\n            \"latestCheckinTime\": null,\n            \"latestCheckinType\": null,\n            \"driver\": {\n                \"id\": 1,\n                \"driverName\": \"Nadiminti Satyanarayana\",\n                \"phone1\": \"9949908731\"\n            },\n            \"vehicle\": {\n                \"id\": 1,\n                \"vehicleNum\": \"AP39UE5863\",\n                \"vehicleType\": \"BOLLERO\"\n            }\n        }\n    ]\n}"
+						},
+						{
+							"name": "getTripsSummarypage-success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"tripStatus\":\"Open\",\r\n    \"latestCheckinHubId\":1,\r\n    \"latestCheckinType\":\"Inwarded\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/getTrips",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"getTrips"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "2177"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"881-9WjFgTNfUct8xg2Dh0XceWt9Uj8\""
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 14 Jun 2024 09:17:02 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"tripCode\": \"123\",\n            \"route\": \"123\",\n            \"tripStatus\": \"Open\",\n            \"numberOfAwb\": null,\n            \"numberOfArticles\": null,\n            \"chargedWeight\": null,\n            \"openingKms\": null,\n            \"closingKms\": null,\n            \"totalKms\": null,\n            \"tripClosingTime\": null,\n            \"latestCheckinHubId\": 2,\n            \"latestCheckinTime\": null,\n            \"latestCheckinType\": null,\n            \"driver\": {\n                \"id\": 1,\n                \"driverName\": \"Nadiminti Satyanarayana\",\n                \"phone1\": \"9949908731\"\n            },\n            \"vehicle\": {\n                \"id\": 1,\n                \"vehicleNum\": \"AP39UE5863\",\n                \"vehicleType\": \"BOLLERO\"\n            }\n        },\n        {\n            \"id\": 2,\n            \"tripCode\": \"456\",\n            \"route\": \"VJD-HYD\",\n            \"tripStatus\": \"Open\",\n            \"numberOfAwb\": null,\n            \"numberOfArticles\": 10,\n            \"chargedWeight\": null,\n            \"openingKms\": null,\n            \"closingKms\": null,\n            \"totalKms\": null,\n            \"tripClosingTime\": null,\n            \"latestCheckinHubId\": 1,\n            \"latestCheckinTime\": null,\n            \"latestCheckinType\": \"Inwarded\",\n            \"driver\": {\n                \"id\": 1,\n                \"driverName\": \"Nadiminti Satyanarayana\",\n                \"phone1\": \"9949908731\"\n            },\n            \"vehicle\": {\n                \"id\": 1,\n                \"vehicleNum\": \"AP39UE5863\",\n                \"vehicleType\": \"BOLLERO\"\n            }\n        },\n        {\n            \"id\": 3,\n            \"tripCode\": \"789\",\n            \"route\": \"BANG-DEL\",\n            \"tripStatus\": \"Open\",\n            \"numberOfAwb\": null,\n            \"numberOfArticles\": null,\n            \"chargedWeight\": null,\n            \"openingKms\": null,\n            \"closingKms\": null,\n            \"totalKms\": null,\n            \"tripClosingTime\": null,\n            \"latestCheckinHubId\": 1,\n            \"latestCheckinTime\": null,\n            \"latestCheckinType\": \"Inwarded\",\n            \"driver\": {\n                \"id\": 1,\n                \"driverName\": \"Nadiminti Satyanarayana\",\n                \"phone1\": \"9949908731\"\n            },\n            \"vehicle\": {\n                \"id\": 1,\n                \"vehicleNum\": \"AP39UE5863\",\n                \"vehicleType\": \"BOLLERO\"\n            }\n        },\n        {\n            \"id\": 4,\n            \"tripCode\": \"1122\",\n            \"route\": \"HYD-DEL\",\n            \"tripStatus\": \"Open\",\n            \"numberOfAwb\": null,\n            \"numberOfArticles\": null,\n            \"chargedWeight\": null,\n            \"openingKms\": null,\n            \"closingKms\": null,\n            \"totalKms\": null,\n            \"tripClosingTime\": null,\n            \"latestCheckinHubId\": 1,\n            \"latestCheckinTime\": null,\n            \"latestCheckinType\": null,\n            \"driver\": {\n                \"id\": 1,\n                \"driverName\": \"Nadiminti Satyanarayana\",\n                \"phone1\": \"9949908731\"\n            },\n            \"vehicle\": {\n                \"id\": 1,\n                \"vehicleNum\": \"AP39UE5863\",\n                \"vehicleType\": \"BOLLERO\"\n            }\n        },\n        {\n            \"id\": 5,\n            \"tripCode\": \"2233\",\n            \"route\": \"DEL-PUNJ\",\n            \"tripStatus\": \"Open\",\n            \"numberOfAwb\": null,\n            \"numberOfArticles\": null,\n            \"chargedWeight\": null,\n            \"openingKms\": null,\n            \"closingKms\": null,\n            \"totalKms\": null,\n            \"tripClosingTime\": null,\n            \"latestCheckinHubId\": 2,\n            \"latestCheckinTime\": null,\n            \"latestCheckinType\": null,\n            \"driver\": {\n                \"id\": 1,\n                \"driverName\": \"Nadiminti Satyanarayana\",\n                \"phone1\": \"9949908731\"\n            },\n            \"vehicle\": {\n                \"id\": 1,\n                \"vehicleNum\": \"AP39UE5863\",\n                \"vehicleType\": \"BOLLERO\"\n            }\n        }\n    ]\n}"
 						}
 					]
 				},
@@ -4033,7 +4069,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"tripId\":1,\r\n    \"tripType\":\"Inwarded\",\r\n    \"hubId\":1,\r\n    \"odometerReading\":12345,\r\n    \"inwardTime\":\"14:34\",\r\n    \"fileId\":1\r\n}",
+							"raw": "{\r\n    \"tripId\":1,\r\n    \"tripType\":\"Inwarded\",\r\n    \"hubId\":3,\r\n    \"inwardTime\":\"14:34\",\r\n    \"fileId\":1,\r\n     \"odometerReading\":12345\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4126,7 +4162,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n\r\n    \"AWBCode\":\"SA-HY-A0649\",\r\n    \"AWBArticleCode\":\"SM-BL-A0919-103\",\r\n    \"tripId\":1\r\n}",
+							"raw": "{\r\n\r\n    \r\n    \"AWBCode\":\"KARA13340\",\r\n    \"AWBArticleCode\":\"FA-AP-A0587-127\",\r\n    \"tripId\":1\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4398,6 +4434,69 @@
 							],
 							"cookie": [],
 							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\"\n}"
+						},
+						{
+							"name": "duplicate",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\r\n    \r\n    \"AWBCode\":\"SL-HY-A0004\",\r\n    \"AWBArticleCode\":\"MYK-VZ-A0339-126\",\r\n    \"tripId\":1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/unloadArticlesValidate",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"unloadArticlesValidate"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "71"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"47-5qhZmmRu7LwCddMJ938MIzgDsdc\""
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 11 Jun 2024 11:01:32 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Article MYK-VZ-A0339-126 Already Scanned\"\n}"
 						}
 					]
 				},
@@ -4405,10 +4504,16 @@
 					"name": "loadArticlesValidate",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoidnJvb21zdGVyMSIsImlhdCI6MTcxODM1ODI4NywiZXhwIjoxNzE4NTMxMDg3fQ.e61yDrz_dibWShB0VmNQtD9ZVTkZDI9dPR6VuDWtQTQ",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n\r\n    \"AWBCode\":\"SA-HY-A0649\",\r\n    \"AWBArticleCode\":\"SM-BL-A0919-103\",\r\n    \"tripId\":1\r\n}",
+							"raw": "{\r\n    \"AWBCode\":\"FLX-A00592\",\r\n    \"AWBArticleCode\":\"MYK-HY-A0705-7\",\r\n    \"tripId\":1\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4680,6 +4785,69 @@
 							],
 							"cookie": [],
 							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\"\n}"
+						},
+						{
+							"name": "Duplicate",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\r\n    \"AWBCode\":\"SA-HY-A0649\",\r\n    \"AWBArticleCode\":\"MYK-VZ-A0339-126\",\r\n    \"tripId\":1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/loadArticlesValidate",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"loadArticlesValidate"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "71"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"47-5qhZmmRu7LwCddMJ938MIzgDsdc\""
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 11 Jun 2024 11:04:56 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Article MYK-VZ-A0339-126 Already Scanned\"\n}"
 						}
 					]
 				},
@@ -4690,7 +4858,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"AWBArticleId\":4,\r\n    \"scanType\":\"Unload\",\r\n    \"tripId\":2\r\n}",
+							"raw": "{\r\n\r\n    \"scanType\":\"Load\",\r\n    \"AWBArticleCode\":\"MYK-HY-A0705-7\",\r\n    \"tripId\":1\r\n}\r\n\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4773,6 +4941,69 @@
 							],
 							"cookie": [],
 							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\"\n}"
+						},
+						{
+							"name": "duplicate",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\r\n    \"scanType\":\"Unload\",\r\n    \"AWBArticleCode\":\"MYK-VZ-A0339-126\",\r\n    \"tripId\":1\r\n}\r\n\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/addAWBArticleLogs",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"addAWBArticleLogs"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "38"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"26-ZAqaae9/yXUsp1mCOrJAh+eNW/w\""
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 11 Jun 2024 11:01:30 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\"\n}"
 						}
 					]
 				},
@@ -4780,10 +5011,16 @@
 					"name": "getTripLineItems",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Barear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoidnJvb21zdGVyMSIsImlhdCI6MTcxODAyNDMzMCwiZXhwIjoxNzE4MDI3OTMwfQ.cDrKWMxP8fNDLVvA_o0Z1h0SxwX_zxs2nmVTNKfY6mM",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"tripId\":1,\r\n    \"scanType\":\"Unload\"\r\n}",
+							"raw": "{\r\n    \"tripId\":1,\r\n    \"scanType\":\"Load\",\r\n    \"tripLineItemStatus\":\"Open\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4808,10 +5045,16 @@
 							"name": "success",
 							"originalRequest": {
 								"method": "POST",
-								"header": [],
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Barear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoidnJvb21zdGVyMSIsImlhdCI6MTcxODAyNDMzMCwiZXhwIjoxNzE4MDI3OTMwfQ.cDrKWMxP8fNDLVvA_o0Z1h0SxwX_zxs2nmVTNKfY6mM",
+										"type": "text"
+									}
+								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"tripId\":1,\r\n    \"scanType\":\"Unload\"\r\n}",
+									"raw": "{\r\n    \"tripId\":1,\r\n    \"scanType\":\"Load\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -4845,15 +5088,15 @@
 								},
 								{
 									"key": "Content-Length",
-									"value": "225"
+									"value": "910"
 								},
 								{
 									"key": "ETag",
-									"value": "W/\"e1-TAkJT8cH73DQmit1XnspRhM5mE8\""
+									"value": "W/\"38e-FVc6pK97a8F13Ev8GN0lIkVXVfU\""
 								},
 								{
 									"key": "Date",
-									"value": "Sat, 18 May 2024 18:29:30 GMT"
+									"value": "Fri, 14 Jun 2024 06:56:19 GMT"
 								},
 								{
 									"key": "Connection",
@@ -4865,16 +5108,46 @@
 								}
 							],
 							"cookie": [],
-							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"tripId\": 1,\n            \"tripCode\": \"123\",\n            \"route\": \"vjd-hyd\",\n            \"driverName\": \"tej sreeram\",\n            \"phone1\": \"78\",\n            \"vehicleNum\": \"9876\",\n            \"numberOfArticles\": 10,\n            \"numOfScan\": 2,\n            \"AWBCode\": \"CUST-A00174160524001\"\n        }\n    ]\n}"
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"tripId\": 1,\n            \"tripCode\": \"123\",\n            \"route\": \"123\",\n            \"driverName\": \"Nadiminti Satyanarayana\",\n            \"phone1\": \"9949908731\",\n            \"vehicleNum\": \"AP39UE5863\",\n            \"numberOfArticles\": 38,\n            \"numOfScan\": 2,\n            \"AWBCode\": \"KARA13340\",\n            \"AWBCreatedOn\": \"2024-05-29T07:38:05.652Z\",\n            \"AWBId\": 2,\n            \"VehicleId\": 1,\n            \"DriverId\": 1,\n            \"tripLineItemId\": 6\n        },\n        {\n            \"tripId\": 1,\n            \"tripCode\": \"123\",\n            \"route\": \"123\",\n            \"driverName\": \"Nadiminti Satyanarayana\",\n            \"phone1\": \"9949908731\",\n            \"vehicleNum\": \"AP39UE5863\",\n            \"numberOfArticles\": 50,\n            \"numOfScan\": 5,\n            \"AWBCode\": \"SA-HY-A0649\",\n            \"AWBCreatedOn\": \"2024-05-29T07:38:05.652Z\",\n            \"AWBId\": 1,\n            \"VehicleId\": 1,\n            \"DriverId\": 1,\n            \"tripLineItemId\": 5\n        },\n        {\n            \"tripId\": 1,\n            \"tripCode\": \"123\",\n            \"route\": \"123\",\n            \"driverName\": \"Nadiminti Satyanarayana\",\n            \"phone1\": \"9949908731\",\n            \"vehicleNum\": \"AP39UE5863\",\n            \"numberOfArticles\": 2,\n            \"numOfScan\": 2,\n            \"AWBCode\": \"FLX-A00592\",\n            \"AWBCreatedOn\": \"2024-05-29T07:38:05.652Z\",\n            \"AWBId\": 3,\n            \"VehicleId\": 1,\n            \"DriverId\": 1,\n            \"tripLineItemId\": 7\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "getScannedArticles",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"AWBId\":1,\r\n  \"tripId\":1,\r\n  \"scanType\":\"Unload\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
+						"url": {
+							"raw": "http://localhost:3000/api/getScannedArticles",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"getScannedArticles"
+							]
+						}
+					},
+					"response": [
 						{
-							"name": "success2",
+							"name": "success",
 							"originalRequest": {
 								"method": "POST",
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"tripId\":1,\r\n    \"scanType\":\"Unload\"\r\n}",
+									"raw": "{\r\n  \"AWBId\":1,\r\n  \"tripId\":1,\r\n  \"scanType\":\"Unload\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -4882,7 +5155,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:3000/api/getTripLineItems",
+									"raw": "http://localhost:3000/api/getScannedArticles",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -4890,7 +5163,7 @@
 									"port": "3000",
 									"path": [
 										"api",
-										"getTripLineItems"
+										"getScannedArticles"
 									]
 								}
 							},
@@ -4908,15 +5181,15 @@
 								},
 								{
 									"key": "Content-Length",
-									"value": "403"
+									"value": "300"
 								},
 								{
 									"key": "ETag",
-									"value": "W/\"193-riuwwguGTyd6YW/rts1fA2MvCok\""
+									"value": "W/\"12c-L/2I8Vbw6TeTZ2534VHNXQFuzPg\""
 								},
 								{
 									"key": "Date",
-									"value": "Tue, 21 May 2024 12:51:51 GMT"
+									"value": "Tue, 11 Jun 2024 12:35:01 GMT"
 								},
 								{
 									"key": "Connection",
@@ -4928,7 +5201,319 @@
 								}
 							],
 							"cookie": [],
-							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"tripId\": 1,\n            \"tripCode\": \"123\",\n            \"route\": \"vjd-hyd\",\n            \"driverName\": \"tej sreeram\",\n            \"phone1\": \"78\",\n            \"vehicleNum\": \"9876\",\n            \"numberOfArticles\": 10,\n            \"numOfScan\": 1,\n            \"AWBCode\": \"CUST-A00174160524001\"\n        },\n        {\n            \"tripId\": 1,\n            \"tripCode\": \"123\",\n            \"route\": \"vjd-hyd\",\n            \"driverName\": \"tej sreeram\",\n            \"phone1\": \"78\",\n            \"vehicleNum\": \"9876\",\n            \"numberOfArticles\": 10,\n            \"numOfScan\": 1,\n            \"AWBCode\": \"CUST-A00174160524002\"\n        }\n    ]\n}"
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"scanType\": \"Unload\",\n            \"awbId\": 1,\n            \"AWBCode\": \"SA-HY-A0649\",\n            \"fromBranchName\": \"SATHUPALLI\",\n            \"fromBranchCode\": \"STUP\",\n            \"toBranchName\": \"ZAHEERABAD\",\n            \"toBranchCode\": \"ZHB\",\n            \"numOfScan\": 1,\n            \"numOfArticles\": 50,\n            \"count\": \"1/50\",\n            \"articleCode\": \"SM-BL-A0919-103\",\n            \"articleId\": 1\n        }\n    ]\n}"
+						},
+						{
+							"name": "validationError",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"AWBId\":1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/getScannedArticles",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"getScannedArticles"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "117"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"75-dbZJn+Bg+wctnJclvcSd6j7LSVU\""
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 11 Jun 2024 12:27:42 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 400,\n    \"message\": \"Validation Error\",\n    \"errors\": [\n        {\n            \"errorType\": \"validation\",\n            \"message\": \"TripId is mandatory\"\n        }\n    ]\n}"
+						},
+						{
+							"name": "scanTypeInvalid",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"AWBId\":1,\r\n  \"tripId\":1,\r\n  \"scanType\":\"Unloads\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/getScannedArticles",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"getScannedArticles"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "164"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"a4-DumgkrR9pF0VAzsN1euo2k6Ms8E\""
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 11 Jun 2024 12:34:37 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 400,\n    \"message\": \"Validation Error\",\n    \"errors\": [\n        {\n            \"errorType\": \"validation\",\n            \"message\": \"Invalid scanType provided\",\n            \"key\": \"scanType Should be: Load,Unload.\"\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "inwardedAWB",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"tripId\":1,\r\n    \"data\":[\r\n        {\r\n            \"AWBId\":3,\r\n            \"latestCheckinHubId\":1,\r\n            \"tripLineItemId\":1\r\n        }\r\n        ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/inwardedAWB",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"inwardedAWB"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"tripId\":1,\r\n    \"data\":[\r\n        {\r\n            \"AWBId\":1,\r\n            \"latestCheckinHubId\":2,\r\n            \"tripLineItemId\":1\r\n        },\r\n        {\r\n            \"AWBId\":2,\r\n            \"latestCheckinHubId\":2,\r\n            \"tripLineItemId\":2\r\n        },\r\n        {\r\n            \"AWBId\":3,\r\n            \"latestCheckinHubId\":2,\r\n            \"tripLineItemId\":1\r\n        }\r\n        ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/inwardedAWB",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"inwardedAWB"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "38"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"26-t+GXWTClmx36sI0qQsaZVYoQm0I\""
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 14 Jun 2024 07:10:38 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"success\"\n}"
+						}
+					]
+				},
+				{
+					"name": "outwardedAWB",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"tripId\":1,\r\n    \"data\":[\r\n        {\r\n            \"AWBId\":3,\r\n            \"latestCheckinHubId\":2,\r\n            \"tripLineItemId\":1,\r\n            \"nextDestinationId\":1\r\n        }\r\n        ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/outwardedAWB",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"outwardedAWB"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"tripId\":1,\r\n    \"data\":[\r\n        {\r\n            \"AWBId\":3,\r\n            \"latestCheckinHubId\":2,\r\n            \"tripLineItemId\":1,\r\n            \"nextDestinationId\":1\r\n        }\r\n        ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/outwardedAWB",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"outwardedAWB"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "38"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"26-t+GXWTClmx36sI0qQsaZVYoQm0I\""
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 14 Jun 2024 12:49:58 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"success\"\n}"
 						}
 					]
 				}
@@ -5037,7 +5622,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"DEPSData\":[\r\n        {\r\n        \"DEPSType\":\"Damage\", \r\n        \"DEPSSubType\":\"Forward\",  \r\n        \"AWBId\":4, \r\n        \"loadingHubId\":1, \r\n        \"numberOfDepsArticles\":5, \r\n        \"vehicleNumberId\":1, \r\n        \"tripIdRoute\":1, \r\n        \"connectedDate\":\"2024-05-27T00:00:00Z\", \r\n        \"TicketRaisedBranchId\":2, \r\n        \"loadingUserId\":2, \r\n        \"unloadingUserId\":1, \r\n        \"sealNumber\":\"seal-27052024\",  \r\n        \"caseComment\":\"endpoint level testing\"\r\n        }\r\n    ],\r\n    \"fileIds\":[1,2,3]\r\n\r\n}",
+							"raw": "{\r\n    \"DEPSData\":[],\r\n    \"fileIds\":[1,2,3]\r\n\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
