@@ -118,147 +118,149 @@ export const getTripCheckin = async (tripType:any) => {
 };
 
 export const unloadArticlesValidate = async (AWBId:string,AWBArticleId:string,tripId:number) => {
-    const result=await prisma.$transaction(async prisma => {
-      const AWBIdRes=await prisma.airWayBill.findFirst({
-        where :{AWBCode:AWBId}
-      })
-      const AWBArticleIdRes=await prisma.awbArticle.findFirst({
-        where :{articleCode:AWBArticleId}
-      })
+  const result=await prisma.$transaction(async prisma => {
+    const AWBIdRes=await prisma.airWayBill.findFirst({
+      where :{AWBCode:AWBId}
+    })
+    const AWBArticleIdRes=await prisma.awbArticle.findFirst({
+      where :{articleCode:AWBArticleId}
+    })
 
-      if(!AWBIdRes){
-        return "InvalidAWB"
+    if(!AWBIdRes){
+      return "InvalidAWB"
+    }
+    if(!AWBArticleIdRes){
+      return "InvalidArticle"
+    }
+    const checkDuplicateRes=await prisma.awbArticleTripLogs.findMany({
+      where :{
+        AWBArticleId:AWBArticleIdRes?.id,
+        tripId:tripId,
+        scanType:"Unload"
       }
-      if(!AWBArticleIdRes){
-        return "InvalidArticle"
-      }
-      const checkDuplicateRes=await prisma.awbArticleTripLogs.findMany({
-        where :{
-          AWBArticleId:AWBArticleIdRes?.id,
-          tripId:tripId,
-          scanType:"Unload"
+    })
+    if(checkDuplicateRes.length>0){
+      return "Duplicate"
+    }
+
+    console.log(AWBIdRes?.id,"$$$$",AWBArticleIdRes?.id,checkDuplicateRes.length)
+      const tripLineItemRes = await prisma.tripLineItem.findFirst({
+          select:{
+              id:true,
+              AWBId:true,
+              tripId:true,
+              nextDestinationId:true,
+              nextBranch:{
+                  select:{
+                      id:true,
+                      branchName:true
+                  }
+              }
+          },
+          where: {
+            AWBId:AWBIdRes?.id,
+            tripId:tripId
+          }, 
+          orderBy: {
+              id: 'desc',
+          },
+        });
+        if(tripLineItemRes==null){
+          console.log("AWBIDInvalid",tripLineItemRes,AWBIdRes?.id)
+          return 'AWBIDInvalid'
+        }
+
+        const tripDetailsRes = await prisma.tripDetails.findFirst({
+          where: {
+            id: tripId
+          }, 
+          orderBy: {
+              id: 'desc',
+          },
+        });
+        console.log(tripDetailsRes?.latestCheckinHubId,"validConditionss",tripLineItemRes?.nextDestinationId)
+        if(tripDetailsRes?.latestCheckinHubId==tripLineItemRes?.nextDestinationId){
+       
+          console.log("valid",tripLineItemRes?.id)
+          return `Valid+${tripLineItemRes?.id}`
+        }
+        else{
+          console.log("invalid")
+          return tripLineItemRes?.nextBranch?.branchName
         }
       })
-      if(checkDuplicateRes.length>0){
-        return "Duplicate"
-      }
-
-      console.log(AWBIdRes?.id,"$$$$",AWBArticleIdRes?.id,checkDuplicateRes.length)
-        const tripLineItemRes = await prisma.tripLineItem.findFirst({
-            select:{
-                AWBId:true,
-                tripId:true,
-                nextDestinationId:true,
-                nextBranch:{
-                    select:{
-                        id:true,
-                        branchName:true
-                    }
-                }
-            },
-            where: {
-              AWBId:AWBIdRes?.id,
-              tripId:tripId
-            }, 
-            orderBy: {
-                id: 'desc',
-            },
-          });
-          if(tripLineItemRes==null){
-            console.log("AWBIDInvalid",tripLineItemRes,AWBIdRes?.id)
-            return 'AWBIDInvalid'
-          }
-
-          const tripDetailsRes = await prisma.tripDetails.findFirst({
-            where: {
-              id: tripId
-            }, 
-            orderBy: {
-                id: 'desc',
-            },
-          });
-          console.log(tripDetailsRes?.latestCheckinHubId,"validConditionss",tripLineItemRes?.nextDestinationId)
-          if(tripDetailsRes?.latestCheckinHubId==tripLineItemRes?.nextDestinationId){
-         
-            console.log("valid")
-            return "Valid"
-          }
-          else{
-            console.log("invalid")
-            return tripLineItemRes?.nextBranch?.branchName
-          }
-        })
-        return result
+      return result
 };
 
 
 export const loadArticlesValidate = async (AWBId:string,AWBArticleId:string,tripId:number) => {
-    const result=await prisma.$transaction(async prisma => {
-      const AWBIdRes=await prisma.airWayBill.findFirst({
-        where :{AWBCode:AWBId}
-      })
-      const AWBArticleIdRes=await prisma.awbArticle.findFirst({
-        where :{articleCode:AWBArticleId}
-      })
-      if(!AWBIdRes){
-        return "InvalidAWB"
+  const result=await prisma.$transaction(async prisma => {
+    const AWBIdRes=await prisma.airWayBill.findFirst({
+      where :{AWBCode:AWBId}
+    })
+    const AWBArticleIdRes=await prisma.awbArticle.findFirst({
+      where :{articleCode:AWBArticleId}
+    })
+    if(!AWBIdRes){
+      return "InvalidAWB"
+    }
+    if(!AWBArticleIdRes){
+      return "InvalidArticle"
+    }
+    const checkDuplicateRes=await prisma.awbArticleTripLogs.findMany({
+      where :{
+        AWBArticleId:AWBArticleIdRes?.id,
+        tripId:tripId,
+        scanType:"Load"
       }
-      if(!AWBArticleIdRes){
-        return "InvalidArticle"
-      }
-      const checkDuplicateRes=await prisma.awbArticleTripLogs.findMany({
-        where :{
-          AWBArticleId:AWBArticleIdRes?.id,
-          tripId:tripId,
-          scanType:"Load"
+    })
+    // console.log("check",checkDuplicateRes,AWBArticleIdRes?.id,)
+    if(checkDuplicateRes.length>0){
+      return "Duplicate"
+    }
+      const tripLineItemRes = await prisma.tripLineItem.findFirst({
+          select:{
+              id:true,
+              AWBId:true,
+              tripId:true,
+              nextDestinationId:true,
+              status:true,
+              nextBranch:{
+                  select:{
+                      id:true,
+                      branchName:true
+                  }
+              },
+              trip:{
+                select:{
+                  tripCode:true,
+                  route:true,
+                  latestCheckinHubId:true
+                }
+              }
+
+          },
+          where: {
+            AWBId: AWBIdRes?.id,
+            tripId:tripId
+          }, 
+          orderBy: {
+              id: 'desc',
+          },
+        });
+        if(tripLineItemRes==null){
+          return 'AWBIDInvalid'
+        }
+        if(tripLineItemRes?.status=="Assigned"){
+          console.log("valid")
+          return `Valid+${tripLineItemRes?.id}`
+        }
+        else{
+          console.log("invalid")
+          return tripLineItemRes?.trip?.tripCode
         }
       })
-      // console.log("check",checkDuplicateRes,AWBArticleIdRes?.id,)
-      if(checkDuplicateRes.length>0){
-        return "Duplicate"
-      }
-        const tripLineItemRes = await prisma.tripLineItem.findFirst({
-            select:{
-                AWBId:true,
-                tripId:true,
-                nextDestinationId:true,
-                status:true,
-                nextBranch:{
-                    select:{
-                        id:true,
-                        branchName:true
-                    }
-                },
-                trip:{
-                  select:{
-                    tripCode:true,
-                    route:true,
-                    latestCheckinHubId:true
-                  }
-                }
-
-            },
-            where: {
-              AWBId: AWBIdRes?.id,
-              tripId:tripId
-            }, 
-            orderBy: {
-                id: 'desc',
-            },
-          });
-          if(tripLineItemRes==null){
-            return 'AWBIDInvalid'
-          }
-          if(tripLineItemRes?.status=="Assigned"){
-            console.log("valid")
-            return "Valid"
-          }
-          else{
-            console.log("invalid")
-            return tripLineItemRes?.trip?.tripCode
-          }
-        })
-        return result
+      return result
 };
 
 export const getTripDetails = async (tripId: number) => {

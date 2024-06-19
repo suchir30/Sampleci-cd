@@ -535,24 +535,31 @@ export const unloadArticlesValidate = async (req: Request, res: Response, next: 
       throwValidationError([{message: "AWBArticeCode is mandatory"}]);
     }
     const unloadArticlesValidateResult = await tripService.unloadArticlesValidate(AWBId,AWBArticleId,tripId);
-    console.log(unloadArticlesValidateResult,"res")
-    if(unloadArticlesValidateResult=='Valid'){
-      res.status(HttpStatusCode.OK).json(buildNoContentResponse("Success"));
-    }
+    
+    if (unloadArticlesValidateResult?.split('+')[0]=== "Valid"){
+      res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(parseInt(unloadArticlesValidateResult?.split('+')[1]),"Success"));
+      return
+    } 
+    
     else if(unloadArticlesValidateResult=='AWBIDInvalid'){
       res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWBID has no Trip Items,Please check the AWBID"));
+      return
     }
     else if(unloadArticlesValidateResult=='Duplicate'){
       res.status(HttpStatusCode.OK).json(buildNoContentResponse(`Article ${AWBArticleId} Already Scanned`));
+      return
     }
     else if(unloadArticlesValidateResult=='InvalidAWB'){
       res.status(HttpStatusCode.OK).json(buildNoContentResponse(`Invalid AirWayBill,Please check the AWB.`));
+      return
     }
     else if(unloadArticlesValidateResult=='InvalidArticle'){
       res.status(HttpStatusCode.OK).json(buildNoContentResponse(`Invalid AWB Article,Please check the Article.`));
+      return
     }
     else{
       res.status(HttpStatusCode.OK).json(buildNoContentResponse(`AWBID next destination is ${unloadArticlesValidateResult}. Please do not unload.`));
+      return
     }
    
   } catch (err) {
@@ -574,23 +581,33 @@ export const loadArticlesValidate = async (req: Request, res: Response, next: Ne
     }
     const loadArticlesValidateResult = await tripService.loadArticlesValidate(AWBId,AWBArticleId,tripId);
     console.log(loadArticlesValidateResult,"res")
+    if (loadArticlesValidateResult?.split('+')[0]=== "Valid"){
+      res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(parseInt(loadArticlesValidateResult?.split('+')[1]),"Success"));
+      return
+    }
     if(loadArticlesValidateResult=='Valid'){
       res.status(HttpStatusCode.OK).json(buildNoContentResponse("Success"));
+      return
     }
     else if(loadArticlesValidateResult=='AWBIDInvalid'){
       res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWBID has no Checkin Trips,Please check the AWBID and TripId"));
+      return
     }
     else if(loadArticlesValidateResult=='Duplicate'){
       res.status(HttpStatusCode.OK).json(buildNoContentResponse(`Article ${AWBArticleId} Already Scanned`));
+      return
     }
     else if(loadArticlesValidateResult=='InvalidAWB'){
       res.status(HttpStatusCode.OK).json(buildNoContentResponse(`Invalid AirWayBill,Please check the AWB.`));
+      return
     }
     else if(loadArticlesValidateResult=='InvalidArticle'){
       res.status(HttpStatusCode.OK).json(buildNoContentResponse(`Invalid AWB Article,Please check the Article.`));
+      return
     }
     else{
       res.status(HttpStatusCode.OK).json(buildNoContentResponse(`TripCode ${loadArticlesValidateResult} not in Assigned Status. Please do not load.`));
+      return
 
     }
    
@@ -599,6 +616,7 @@ export const loadArticlesValidate = async (req: Request, res: Response, next: Ne
     next(err)
   }
 }
+
 export const getTripDetails = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const tripId:number=req.body.tripId
