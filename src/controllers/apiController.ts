@@ -537,7 +537,8 @@ export const unloadArticlesValidate = async (req: Request, res: Response, next: 
     const unloadArticlesValidateResult = await tripService.unloadArticlesValidate(AWBId,AWBArticleId,tripId);
     
     if (unloadArticlesValidateResult?.split('+')[0]=== "Valid"){
-      res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(parseInt(unloadArticlesValidateResult?.split('+')[1]),"Success"));
+      res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(
+        {"TripLineItemId":parseInt(unloadArticlesValidateResult?.split('+')[1])},"Success"));
       return
     } 
     
@@ -582,7 +583,8 @@ export const loadArticlesValidate = async (req: Request, res: Response, next: Ne
     const loadArticlesValidateResult = await tripService.loadArticlesValidate(AWBId,AWBArticleId,tripId);
     console.log(loadArticlesValidateResult,"res")
     if (loadArticlesValidateResult?.split('+')[0]=== "Valid"){
-      res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(parseInt(loadArticlesValidateResult?.split('+')[1]),"Success"));
+      res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(
+        {"TripLineItemId":parseInt(loadArticlesValidateResult?.split('+')[1])},"Success"));
       return
     }
     if(loadArticlesValidateResult=='Valid'){

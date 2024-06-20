@@ -2873,7 +2873,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n   \"AWBId\": 1\r\n}",
+							"raw": "{\r\n   \"AWBId\": 5\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3784,15 +3784,15 @@
 								},
 								{
 									"key": "Content-Length",
-									"value": "739"
+									"value": "719"
 								},
 								{
 									"key": "ETag",
-									"value": "W/\"2e3-wVGspg7pImeM4RVFe4UzJD9QQjA\""
+									"value": "W/\"2cf-CWJG99xHBzKEsEx+Tycx1T5E98A\""
 								},
 								{
 									"key": "Date",
-									"value": "Wed, 12 Jun 2024 11:22:54 GMT"
+									"value": "Tue, 18 Jun 2024 13:39:41 GMT"
 								},
 								{
 									"key": "Connection",
@@ -3804,7 +3804,7 @@
 								}
 							],
 							"cookie": [],
-							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"AWBCode\": \"SA-HY-A0649\",\n            \"appointmentDate\": null,\n            \"invoiceNumber\": \"2184\",\n            \"invoiceValue\": 40380,\n            \"ewayBillNumber\": null,\n            \"numOfArticles\": 50,\n            \"consignorId\": 1,\n            \"consigneeId\": 1,\n            \"AWBStatus\": \"PickUp\",\n            \"articleGenFlag\": true,\n            \"AWBLineItems\": [\n                {\n                    \"id\": 1,\n                    \"ActualWeightKg\": 114.72,\n                    \"lengthCms\": 318.5,\n                    \"breadthCms\": 230.5,\n                    \"heightCms\": 193,\n                    \"numOfArticles\": 25\n                },\n                {\n                    \"id\": 2,\n                    \"ActualWeightKg\": 480,\n                    \"lengthCms\": null,\n                    \"breadthCms\": null,\n                    \"heightCms\": null,\n                    \"numOfArticles\": 25\n                }\n            ],\n            \"consignor\": {\n                \"publicName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\"\n            },\n            \"consignee\": {\n                \"consigneeName\": \"CHANDRAHASA AGENCIES\"\n            },\n            \"fromBranch\": {\n                \"branchName\": \"SATHUPALLI\",\n                \"branchCode\": \"STUP\"\n            },\n            \"toBranch\": {\n                \"branchName\": \"ZAHEERABAD\",\n                \"branchCode\": \"ZHB\"\n            }\n        }\n    ]\n}"
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"AWBCode\": \"SA-HY-A0649\",\n            \"appointmentDate\": null,\n            \"invoiceNumber\": \"2184\",\n            \"invoiceValue\": 40380,\n            \"ewayBillNumber\": null,\n            \"numOfArticles\": 7,\n            \"consignorId\": 1,\n            \"consigneeId\": 1,\n            \"AWBStatus\": \"PickUp\",\n            \"articleGenFlag\": false,\n            \"AWBLineItems\": [\n                {\n                    \"id\": 1,\n                    \"ActualWeightKg\": 114.72,\n                    \"lengthCms\": 318.5,\n                    \"breadthCms\": 230.5,\n                    \"heightCms\": 193,\n                    \"numOfArticles\": 24\n                }\n            ],\n            \"consignor\": {\n                \"publicName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"contractConsignorIds\": [\n                    {\n                        \"consignorContractType\": \"Actual\",\n                        \"ContractType\": \"PTL\"\n                    }\n                ]\n            },\n            \"consignee\": {\n                \"consigneeName\": \"CHANDRAHASA AGENCIES\"\n            },\n            \"fromBranch\": {\n                \"branchName\": \"SATHUPALLI\",\n                \"branchCode\": \"STUP\"\n            },\n            \"toBranch\": {\n                \"branchName\": \"ZAHEERABAD\",\n                \"branchCode\": \"ZHB\"\n            }\n        }\n    ]\n}"
 						}
 					]
 				}
@@ -3820,7 +3820,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"tripStatus\":\"Open\"\r\n   \r\n}",
+							"raw": "{\r\n    \"tripStatus\":\"Open\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4162,7 +4162,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n\r\n    \r\n    \"AWBCode\":\"KARA13340\",\r\n    \"AWBArticleCode\":\"FA-AP-A0587-127\",\r\n    \"tripId\":1\r\n}",
+							"raw": "{\r\n    \"AWBCode\":\"SA-HY-A0649\",\r\n    \"AWBArticleCode\":\"SM-BL-A0919-103\",\r\n    \"tripId\":1\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4183,69 +4183,6 @@
 						}
 					},
 					"response": [
-						{
-							"name": "success",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n\r\n    \"AWBId\":2,\r\n    \"AWBArticleId\":1,\r\n    \"tripId\":2\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:3000/api/unloadArticlesValidate",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "3000",
-									"path": [
-										"api",
-										"unloadArticlesValidate"
-									]
-								}
-							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"header": [
-								{
-									"key": "X-Powered-By",
-									"value": "Express"
-								},
-								{
-									"key": "Content-Type",
-									"value": "application/json; charset=utf-8"
-								},
-								{
-									"key": "Content-Length",
-									"value": "38"
-								},
-								{
-									"key": "ETag",
-									"value": "W/\"26-ZAqaae9/yXUsp1mCOrJAh+eNW/w\""
-								},
-								{
-									"key": "Date",
-									"value": "Wed, 15 May 2024 13:09:17 GMT"
-								},
-								{
-									"key": "Connection",
-									"value": "keep-alive"
-								},
-								{
-									"key": "Keep-Alive",
-									"value": "timeout=5"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\"\n}"
-						},
 						{
 							"name": "invalid hub",
 							"originalRequest": {
@@ -4497,6 +4434,69 @@
 							],
 							"cookie": [],
 							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Article MYK-VZ-A0339-126 Already Scanned\"\n}"
+						},
+						{
+							"name": "successs",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"AWBCode\":\"SA-HY-A0649\",\r\n    \"AWBArticleCode\":\"SM-BL-A0919-103\",\r\n    \"tripId\":1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/unloadArticlesValidate",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"unloadArticlesValidate"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "66"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"42-o+uQGyDqJQyYw6QS0cyaCrGsQRk\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 20 Jun 2024 02:27:31 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": {\n        \"tripLineItemID\": 1\n    }\n}"
 						}
 					]
 				},
@@ -4513,7 +4513,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"AWBCode\":\"FLX-A00592\",\r\n    \"AWBArticleCode\":\"MYK-HY-A0705-7\",\r\n    \"tripId\":1\r\n}",
+							"raw": "{\r\n    \"AWBCode\":\"SL-HY-A0004\",\r\n    \"AWBArticleCode\":\"SL-HY-A00040001\",\r\n    \"tripId\":1\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4534,69 +4534,6 @@
 						}
 					},
 					"response": [
-						{
-							"name": "success",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n\r\n    \"AWBId\":1,\r\n    \"AWBArticleId\":1,\r\n    \"tripId\":1\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:3000/api/loadArticlesValidate",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "3000",
-									"path": [
-										"api",
-										"loadArticlesValidate"
-									]
-								}
-							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"header": [
-								{
-									"key": "X-Powered-By",
-									"value": "Express"
-								},
-								{
-									"key": "Content-Type",
-									"value": "application/json; charset=utf-8"
-								},
-								{
-									"key": "Content-Length",
-									"value": "38"
-								},
-								{
-									"key": "ETag",
-									"value": "W/\"26-ZAqaae9/yXUsp1mCOrJAh+eNW/w\""
-								},
-								{
-									"key": "Date",
-									"value": "Wed, 15 May 2024 13:15:42 GMT"
-								},
-								{
-									"key": "Connection",
-									"value": "keep-alive"
-								},
-								{
-									"key": "Keep-Alive",
-									"value": "timeout=5"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\"\n}"
-						},
 						{
 							"name": "invalid AWBId/TripID",
 							"originalRequest": {
@@ -4848,6 +4785,75 @@
 							],
 							"cookie": [],
 							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Article MYK-VZ-A0339-126 Already Scanned\"\n}"
+						},
+						{
+							"name": "success1",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoidnJvb21zdGVyMSIsImlhdCI6MTcxODM1ODI4NywiZXhwIjoxNzE4NTMxMDg3fQ.e61yDrz_dibWShB0VmNQtD9ZVTkZDI9dPR6VuDWtQTQ",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"AWBCode\":\"SL-HY-A0004\",\r\n    \"AWBArticleCode\":\"SL-HY-A00040001\",\r\n    \"tripId\":1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/loadArticlesValidate",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"loadArticlesValidate"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "66"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"42-6hER4bjnqnN2eWDzmTa5nKgkf0g\""
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 19 Jun 2024 13:51:27 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": {\n        \"tripLineItemID\": 5\n    }\n}"
 						}
 					]
 				},
@@ -4858,7 +4864,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n\r\n    \"scanType\":\"Load\",\r\n    \"AWBArticleCode\":\"MYK-HY-A0705-7\",\r\n    \"tripId\":1\r\n}\r\n\r\n",
+							"raw": "{\r\n\r\n    \"scanType\":\"Unload\",\r\n    \"AWBArticleCode\":\"SL-HY-A00040001\",\r\n    \"tripId\":1,\r\n    \"tripLineItemId\":1\r\n}\r\n\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -5008,6 +5014,99 @@
 					]
 				},
 				{
+					"name": "getTripDetails",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"tripId\":1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/getTripDetails",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"getTripDetails"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"tripId\":1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/getTripDetails",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"getTripDetails"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "199"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"c7-y7sIYwQW5ftTeaISoIkQeuktV9k\""
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 19 Jun 2024 09:53:12 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"tripId\": 1,\n            \"tripCode\": \"123\",\n            \"route\": \"123\",\n            \"vehicleNum\": \"AP39UE5863\",\n            \"driverName\": \"Nadiminti Satyanarayana\",\n            \"phone1\": \"9949908731\",\n            \"latestCheckinHub\": 1\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
 					"name": "getTripLineItems",
 					"request": {
 						"method": "POST",
@@ -5020,7 +5119,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"tripId\":1,\r\n    \"scanType\":\"Load\",\r\n    \"tripLineItemStatus\":\"Open\"\r\n}",
+							"raw": "{\r\n    \"tripId\":1,\r\n    \"scanType\":\"Unload\",\r\n    \"tripLineItemStatus\":\"Assigned\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -5054,7 +5153,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"tripId\":1,\r\n    \"scanType\":\"Load\"\r\n}",
+									"raw": "{\r\n    \"tripId\":1,\r\n    \"scanType\":\"Unload\",\r\n    \"tripLineItemStatus\":\"Assigned\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -5088,15 +5187,15 @@
 								},
 								{
 									"key": "Content-Length",
-									"value": "910"
+									"value": "270"
 								},
 								{
 									"key": "ETag",
-									"value": "W/\"38e-FVc6pK97a8F13Ev8GN0lIkVXVfU\""
+									"value": "W/\"10e-oZb1xuuSaO7atbJccGChqPz/zDM\""
 								},
 								{
 									"key": "Date",
-									"value": "Fri, 14 Jun 2024 06:56:19 GMT"
+									"value": "Wed, 19 Jun 2024 09:53:20 GMT"
 								},
 								{
 									"key": "Connection",
@@ -5108,7 +5207,7 @@
 								}
 							],
 							"cookie": [],
-							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"tripId\": 1,\n            \"tripCode\": \"123\",\n            \"route\": \"123\",\n            \"driverName\": \"Nadiminti Satyanarayana\",\n            \"phone1\": \"9949908731\",\n            \"vehicleNum\": \"AP39UE5863\",\n            \"numberOfArticles\": 38,\n            \"numOfScan\": 2,\n            \"AWBCode\": \"KARA13340\",\n            \"AWBCreatedOn\": \"2024-05-29T07:38:05.652Z\",\n            \"AWBId\": 2,\n            \"VehicleId\": 1,\n            \"DriverId\": 1,\n            \"tripLineItemId\": 6\n        },\n        {\n            \"tripId\": 1,\n            \"tripCode\": \"123\",\n            \"route\": \"123\",\n            \"driverName\": \"Nadiminti Satyanarayana\",\n            \"phone1\": \"9949908731\",\n            \"vehicleNum\": \"AP39UE5863\",\n            \"numberOfArticles\": 50,\n            \"numOfScan\": 5,\n            \"AWBCode\": \"SA-HY-A0649\",\n            \"AWBCreatedOn\": \"2024-05-29T07:38:05.652Z\",\n            \"AWBId\": 1,\n            \"VehicleId\": 1,\n            \"DriverId\": 1,\n            \"tripLineItemId\": 5\n        },\n        {\n            \"tripId\": 1,\n            \"tripCode\": \"123\",\n            \"route\": \"123\",\n            \"driverName\": \"Nadiminti Satyanarayana\",\n            \"phone1\": \"9949908731\",\n            \"vehicleNum\": \"AP39UE5863\",\n            \"numberOfArticles\": 2,\n            \"numOfScan\": 2,\n            \"AWBCode\": \"FLX-A00592\",\n            \"AWBCreatedOn\": \"2024-05-29T07:38:05.652Z\",\n            \"AWBId\": 3,\n            \"VehicleId\": 1,\n            \"DriverId\": 1,\n            \"tripLineItemId\": 7\n        }\n    ]\n}"
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"numberOfArticles\": 4,\n            \"numOfScan\": 1,\n            \"AWBCode\": \"SL-HY-A0004\",\n            \"AWBCreatedOn\": \"2024-06-18T06:23:10.822Z\",\n            \"AWBId\": 5,\n            \"tripLineItemId\": 5,\n            \"nextDestinationCode\": \"MTNI\",\n            \"finalDestinationCode\": \"BNSA\",\n            \"TripLineItemStatus\": \"Assigned\"\n        }\n    ]\n}"
 						}
 					]
 				},
