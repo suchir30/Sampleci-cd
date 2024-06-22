@@ -51,7 +51,7 @@ export const generateBulkAWBForConsignor = async (consignorId: number, awbData: 
         if (latestAWB) {
             const lastThreeChars = parseInt(latestAWB.AWBCode.slice(-3));
             console.log(lastThreeChars,"LASTTHREE");
-            
+
             increment = lastThreeChars + 1;
         }
 
@@ -69,7 +69,7 @@ export const generateBulkAWBForConsignor = async (consignorId: number, awbData: 
             }
         }
 
-        
+
 
         const createdAWBs = await prisma.airWayBill.createMany({
             data: awbData.map(data => ({
@@ -90,7 +90,7 @@ export const generateBulkAWBForConsignor = async (consignorId: number, awbData: 
 export const getGeneratedAWB = async (consignorId: number, AWBStatus: any) => {
     const getGeneratedAWBQuery = await prisma.airWayBill.findMany({
         select: {
-            id: true, 
+            id: true,
             AWBCode: true,
             consignorId: true,
             consigneeId: true,
@@ -245,7 +245,7 @@ export const getAWBArticles = async (AWBId: number) => {
                             publicName: true,
                             consignorCode: true
                         }
-                    },   
+                    },
                     fromBranch: {
                         select: {
                             branchName: true,
@@ -290,7 +290,7 @@ export const generateAWBArticles = async (AWBId: number):Promise<boolean> => {
               articleGenFlag:true,
             },
           });
-     
+
         if (anyArticle !== null) {
             const generateArticles = await prisma.awbArticle.findMany({
                 where: {
@@ -365,7 +365,7 @@ export const markAWBArticleAsDeleted = async (articleId: number, AWBId: number) 
             status: ArticleStatus.Deleted,
         }
     });
-   
+
     const deletedArticle = await prisma.awbArticle.findMany({
         where: {
             AWBId: AWBId,
@@ -401,7 +401,7 @@ export const assignedTriptoAWB = async (AWBId:number,tripId:number,finalDestinat
                 finalDestinationId: finalDestinationId
             }
         });
-    } 
+    }
     else if(existingTripLineItem?.status=="Open" || existingTripLineItem?.status=="Closed" || existingTripLineItem?.status=="Delivered"){
         return "Already EXists"
     }
@@ -419,7 +419,7 @@ export const assignedTriptoAWB = async (AWBId:number,tripId:number,finalDestinat
 export const getUpdateAWB = async (AWBId: number) => {
     const getUpdateAWBRes = await prisma.airWayBill.findMany({
         where: {
-          id: AWBId, 
+          id: AWBId,
         },
         select: {
           id: true,
@@ -473,18 +473,18 @@ export const getUpdateAWB = async (AWBId: number) => {
           },
         },
       });
-      
+
       return getUpdateAWBRes;
-      
+
 };
 
 export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem[]) => {
     try {
         const result = await prisma.$transaction(async (prisma) => {
-               
+
                     await prisma.awbLineItem.deleteMany({
                         where: {AWBId:AWBId}
-                        
+
                     });
                     for (const item of awbLineItems) {
                         await prisma.awbLineItem.create({
@@ -528,12 +528,12 @@ export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem
     }
     catch (error) {
         console.error("Error in updateAWBLineItem", error);
-        throw error; 
-      
-     
+        throw error;
+
+
   };
 }
-  
+
 export const updateAWB = async (AWBId: number,consigneeId: number,appointmentDate: Date,invoiceNumber: string,invoiceValue: number,ewayBillNumber: string): Promise<string | boolean> => {
     try {
       const result = await prisma.$transaction(async (prisma) => {
@@ -542,11 +542,11 @@ export const updateAWB = async (AWBId: number,consigneeId: number,appointmentDat
             id: AWBId,
           },
         });
-  
+
         if (AWBRes.length === 0) {
           return "NotExists";
         }
-  
+
         await prisma.airWayBill.update({
           where: {
             id: AWBId,
@@ -561,11 +561,90 @@ export const updateAWB = async (AWBId: number,consigneeId: number,appointmentDat
         });
         return true;
       });
-  
+
       return result;
     } catch (error) {
       console.error("Error in updateAWB", error);
-      throw error; 
+      throw error;
     }
   };
-  
+
+export const getAwbPdfData = async (AWBId: number) => {
+    const result = await prisma.airWayBill.findUnique({
+        where: {
+            id: 1
+        },
+        select: {
+            id: true,
+            AWBCode: true,
+            consignorId: true,
+            consigneeId: true,
+            invoiceNumber: true,
+            invoiceValue: true,
+            createdOn: true,
+            grandTotal:true,
+            subTotal:true,
+            weightKgs:true,
+            rollupChargedWtInKgs:true,
+            ewayBillNumber:true,
+            ratePerKg:true,
+            rollupVolume:true,
+            rollupWeight:true,
+            rollupArticleCnt:true,
+            numOfArticles:true,
+            fromBranchId:true,
+            toBranchId:true,
+            fromBranch: {
+                select: {
+                    branchName: true,
+                    branchCode: true,
+                }
+            },
+            toBranch: {
+                select: {
+                    branchName: true,
+                    branchCode: true,
+                }
+            },
+            consignor: {
+                select: {
+                    consignorCode: true,
+                    publicName: true,
+                    legalName: true,
+                    gstNumber: true,
+                    address1: true,
+                    address2: true,
+                }
+            },
+            consignee: {
+                select: {
+                    consigneeCode: true,
+                    consigneeName: true,
+                    phone1: true,
+                    phone2: true,
+                    email: true,
+                    address1: true,
+                    address2: true,
+                }
+            },
+            AWBLineItems: {
+                select: {
+                    lineItemDescription: true,
+                    lengthCms: true,
+                    breadthCms: true,
+                    heightCms: true,
+                    numOfArticles: true,
+                    ActualWeightKg: true,
+                    chargedWeight: true,
+                    volume: true
+                }
+            }
+        }
+    });
+    return result;
+};
+
+export const awbEntry = async (AWBId: number, fileId: number) => {
+    const result = await prisma.airWayBill.update({ where: { id: AWBId }, data: { AWBPdf: fileId }, });
+    return;
+};

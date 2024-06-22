@@ -52,6 +52,7 @@ router.post('/inwardedAWB',apiController.inwardedAWB)
 router.post('/fileUpload',upload.fields([{name: 'file', maxCount: 6}]),apiController.fileUpload)
 router.post('/getDepsLists',apiController.getDepsLists)
 router.post('/addDeps',apiController.addDeps)
+router.post('/generatePDF', apiController.generatePDF)
 
 
 

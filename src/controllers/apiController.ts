@@ -12,6 +12,7 @@ import { MulterFile } from '../types/multerTypes';
 import { Inwarded, Outwarded } from '../types/outwardInwardTypes';
 import { buildNoContentResponse, buildObjectFetchResponse, throwValidationError} from '../utils/apiUtils';
 import { Consignee, Consignor,AwbLineItem, DEPS} from '@prisma/client';
+import {pdfGenerator} from "../services/pdfGenerator";
 
 export const getIndustryTypes = async (_req: Request, res: Response, next: NextFunction) => {
   try {
@@ -149,7 +150,7 @@ export const createConsignors = async (req: Request, res: Response, next: NextFu
   try {
     const consignorsData: Consignor[] = req.body.consignorsDatax || [];
     const errors: { message: string, key?: string }[] = [];
-    
+
     if (!consignorsData.length) {
       throwValidationError([{message: "No consignors provided."}]);
     }
@@ -183,7 +184,7 @@ export const getConsignees = async (req: Request, res: Response, next: NextFunct
   try {
     const consignorId: number = req.body.consignorId;
     const toBranchId: number = req.body.toBranchId;
-    
+
     if (!consignorId) {
       throwValidationError([{message: "No Consignor Id Provided."}]);
     }
@@ -222,7 +223,7 @@ export const createConsignees = async (req: Request, res: Response, next: NextFu
     else{
       res.status(HttpStatusCode.OK).json(buildNoContentResponse("Consignee Created Successful"));
     }
-   
+
   } catch (err) {
     console.error('Error creating consignees:', err);
     next(err)
@@ -397,7 +398,7 @@ export const assignedTriptoAWB = async (req: Request, res: Response, next: NextF
     else{
       res.status(HttpStatusCode.OK).json(buildNoContentResponse("Trip Assigned to AWB"));
     }
-   
+
   } catch (err) {
     console.error('Error assignedTriptoAWB', err);
     next(err)
@@ -441,7 +442,7 @@ export const updateAWB = async (req: Request, res: Response, next: NextFunction)
     else{
       res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWB Updated Successfully"));
     }
-  
+
   } catch (err) {
     console.error('Error updateAWB', err);
     next(err)
@@ -465,7 +466,7 @@ export const getTrips = async (req: Request, res: Response, next: NextFunction) 
     const tripStatus:string=req.body.tripStatus;
     const latestCheckinHubId:number=req.body.latestCheckinHubId;
     const latestCheckinType:string=req.body.latestCheckinType;
-    
+
     const validtripStatus = ['Open','CompletedWithRemarks','Closed'];
     if (!validtripStatus.includes(tripStatus)) {
       throwValidationError([{message: "Invalid Trip Status provided",key:`Status Should be: ${validtripStatus}.`}]);
@@ -535,13 +536,13 @@ export const unloadArticlesValidate = async (req: Request, res: Response, next: 
       throwValidationError([{message: "AWBArticeCode is mandatory"}]);
     }
     const unloadArticlesValidateResult = await tripService.unloadArticlesValidate(AWBId,AWBArticleId,tripId);
-    
+
     if (unloadArticlesValidateResult?.split('+')[0]=== "Valid"){
       res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(
         {"TripLineItemId":parseInt(unloadArticlesValidateResult?.split('+')[1])},"Success"));
       return
-    } 
-    
+    }
+
     else if(unloadArticlesValidateResult=='AWBIDInvalid'){
       res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWBID has no Trip Items,Please check the AWBID"));
       return
@@ -562,7 +563,7 @@ export const unloadArticlesValidate = async (req: Request, res: Response, next: 
       res.status(HttpStatusCode.OK).json(buildNoContentResponse(`AWBID next destination is ${unloadArticlesValidateResult}. Please do not unload.`));
       return
     }
-   
+
   } catch (err) {
     console.error('Error unloadArticlesValidate', err);
     next(err)
@@ -612,7 +613,7 @@ export const loadArticlesValidate = async (req: Request, res: Response, next: Ne
       return
 
     }
-   
+
   } catch (err) {
     console.error('Error loadArticlesValidate', err);
     next(err)
@@ -729,19 +730,19 @@ export const fileUpload = async (req: Request & { files?: { file: MulterFile[] }
   try {
     if (!req.files || !req.files.file || req.files.file.length === 0) {
       throwValidationError([{message: "No file uploaded"}]);
-      return 
+      return
     }
-  
+
     if (req.files.file.length > 6) {
       throwValidationError([{ message: "Number of files exceeded. Maximum allowed: 6" }]);
       return;
     }
-    const type: string = req.body.type || 'defaultScreen'; 
+    const type: string = req.body.type || 'defaultScreen';
     const validType = ['DEPS','AWB','GST','ShippingLabel','TripCheckin'];
     if (!validType.includes(type)) {
       throwValidationError([{message: "Invalid type provided",key:`Type Should be: ${validType}.`}]);
     }
-    const currentTimestamp: string = new Date().getTime().toString(); 
+    const currentTimestamp: string = new Date().getTime().toString();
     const fileUploadPromises: Promise<string>[] = [];
 
     const uploadDir = path.join(__dirname, '..','..', process.env.UPLOAD_DIR ||'uploads', type);
@@ -760,22 +761,23 @@ export const fileUpload = async (req: Request & { files?: { file: MulterFile[] }
               reject(err);
             } else {
               console.log(`File ${item.originalname} uploaded successfully`);
-              resolve(filePath); 
+              resolve(filePath);
             }
           });
         })
       );
     });
     const filePaths = await Promise.all(fileUploadPromises);
+    console.log(filePaths);
     const normalizedFilePaths = filePaths.map((filePath) => filePath.replace(/\\/g, '/'));
-    
+    console.log(normalizedFilePaths);
     const fileUploadRes = await tripService.fileUploadRes(normalizedFilePaths,type);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(fileUploadRes));
     return
 
   } catch (error) {
     console.error('Error in fileUpload:', error);
-    next(error); 
+    next(error);
   }
 };
 
@@ -804,6 +806,29 @@ export const addDeps = async (req: Request, res: Response, next: NextFunction) =
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(addDepsResult));
   } catch (err) {
     console.error('Error getDepsLists', err);
+    next(err)
+  }
+}
+
+export const generatePDF = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const AWBId=req.body.AWBId
+    if (!AWBId || AWBId.length==0) {
+      throwValidationError([{message: "AWB ID is mandatory"}]);
+    }
+    const pdfData = await AWBService.getAwbPdfData(AWBId);
+    const path = await pdfGenerator(pdfData);
+
+    const fileUploadRes = await tripService.fileUploadRes([path],'AWB');
+    await AWBService.awbEntry(AWBId, fileUploadRes[0].fileId);
+
+    let response= {
+      "fileName":`${pdfData?.AWBCode}`,
+      "pdfPath":path
+    }
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(response));
+  } catch (err) {
+    console.error('Error generatePdf', err);
     next(err)
   }
 }
