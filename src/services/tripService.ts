@@ -123,7 +123,9 @@ export const unloadArticlesValidate = async (AWBId:string,AWBArticleId:string,tr
       where :{AWBCode:AWBId}
     })
     const AWBArticleIdRes=await prisma.awbArticle.findFirst({
-      where :{articleCode:AWBArticleId}
+      where :{articleCode:AWBArticleId, status: {
+        not: "Deleted"
+      }}
     })
 
     if(!AWBIdRes){
@@ -199,7 +201,9 @@ export const loadArticlesValidate = async (AWBId:string,AWBArticleId:string,trip
       where :{AWBCode:AWBId}
     })
     const AWBArticleIdRes=await prisma.awbArticle.findFirst({
-      where :{articleCode:AWBArticleId}
+      where :{articleCode:AWBArticleId, status: {
+        not: "Deleted"
+      }}
     })
     if(!AWBIdRes){
       return "InvalidAWB"

@@ -464,8 +464,8 @@ model Contract {
   monthlyMinCommitVolume      Int?
   minimumAWBValue             Float?                @db.Float
   docketChargeValue           Float?                @db.Float
-  fovOfCoustomersInvoiceValue Int?
-  liabilityClause             Float?                @db.Float
+  fovOfCoustomersInvoiceValue Float?
+  liabilityClause             String?             
   articleChargeMandatory      Float?                @db.Float
   articleChargeMinAmount      Float?                @db.Float
   articleChargeMaxAmount      Float?                @db.Float
