@@ -416,7 +416,6 @@ export const addAWBArticleLogs = async (AWBArticleCode: any, scanType: any, trip
 
   return result; 
 };
-
 export const fileUploadRes = async (normalizedFilePaths: string[], type: string) => {
   try {
     const createdRecords = await prisma.$transaction(async (prisma) => {
@@ -591,67 +590,51 @@ export const getScannedArticles = async (AWBId:number,tripId:number,scanType:any
   return transformedResult;
 };
 
-export const outwardedAWB = async (tripId:number,data:any,checkinHub:number) => {
-
-  const allConsignee = data.every((item: { unloadLocationId: any }) => item.unloadLocationId === "CONSIGNEE");
-  if(allConsignee){
-    const awbIds = data.map((item: { AWBId: number }) => item.AWBId);
-    const tripLineItemUpdatePromises = data.map((item: { AWBId: number;unloadLocationId:number }) => {
-      return prisma.tripLineItem.updateMany({
+export const outwardedAWB = async (tripId: number, data: any, checkinHub: number) => {
+  // Loop through each item in the data array
+  for (const item of data) {
+    if (item.unloadLocationId === "CONSIGNEE") {  // unloadLocationId is "CONSIGNEE"
+      await prisma.tripLineItem.updateMany({
         where: {
-          AWBId:item.AWBId,
-          tripId:tripId,
-
+          AWBId: item.AWBId,
+          tripId: tripId,
         },
         data: {
-          status: 'Open'
-        }
-      })
-    })
-    await Promise.all(tripLineItemUpdatePromises);
+          status: 'Open',
+        },
+      });
 
-    const updatedAirWayBills = await prisma.airWayBill.updateMany({
-      where: {
-        id: {
-          in: awbIds
-        }
-      },
-      data: {
-        AWBStatus:"outForDelivery"
-      }
-    })
-    return
-  }
-  else{
-    const result=await prisma.$transaction(async prisma => {
-      const awbIds = data.map((item: { AWBId: number }) => item.AWBId);
-      const tripLineItemUpdatePromises = data.map((item: { AWBId: number;unloadLocationId:number }) => {
-        return prisma.tripLineItem.updateMany({
+      await prisma.airWayBill.updateMany({
+        where: {
+          id: item.AWBId,
+        },
+        data: {
+          AWBStatus: "outForDelivery",
+        },
+      });
+    } 
+    else {// unloadLocationId is not "CONSIGNEE"
+      await prisma.$transaction(async (prisma) => {
+        await prisma.tripLineItem.updateMany({
           where: {
-            AWBId:item.AWBId,
-            tripId:tripId,
-
+            AWBId: item.AWBId,
+            tripId: tripId,
           },
           data: {
             status: 'Open',
-            unloadLocationId: item.unloadLocationId
-          }
-        })
-      })
-      await Promise.all(tripLineItemUpdatePromises);
-  
-      const updatedAirWayBills = await prisma.airWayBill.updateMany({
-        where: {
-          id: {
-            in: awbIds
-          }
-        },
-        data: {
-          AWBStatus:"InTransit"
-        }
-      })
-  
-      const hlfUpdatePromises =  data.map(async(item: { AWBId: number; latestCheckinHubId: number,tripLineItemId:number,unloadLocationId:number }) => {
+            unloadLocationId: item.unloadLocationId,
+          },
+        });
+
+        await prisma.airWayBill.updateMany({
+          where: {
+            id: item.AWBId,
+          },
+          data: {
+            AWBStatus: "InTransit",
+          },
+        });
+
         const existingRecord = await prisma.hLFLineItem.findFirst({
           where: {
             hlfLineItemAWBId: item.AWBId,
@@ -660,33 +643,28 @@ export const outwardedAWB = async (tripId:number,data:any,checkinHub:number) => 
             id: 'desc',
           },
         });
-  
-        if(existingRecord){
-          if(existingRecord.hlfLineStatus=="Inwarded"){
-           
-            const updateRecord = await prisma.hLFLineItem.updateMany({
+
+        if (existingRecord) {
+          if (existingRecord.hlfLineStatus == "Inwarded") {
+            await prisma.hLFLineItem.updateMany({
               where: {
                 hlfLineItemAWBId: item.AWBId,
               },
               data: {
-                hlfLineStatus: 'Outwarded'
+                hlfLineStatus: 'Outwarded',
               },
             });
-  
-            return prisma.hLFLineItem.create({
+
+            await prisma.hLFLineItem.create({
               data: {
                 hlfLineItemAWBId: item.AWBId,
                 hlfLineStatus: 'ToBeInwarded',
                 branchId: item.unloadLocationId,
               },
             });
-  
-  
           }
-        }
-  
-        else{
-          return prisma.hLFLineItem.create({
+        } else {
+          await prisma.hLFLineItem.create({
             data: {
               hlfLineItemAWBId: item.AWBId,
               hlfLineStatus: 'ToBeInwarded',
@@ -694,19 +672,14 @@ export const outwardedAWB = async (tripId:number,data:any,checkinHub:number) => 
             },
           });
         }
-      })
-      await Promise.all(hlfUpdatePromises);
-      
-  
-   })
+      });
+    }
   }
-
 };
 
 export const inwardedAWB = async (tripId: number, awbIds: number[], checkinHub: any) => {
  
     if (checkinHub === "CONSIGNEE") {
-      // Using Promise.all to ensure all updates are awaited properly
       await Promise.all(awbIds.map(async (AWBId) => {
         await prisma.tripLineItem.updateMany({
           where: {

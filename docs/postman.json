@@ -5576,7 +5576,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"tripId\":1,\r\n    \"checkinHub\":\"CONSIGNEE\",\r\n    \"awbIds\":[1,4]\r\n}",
+							"raw": "{\r\n    \"tripId\":1,\r\n    \"checkinHub\":2,\r\n    \"awbIds\":[1,4]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -5597,6 +5597,69 @@
 						}
 					},
 					"response": [
+						{
+							"name": "success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"tripId\":1,\r\n    \"checkinHub\":2,\r\n    \"awbIds\":[1,4]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/inwardedAWB",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"inwardedAWB"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "38"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"26-t+GXWTClmx36sI0qQsaZVYoQm0I\""
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 25 Jun 2024 05:56:05 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"success\"\n}"
+						},
 						{
 							"name": "succeess",
 							"originalRequest": {
@@ -5669,7 +5732,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"tripId\":1,\r\n    \"checkinHub\":2,\r\n    \"data\":[\r\n        {\r\n            \"AWBId\":3,\r\n            \"unloadLocationId\":\"CONSIGNEE\"\r\n          \r\n        },\r\n      {\r\n            \"AWBId\":3,\r\n            \"unloadLocationId\":\"CONSIGNEE\"\r\n        }\r\n        ]\r\n}",
+							"raw": "{\r\n    \"tripId\":1,\r\n    \"checkinHub\":2,\r\n    \"data\":[\r\n        {\r\n            \"AWBId\":3,\r\n            \"unloadLocationId\":\"CONSIGNEE\"\r\n          \r\n        },\r\n      {\r\n            \"AWBId\":4,\r\n            \"unloadLocationId\":2\r\n        }\r\n        ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -5690,6 +5753,69 @@
 						}
 					},
 					"response": [
+						{
+							"name": "success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"tripId\":1,\r\n    \"checkinHub\":2,\r\n    \"data\":[\r\n        {\r\n            \"AWBId\":3,\r\n            \"unloadLocationId\":2\r\n          \r\n        },\r\n      {\r\n            \"AWBId\":4,\r\n            \"unloadLocationId\":2\r\n        }\r\n        ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/outwardedAWB",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"outwardedAWB"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "38"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"26-t+GXWTClmx36sI0qQsaZVYoQm0I\""
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 25 Jun 2024 05:55:47 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"success\"\n}"
+						},
 						{
 							"name": "success",
 							"originalRequest": {
