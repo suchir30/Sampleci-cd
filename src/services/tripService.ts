@@ -149,7 +149,7 @@ export const unloadArticlesValidate = async (AWBId:string,AWBArticleId:string,tr
               id:true,
               AWBId:true,
               tripId:true,
-              nextDestinationId:true,
+              unloadLocationId:true,
               nextBranch:{
                   select:{
                       id:true,
@@ -178,8 +178,8 @@ export const unloadArticlesValidate = async (AWBId:string,AWBArticleId:string,tr
               id: 'desc',
           },
         });
-        console.log(tripDetailsRes?.latestCheckinHubId,"validConditionss",tripLineItemRes?.nextDestinationId)
-        if(tripDetailsRes?.latestCheckinHubId==tripLineItemRes?.nextDestinationId){
+        console.log(tripDetailsRes?.latestCheckinHubId,"validConditionss",tripLineItemRes?.unloadLocationId)
+        if(tripDetailsRes?.latestCheckinHubId==tripLineItemRes?.unloadLocationId){
        
           console.log("valid",tripLineItemRes?.id)
           return `Valid+${tripLineItemRes?.id}`
@@ -223,7 +223,7 @@ export const loadArticlesValidate = async (AWBId:string,AWBArticleId:string,trip
               id:true,
               AWBId:true,
               tripId:true,
-              nextDestinationId:true,
+              unloadLocationId:true,
               status:true,
               nextBranch:{
                   select:{
@@ -300,158 +300,121 @@ export const getTripDetails = async (tripId: number) => {
    
 };
 
-
-interface TripDetails {
-  numberOfArticles?: number;
-  numOfScan: number;
-  AWBCode: string;
-  AWBCreatedOn?: Date;
-  AWBId: number;
-  tripLineItemId?: number;
-  nextDestinationCode?:string;
-  finalDestinationCode?:string;
-  TripLineItemStatus?: string;
-}
-
-export const getTripLineItems = async (tripId: number, scanType: any, tripLineItemStatus: any) => {
-  const LogsRes = await prisma.awbArticleTripLogs.findMany({
-    where: {
-      tripId: tripId,
-      scanType: scanType,
-    },
-  });
-
-  if (LogsRes.length === 0) {
-    return [];
-  } else {
-    const result = await prisma.awbArticleTripLogs.findMany({
-      where: {
-        tripId: tripId,
-        scanType: scanType,
+export const getTripLineItems = async (tripId: number, tripLineItemStatus: any,checkinHub:number) => {
+    const result = await prisma.tripLineItem.findMany({
+      where:{
+        status:tripLineItemStatus,
+        tripId:tripId,
+        loadLocationId:checkinHub
       },
-      orderBy: {
-        createdOn: 'desc'
+      orderBy:{
+        latestScanTime:'desc'
       },
-      select: {
-        TripLineItem:{
-          where: {
-            status:tripLineItemStatus
-          },
+      select:{
+        id:true,
+        rollupScanCount:true,
+        latestScanTime:true,
+        unloadLocationId:true,
+        finalDestinationId:true,
+        status:true,
+        AirWayBill:{
           select:{
-            id: true,
-            AWBId: true,
-            status: true,
-            nextDestinationId:true,
-            finalDestinationId:true,
-            nextBranch:{
-              select:{
-                id:true,
-                branchName:true,
-                branchCode:true
-            }
-          },
-          finalBranch:{
-            select:{
-              id:true,
-              branchCode:true,
-              branchName:true
-            }
-          }
+            id:true,AWBCode:true,createdOn:true,numOfArticles:true
           }
         },
-        AwbArticle:{
+        nextBranch:{
           select:{
-            AWB:{
-              select:{
-                id: true,
-                AWBCode: true,
-                createdOn: true,
-                numOfArticles: true
-              }
-            
-            }
-
+            id:true,
+            branchName:true,
+            branchCode:true
+          }
+        },
+        finalBranch:{
+          select:{
+            id:true,
+            branchCode:true,
+            branchName:true
           }
         }
-      },
-    })
-
-    // Group by AWBArticleId and get the latest createdOn date for each AWBCode
-    const latestLogs = await prisma.awbArticleTripLogs.groupBy({
-      by: ['AWBArticleId'], 
-      where: {
-        tripId: tripId,
-        scanType: scanType,
-      },
-      _max: {
-        createdOn: true
       }
-    });
-
-   
-    const latestCreatedOnMap: { [key: string]: Date | null } = {};
-    latestLogs.forEach(log => {
-      const AWBCode = log.AWBArticleId; 
-      const latestCreatedOn = log._max?.createdOn;
-      latestCreatedOnMap[AWBCode] = latestCreatedOn ?? null;
-    });
-    const groupedResult: TripDetails[] = [];
-    console.log(result,"^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",)
-    result.forEach(entry => {
-      if(entry.TripLineItem){
-      const AWBCode=entry.AwbArticle?.AWB?.AWBCode || "Unknown";
-      const createdOn = entry.AwbArticle?.AWB?.createdOn ?? undefined;
-       const AWBId = entry.AwbArticle?.AWB?.id ?? 0;
-       const numberOfArticles = entry.AwbArticle?.AWB?.numOfArticles ?? undefined;
-       const tripLineItemId = entry.TripLineItem?.id;
-       const TripLineItemStatus = entry.TripLineItem?.status ?? undefined;
-       const nextDestinationCode = entry.TripLineItem?.nextBranch?.branchCode ?? undefined;
-       const finalDestinationCode = entry.TripLineItem?.finalBranch?.branchCode ?? undefined;
-    
-
-      if (!groupedResult.find(item => item.AWBCode === AWBCode)) {
-        groupedResult.push({
-          numberOfArticles: numberOfArticles,
-          numOfScan: 0, // Initialize numOfScan to 0 for each AWBCode
-          AWBCode: AWBCode,
-          AWBCreatedOn: createdOn,
-          AWBId: AWBId,
-          tripLineItemId: tripLineItemId,
-          nextDestinationCode:nextDestinationCode,
-          finalDestinationCode:finalDestinationCode,
-          TripLineItemStatus: TripLineItemStatus
-      })
-    }
-
-    groupedResult.find(item => item.AWBCode === AWBCode)!.numOfScan += 1;
-    }
-    });
-
-
-    return groupedResult;
-  }
+    })
+    const finalResult = result.map(item => ({
+      AWBCode: item.AirWayBill.AWBCode,
+      AWBCreatedOn: item.AirWayBill.createdOn,
+      AWBId: item.AirWayBill.id,
+      tripLineItemId: item.id,
+      nextDestinationCode:item.nextBranch?.branchCode,
+      finalDestinationCode:item.finalBranch?.branchCode,
+      TripLineItemStatus: item.status,
+      numOfScan:item.rollupScanCount||0,
+      numberOfArticles: item.AirWayBill.numOfArticles,
+      latestScanTime:item.latestScanTime 
+    }));
+    return finalResult;
 };
 
-export const addAWBArticleLogs = async (AWBArticleCode:any,scanType:any,tripId:number,tripLineItemId:number) => {
-  const today =moment().toISOString();  
-   const result=await prisma.$transaction(async prisma => {
-    const AWBArticleRes=await prisma.awbArticle.findFirst({
-      where :{articleCode:AWBArticleCode}
-    })
+export const addAWBArticleLogs = async (AWBArticleCode: any, scanType: any, tripId: number, tripLineItemId: number): Promise<string | void> => {
+  const today = moment().toISOString();  
 
-    if(AWBArticleRes){
-      const AWBArticleTripLogsRes=await prisma.awbArticleTripLogs.createMany({
-        data:{
-          AWBArticleId:AWBArticleRes?.id,
-          tripId:tripId,
-          scanType:scanType,
-          tripLineItemId:tripLineItemId
+  const result = await prisma.$transaction(async prisma => {
+    const AWBArticleRes = await prisma.awbArticle.findFirst({
+      where: { articleCode: AWBArticleCode }
+    });
 
+    if (AWBArticleRes) {
+      const checkDuplicateRes = await prisma.awbArticleTripLogs.findMany({
+        where: {
+          AWBArticleId: AWBArticleRes?.id,
+          tripId: tripId,
+          scanType: scanType
         }
-    })
+      });
+
+      if (checkDuplicateRes.length > 0) {
+        console.log("duplicate");
+        return "Duplicate";
+      }
+
+      const AWBArticleTripLogsRes = await prisma.awbArticleTripLogs.create({
+        data: {
+          AWBArticleId: AWBArticleRes?.id,
+          tripId: tripId,
+          scanType: scanType,
+          tripLineItemId: tripLineItemId
+        }
+      });
+
+      console.log(AWBArticleTripLogsRes.id);
+
+      const countQuery = await prisma.awbArticleTripLogs.findMany({
+        where: {
+          tripLineItemId: tripLineItemId,
+          scanType: scanType
+        }
+      });
+
+      console.log(countQuery.length);
+
+      await prisma.tripLineItem.update({
+        where: {
+          id: tripLineItemId,
+        },
+        data: {
+          rollupScanCount: countQuery.length,
+          latestScanTime: today
+        }
+      });
+
+      
+      return "Success";
     }
-  
-  })
+    else{
+      return "Duplicate"
+    }
+    return; 
+  });
+
+  return result; 
 };
 
 export const fileUploadRes = async (normalizedFilePaths: string[], type: string) => {
@@ -628,17 +591,20 @@ export const getScannedArticles = async (AWBId:number,tripId:number,scanType:any
   return transformedResult;
 };
 
-export const outwardedAWB = async (tripId:number,data:any) => {
-  const result=await prisma.$transaction(async prisma => {
+export const outwardedAWB = async (tripId:number,data:any,checkinHub:number) => {
+
+  const allConsignee = data.every((item: { unloadLocationId: any }) => item.unloadLocationId === "CONSIGNEE");
+  if(allConsignee){
     const awbIds = data.map((item: { AWBId: number }) => item.AWBId);
-    const tripLineItemUpdatePromises = data.map((item: { AWBId: number; latestCheckinHubId: number,tripLineItemId:number,nextDestinationId:number }) => {
+    const tripLineItemUpdatePromises = data.map((item: { AWBId: number;unloadLocationId:number }) => {
       return prisma.tripLineItem.updateMany({
         where: {
-          id: item.tripLineItemId
+          AWBId:item.AWBId,
+          tripId:tripId,
+
         },
         data: {
-          status: 'Open',
-          nextDestinationId: item.nextDestinationId
+          status: 'Open'
         }
       })
     })
@@ -651,96 +617,158 @@ export const outwardedAWB = async (tripId:number,data:any) => {
         }
       },
       data: {
-        AWBStatus:"InTransit"
+        AWBStatus:"outForDelivery"
       }
     })
+    return
+  }
+  else{
+    const result=await prisma.$transaction(async prisma => {
+      const awbIds = data.map((item: { AWBId: number }) => item.AWBId);
+      const tripLineItemUpdatePromises = data.map((item: { AWBId: number;unloadLocationId:number }) => {
+        return prisma.tripLineItem.updateMany({
+          where: {
+            AWBId:item.AWBId,
+            tripId:tripId,
 
-    const hlfUpdatePromises =  data.map(async(item: { AWBId: number; latestCheckinHubId: number,tripLineItemId:number,nextDestinationId:number }) => {
-      const existingRecord = await prisma.hLFLineItem.findFirst({
+          },
+          data: {
+            status: 'Open',
+            unloadLocationId: item.unloadLocationId
+          }
+        })
+      })
+      await Promise.all(tripLineItemUpdatePromises);
+  
+      const updatedAirWayBills = await prisma.airWayBill.updateMany({
         where: {
-          hlfLineItemAWBId: item.AWBId,
+          id: {
+            in: awbIds
+          }
         },
-        orderBy: {
-          id: 'desc',
-        },
-      });
-
-      if(existingRecord){
-        if(existingRecord.hlfLineStatus=="Inwarded"){
-         
-          const updateRecord = await prisma.hLFLineItem.updateMany({
-            where: {
-              hlfLineItemAWBId: item.AWBId,
-            },
-            data: {
-              hlfLineStatus: 'Outwarded'
-            },
-          });
-
+        data: {
+          AWBStatus:"InTransit"
+        }
+      })
+  
+      const hlfUpdatePromises =  data.map(async(item: { AWBId: number; latestCheckinHubId: number,tripLineItemId:number,unloadLocationId:number }) => {
+        const existingRecord = await prisma.hLFLineItem.findFirst({
+          where: {
+            hlfLineItemAWBId: item.AWBId,
+          },
+          orderBy: {
+            id: 'desc',
+          },
+        });
+  
+        if(existingRecord){
+          if(existingRecord.hlfLineStatus=="Inwarded"){
+           
+            const updateRecord = await prisma.hLFLineItem.updateMany({
+              where: {
+                hlfLineItemAWBId: item.AWBId,
+              },
+              data: {
+                hlfLineStatus: 'Outwarded'
+              },
+            });
+  
+            return prisma.hLFLineItem.create({
+              data: {
+                hlfLineItemAWBId: item.AWBId,
+                hlfLineStatus: 'ToBeInwarded',
+                branchId: item.unloadLocationId,
+              },
+            });
+  
+  
+          }
+        }
+  
+        else{
           return prisma.hLFLineItem.create({
             data: {
               hlfLineItemAWBId: item.AWBId,
               hlfLineStatus: 'ToBeInwarded',
-              branchId: item.nextDestinationId,
+              branchId: item.unloadLocationId,
             },
           });
-
-
-        }
-      }
-
-      else{
-        return prisma.hLFLineItem.create({
-          data: {
-            hlfLineItemAWBId: item.AWBId,
-            hlfLineStatus: 'ToBeInwarded',
-            branchId: item.nextDestinationId,
-          },
-        });
-      }
-    })
-    await Promise.all(hlfUpdatePromises);
-    
-
- })
-};
-
-export const inwardedAWB = async (tripId:number,data:any) => {
-  const result=await prisma.$transaction(async prisma => {
-    const awbIds = data.map((item: { AWBId: number }) => item.AWBId);
-    const updatedTripLineItems = await prisma.tripLineItem.updateMany({
-      where: {
-        tripId:tripId
-      },
-      data: {
-        status: "Closed"
-      }
-    });
-
-    const updatedAirWayBills = await prisma.airWayBill.updateMany({
-      where: {
-        id: {
-          in: awbIds
-        }
-      },
-      data: {
-        AWBStatus: 'atHub'
-      }
-    })
-
-    const hlfUpdatePromises = data.map((item: { AWBId: number; latestCheckinHubId: number }) => {
-      return prisma.hLFLineItem.updateMany({
-        where: {
-          hlfLineItemAWBId: item.AWBId,
-          hlfLineStatus:"ToBeInwarded"
-        },
-        data: {
-          hlfLineStatus: 'Inwarded'
         }
       })
-    })
-    await Promise.all(hlfUpdatePromises);
+      await Promise.all(hlfUpdatePromises);
+      
+  
+   })
+  }
 
- })
 };
+
+export const inwardedAWB = async (tripId: number, awbIds: number[], checkinHub: any) => {
+ 
+    if (checkinHub === "CONSIGNEE") {
+      // Using Promise.all to ensure all updates are awaited properly
+      await Promise.all(awbIds.map(async (AWBId) => {
+        await prisma.tripLineItem.updateMany({
+          where: {
+            tripId: tripId,
+            AWBId: AWBId
+          },
+          data: {
+            status: "Closed"
+          }
+        });
+      }));
+  
+      await prisma.airWayBill.updateMany({
+        where: {
+          id: {
+            in: awbIds
+          }
+        },
+        data: {
+          AWBStatus: "Delivered"
+        }
+      });
+    }
+     else {
+      await prisma.$transaction(async (prisma) => {
+        await prisma.tripLineItem.updateMany({
+          where: {
+            tripId: tripId,
+            unloadLocationId: checkinHub
+          },
+          data: {
+            status: "Closed"
+          }
+        });
+  
+        await prisma.airWayBill.updateMany({
+          where: {
+            id: {
+              in: awbIds
+            }
+          },
+          data: {
+            AWBStatus: 'atHub'
+          }
+        });
+  
+        await prisma.hLFLineItem.updateMany({
+          where: {
+            hlfLineItemAWBId: {
+              in: awbIds
+            },
+            hlfLineStatus: "ToBeInwarded"
+          },
+          data: {
+            hlfLineStatus: 'Inwarded'
+          }
+        });
+      });
+    }
+
+  
+ 
+};
+
 
