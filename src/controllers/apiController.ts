@@ -377,6 +377,7 @@ export const assignedTriptoAWB = async (req: Request, res: Response, next: NextF
     const AWBId:number=req.body.AWBId
     const tripId:number=req.body.tripId
     const status:string=req.body.status
+    const loadLocationId:number=req.body.loadLocationId
     if (!AWBId) {
       throwValidationError([{ message: `Mandatory field AWBId is missing` }]);
     }
@@ -391,7 +392,7 @@ export const assignedTriptoAWB = async (req: Request, res: Response, next: NextF
     if (!AWBId || !tripId || !finalDestinationId) {
       throwValidationError([{message: "Mandatory fields are missing"}]);
     }
-    const assignedTriptoAWBResult = await AWBService.assignedTriptoAWB(AWBId,tripId,finalDestinationId,status);
+    const assignedTriptoAWBResult = await AWBService.assignedTriptoAWB(AWBId,tripId,finalDestinationId,status,loadLocationId);
     if(assignedTriptoAWBResult=="Already EXists"){
       throwValidationError([{message: "Already Trip Assigned to AWB"}]);
     }
@@ -634,15 +635,12 @@ export const getTripDetails = async (req: Request, res: Response, next: NextFunc
 export const getTripLineItems = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const tripId:number=req.body.tripId
-    const scanType:string=req.body.scanType
     const tripLineItemStatus:string=req.body.tripLineItemStatus;
+    const checkinHub:number=req.body.checkinHub
     if (!tripId) {
       throwValidationError([{message: "tripId is mandatory"}]);
     }
-    if (!scanType) {
-      throwValidationError([{message: "scanType is mandatory"}]);
-    }
-    const getTripsResult = await tripService.getTripLineItems(tripId,scanType,tripLineItemStatus);
+    const getTripsResult = await tripService.getTripLineItems(tripId,tripLineItemStatus,checkinHub);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getTripsResult));
   } catch (err) {
     console.error('Error getTripLineItems', err);
@@ -650,31 +648,45 @@ export const getTripLineItems = async (req: Request, res: Response, next: NextFu
   }
 }
 
-export const addAWBArticleLogs = async (req: Request, res: Response, next: NextFunction) => {
+export const addAWBArticleLogs = async (
+  req: Request, 
+  res: Response, 
+  next: NextFunction
+) => {
   try {
-    const AWBArticleCode:string=req.body.AWBArticleCode
-    const scanType:string=req.body.scanType
-    const tripId:number=req.body.tripId
-    const tripLineItemId:number=req.body.tripLineItemId
+    const AWBArticleCode: string = req.body.AWBArticleCode;
+    const scanType: string = req.body.scanType;
+    const tripId: number = req.body.tripId;
+    const tripLineItemId: number = req.body.tripLineItemId;
+
     if (!scanType) {
-      throwValidationError([{message: "scanType is mandatory"}]);
+      throwValidationError([{ message: "scanType is mandatory" }]);
     }
     if (!tripId) {
-      throwValidationError([{message: "tripId is mandatory"}]);
+      throwValidationError([{ message: "tripId is mandatory" }]);
     }
     if (!AWBArticleCode) {
-      throwValidationError([{message: "AWBArticleCode is mandatory"}]);
+      throwValidationError([{ message: "AWBArticleCode is mandatory" }]);
     }
     if (!tripLineItemId) {
-      throwValidationError([{message: "tripLineItemId is mandatory"}]);
+      throwValidationError([{ message: "tripLineItemId is mandatory" }]);
     }
-    const getTripsResult = await tripService.addAWBArticleLogs(AWBArticleCode,scanType,tripId,tripLineItemId);
-    res.status(HttpStatusCode.OK).json(buildNoContentResponse("Success"));
+
+    const addAWBArticleLogsRes = await tripService.addAWBArticleLogs(AWBArticleCode, scanType, tripId, tripLineItemId);
+    console.log(addAWBArticleLogsRes, "Service Response");
+
+    if (addAWBArticleLogsRes === 'Duplicate') {
+      res.status(HttpStatusCode.OK).json(buildNoContentResponse(`Invalid Article`));
+    } else {
+      res.status(HttpStatusCode.OK).json(buildNoContentResponse("Success"));
+    }
+  
   } catch (err) {
     console.error('Error addAWBArticleLogs', err);
-    next(err)
+    next(err);
   }
 }
+
 
 export const getScannedArticles = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -704,8 +716,17 @@ export const getScannedArticles = async (req: Request, res: Response, next: Next
 1
 export const outwardedAWB = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { tripId, data }: { tripId: number, data: Outwarded[] } = req.body;
-    const getScannedArticlesResult = await tripService.outwardedAWB(tripId,data);
+    const { tripId, data,checkinHub }: { tripId: number, data: Outwarded[],checkinHub:number } = req.body;
+    if(!data){
+      throwValidationError([{message: "Data is mandatory"}]);
+    }
+    if(!tripId){
+      throwValidationError([{message: "tripId is mandatory"}]);
+    }
+    if(!checkinHub){
+      throwValidationError([{message: "checkinHub is mandatory"}]);
+    }
+    const getScannedArticlesResult = await tripService.outwardedAWB(tripId,data,checkinHub);
     res.status(HttpStatusCode.OK).json(buildNoContentResponse("success"));
   } catch (err) {
     console.error('Error getScannedArticles', err);
@@ -715,8 +736,18 @@ export const outwardedAWB = async (req: Request, res: Response, next: NextFuncti
 
 export const inwardedAWB = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { tripId, data }: { tripId: number, data: Inwarded[] } = req.body;
-    const getScannedArticlesResult = await tripService.inwardedAWB(tripId,data);
+    const { tripId, awbIds,checkinHub }: { tripId: number, awbIds:[] ,checkinHub:any } = req.body;
+    if(!awbIds){
+      throwValidationError([{message: "AWBID is mandatory"}]);
+    }
+    if(!tripId){
+      throwValidationError([{message: "tripId is mandatory"}]);
+    }
+    if(!checkinHub){
+      throwValidationError([{message: "checkinHub is mandatory"}]);
+    }
+  
+    const getScannedArticlesResult = await tripService.inwardedAWB(tripId,awbIds,checkinHub);
     res.status(HttpStatusCode.OK).json(buildNoContentResponse("success"));
   } catch (err) {
     console.error('Error getScannedArticles', err);

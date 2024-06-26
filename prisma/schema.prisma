@@ -51,6 +51,7 @@ model Branch {
   phone1                   String?              @db.VarChar(255)
   phone2                   String?              @db.VarChar(255)
   isHub                    Boolean
+  isWareHouse              Boolean?
   isActive                 Boolean              @default(true)
   createdOn                DateTime             @default(now())
   consignors               Consignor[]          @relation("consignorBranch")
@@ -65,6 +66,7 @@ model Branch {
   hlfLineBranchIds         HLFLineItem[]        @relation("hlfLineBranchId")
   depsBrnachIds            DEPS[]               @relation("depsBrnachId")
   tripLatestCheckinHubs    TripDetails[]        @relation("tripLatestCheckinHub")
+  consignorwareHouseIds    Consignor[]          @relation("consignorwareHouseId")
 }
 
 model Consignor {
@@ -98,6 +100,8 @@ model Consignor {
   childConsignors       Consignor[]          @relation("parentConsignor")
   branchId              Int?
   branch                Branch?              @relation("consignorBranch", fields: [branchId], references: [id])
+  wareHouseId           Int?
+  wareHouse             Branch?              @relation("consignorwareHouseId", fields: [wareHouseId], references: [id])
   keyContactName        String?              @db.VarChar(255)
   keyContactDesignation String?              @db.VarChar(255)
   keyContactAddress     String?              @db.VarChar(255)
@@ -142,6 +146,7 @@ enum AWBStatus {
   PickUp
   InTransit
   atHub
+  outForDelivery
   Delivered
 }
 
@@ -320,12 +325,15 @@ model TripLineItem {
   AirWayBill               AirWayBill           @relation("AWBIdTripLineItem", fields: [AWBId], references: [id])
   tripId                   Int
   trip                     TripDetails          @relation("tripIdTripLineItem", fields: [tripId], references: [id])
-  nextDestinationId        Int?
-  nextBranch               Branch?              @relation("nextBranchTripLineItem", fields: [nextDestinationId], references: [id])
+  unloadLocationId         Int?
+  nextBranch               Branch?              @relation("nextBranchTripLineItem", fields: [unloadLocationId], references: [id])
   finalDestinationId       Int?
   finalBranch              Branch?              @relation("finalBranchTripLineItem", fields: [finalDestinationId], references: [id])
   status                   TripLineItemStatus   @default(Assigned)
   ePODReceived             Boolean              @default(false)
+  loadLocationId           Int?
+  rollupScanCount          Int?
+  latestScanTime           DateTime?
   originalPODReceived      Boolean              @default(false)
   createdOn                DateTime?            @default(now())
   modifiedOn               DateTime?            @updatedAt

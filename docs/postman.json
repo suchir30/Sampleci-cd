@@ -2447,7 +2447,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"consignorId\":1,\r\n    \"AWBStatus\":\"PickUp\"\r\n}",
+							"raw": "{\r\n    \"consignorId\":1,\r\n    \"AWBStatus\":\"atHub\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2538,6 +2538,76 @@
 							],
 							"cookie": [],
 							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"AWBCode\": \"SA-HY-A0649\",\n            \"consignorId\": 1,\n            \"consigneeId\": 1,\n            \"fromBranchId\": 1,\n            \"toBranchId\": 7,\n            \"numOfArticles\": 50,\n            \"AWBStatus\": \"PickUp\",\n            \"articleGenFlag\": true,\n            \"rollupArticleCnt\": 50,\n            \"consignor\": {\n                \"consignorCode\": \"CUST-A00174\",\n                \"publicName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"legalName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"address1\": \"GROUND, 5-283, ASWINI HOUSE, H P ROAD, MOOSAPET, RANGAREDDY, TELANGANA, 500018\",\n                \"disstrict\": null,\n                \"state\": {\n                    \"name\": \"TELANGANA\"\n                },\n                \"city\": {\n                    \"name\": \"HYDERABAD\"\n                }\n            },\n            \"consignee\": {\n                \"consigneeCode\": \"A0001\",\n                \"consigneeName\": \"CHANDRAHASA AGENCIES\",\n                \"address1\": \"VENKATESHWARA TALKIES ROAD SATHUPALLI-507303,TS.\",\n                \"address2\": \"SATTUPALLI\",\n                \"city\": null,\n                \"district\": {\n                    \"name\": \"SATTUPALLI\"\n                },\n                \"state\": {\n                    \"name\": \"TELANGANA\"\n                }\n            },\n            \"fromBranch\": {\n                \"branchName\": \"SATHUPALLI\",\n                \"branchCode\": \"STUP\"\n            },\n            \"toBranch\": {\n                \"branchName\": \"ZAHEERABAD\",\n                \"branchCode\": \"ZHB\"\n            },\n            \"AWBIdTripLineItems\": [\n                {\n                    \"id\": 1,\n                    \"tripId\": 1,\n                    \"nextDestinationId\": 3,\n                    \"finalDestinationId\": 3,\n                    \"status\": \"Open\",\n                    \"ePODReceived\": true,\n                    \"originalPODReceived\": true,\n                    \"trip\": {\n                        \"route\": \"123\"\n                    }\n                },\n                {\n                    \"id\": 7,\n                    \"tripId\": 2,\n                    \"nextDestinationId\": 2,\n                    \"finalDestinationId\": 6,\n                    \"status\": \"Delivered\",\n                    \"ePODReceived\": true,\n                    \"originalPODReceived\": true,\n                    \"trip\": {\n                        \"route\": \"VJD-HYD\"\n                    }\n                }\n            ]\n        }\n    ]\n}"
+						},
+						{
+							"name": "success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "bAREAR eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoidnJvb21zdGVyMSIsImlhdCI6MTcxODE3ODIyNCwiZXhwIjoxNzE4MTgxODI0fQ.-Efnj3z6Gp779lya6_NHCWm2qrK2ytWXOXooC-xFlWM",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"consignorId\":1,\r\n    \"AWBStatus\":\"atHub\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/AWB/getAWBs",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"AWB",
+										"getAWBs"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1122"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"462-OFlkelQgTHzIAz2G+9yuoR465Vc\""
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 24 Jun 2024 13:36:32 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"AWBCode\": \"SA-HY-A0649\",\n            \"consignorId\": 1,\n            \"consigneeId\": 1,\n            \"fromBranchId\": 1,\n            \"toBranchId\": 7,\n            \"numOfArticles\": 7,\n            \"AWBStatus\": \"atHub\",\n            \"articleGenFlag\": false,\n            \"rollupArticleCnt\": null,\n            \"consignor\": {\n                \"consignorCode\": \"CUST-A00174\",\n                \"publicName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"legalName\": \"ASWINI HOMEO AND AYURVEDIC PRODUCTS PRIVATE LIMITED\",\n                \"address1\": \"GROUND, 5-283, ASWINI HOUSE, H P ROAD, MOOSAPET, RANGAREDDY, TELANGANA, 500018\",\n                \"wareHouseId\": 15,\n                \"disstrict\": null,\n                \"state\": {\n                    \"name\": \"TELANGANA\"\n                },\n                \"city\": {\n                    \"name\": \"HYDERABAD\"\n                }\n            },\n            \"consignee\": {\n                \"consigneeCode\": \"A0001\",\n                \"consigneeName\": \"CHANDRAHASA AGENCIES\",\n                \"address1\": \"VENKATESHWARA TALKIES ROAD SATHUPALLI-507303,TS.\",\n                \"address2\": \"SATTUPALLI\",\n                \"city\": null,\n                \"district\": {\n                    \"name\": \"SATTUPALLI\"\n                },\n                \"state\": {\n                    \"name\": \"TELANGANA\"\n                }\n            },\n            \"fromBranch\": {\n                \"branchName\": \"SATHUPALLI\",\n                \"branchCode\": \"STUP\"\n            },\n            \"toBranch\": {\n                \"branchName\": \"ZAHEERABAD\",\n                \"branchCode\": \"ZHB\"\n            },\n            \"AWBIdTripLineItems\": [\n                {\n                    \"id\": 2,\n                    \"tripId\": 1,\n                    \"unloadLocationId\": 2,\n                    \"finalDestinationId\": 9,\n                    \"status\": \"Closed\",\n                    \"ePODReceived\": false,\n                    \"originalPODReceived\": false,\n                    \"trip\": {\n                        \"route\": \"123\"\n                    }\n                }\n            ]\n        }\n    ]\n}"
 						}
 					]
 				},
@@ -2873,7 +2943,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n   \"AWBId\": 5\r\n}",
+							"raw": "{\r\n   \"AWBId\": 4\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3435,7 +3505,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"AWBId\":3,\r\n    \"tripId\":1 ,\r\n    \"status\":\"Assigned\",\r\n    \"finalDestinationId\":9  // toBranchId(ConsigneeBranch)\r\n}",
+							"raw": "{\r\n    \"AWBId\":4,\r\n    \"tripId\":2 ,\r\n    \"status\":\"Assigned\",\r\n    \"finalDestinationId\":9,  // toBranchId(ConsigneeBranch)\r\n    \"loadLocationId\":2\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4864,7 +4934,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n\r\n    \"scanType\":\"Unload\",\r\n    \"AWBArticleCode\":\"SL-HY-A00040001\",\r\n    \"tripId\":1,\r\n    \"tripLineItemId\":1\r\n}\r\n\r\n",
+							"raw": "{\r\n\r\n    \"scanType\":\"Unload\",\r\n    \"AWBArticleCode\":\"KARA133490001\",\r\n    \"tripId\":1,\r\n    \"tripLineItemId\":2\r\n}\r\n\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -5119,7 +5189,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"tripId\":1,\r\n    \"scanType\":\"Unload\",\r\n    \"tripLineItemStatus\":\"Assigned\"\r\n}",
+							"raw": "{\r\n    \"tripId\":1,\r\n    \"tripLineItemStatus\":\"Open\",\r\n    \"checkinHub\":2\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -5141,7 +5211,7 @@
 					},
 					"response": [
 						{
-							"name": "success",
+							"name": "LoadSuccess",
 							"originalRequest": {
 								"method": "POST",
 								"header": [
@@ -5153,7 +5223,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"tripId\":1,\r\n    \"scanType\":\"Unload\",\r\n    \"tripLineItemStatus\":\"Assigned\"\r\n}",
+									"raw": "{\r\n    \"tripId\":1,\r\n    \"tripLineItemStatus\":\"Assigned\",\r\n    \"checkinHub\":2\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -5187,15 +5257,15 @@
 								},
 								{
 									"key": "Content-Length",
-									"value": "270"
+									"value": "500"
 								},
 								{
 									"key": "ETag",
-									"value": "W/\"10e-oZb1xuuSaO7atbJccGChqPz/zDM\""
+									"value": "W/\"1f4-eiguocHEgCKurPU1r4IW2rcaXMI\""
 								},
 								{
 									"key": "Date",
-									"value": "Wed, 19 Jun 2024 09:53:20 GMT"
+									"value": "Mon, 24 Jun 2024 11:38:00 GMT"
 								},
 								{
 									"key": "Connection",
@@ -5207,7 +5277,76 @@
 								}
 							],
 							"cookie": [],
-							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"numberOfArticles\": 4,\n            \"numOfScan\": 1,\n            \"AWBCode\": \"SL-HY-A0004\",\n            \"AWBCreatedOn\": \"2024-06-18T06:23:10.822Z\",\n            \"AWBId\": 5,\n            \"tripLineItemId\": 5,\n            \"nextDestinationCode\": \"MTNI\",\n            \"finalDestinationCode\": \"BNSA\",\n            \"TripLineItemStatus\": \"Assigned\"\n        }\n    ]\n}"
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"AWBCode\": \"FLX-A00592\",\n            \"AWBCreatedOn\": \"2024-06-24T10:46:13.584Z\",\n            \"AWBId\": 3,\n            \"tripLineItemId\": 1,\n            \"finalDestinationCode\": \"KARE\",\n            \"TripLineItemStatus\": \"Assigned\",\n            \"numOfScan\": 1,\n            \"numberOfArticles\": 2,\n            \"latestScanTime\": \"2024-06-24T11:36:23.702Z\"\n        },\n        {\n            \"AWBCode\": \"SA-HY-A0649\",\n            \"AWBCreatedOn\": \"2024-06-24T10:46:13.584Z\",\n            \"AWBId\": 1,\n            \"tripLineItemId\": 2,\n            \"finalDestinationCode\": \"KARE\",\n            \"TripLineItemStatus\": \"Assigned\",\n            \"numOfScan\": 0,\n            \"numberOfArticles\": 7,\n            \"latestScanTime\": null\n        }\n    ]\n}"
+						},
+						{
+							"name": "unloadSuccess",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Barear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoidnJvb21zdGVyMSIsImlhdCI6MTcxODAyNDMzMCwiZXhwIjoxNzE4MDI3OTMwfQ.cDrKWMxP8fNDLVvA_o0Z1h0SxwX_zxs2nmVTNKfY6mM",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"tripId\":1,\r\n    \"tripLineItemStatus\":\"Open\",\r\n    \"checkinHub\":2\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/getTripLineItems",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"getTripLineItems"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "281"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"119-PsKzszirc8sxF9fQSl05KKmKO0Y\""
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 24 Jun 2024 11:43:33 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"AWBCode\": \"SA-HY-A0649\",\n            \"AWBCreatedOn\": \"2024-06-24T10:46:13.584Z\",\n            \"AWBId\": 1,\n            \"tripLineItemId\": 2,\n            \"finalDestinationCode\": \"KARE\",\n            \"TripLineItemStatus\": \"Open\",\n            \"numOfScan\": 2,\n            \"numberOfArticles\": 7,\n            \"latestScanTime\": \"2024-06-24T11:42:32.024Z\"\n        }\n    ]\n}"
 						}
 					]
 				},
@@ -5437,7 +5576,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"tripId\":1,\r\n    \"data\":[\r\n        {\r\n            \"AWBId\":3,\r\n            \"latestCheckinHubId\":1,\r\n            \"tripLineItemId\":1\r\n        }\r\n        ]\r\n}",
+							"raw": "{\r\n    \"tripId\":1,\r\n    \"checkinHub\":2,\r\n    \"awbIds\":[1,4]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -5465,7 +5604,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"tripId\":1,\r\n    \"data\":[\r\n        {\r\n            \"AWBId\":1,\r\n            \"latestCheckinHubId\":2,\r\n            \"tripLineItemId\":1\r\n        },\r\n        {\r\n            \"AWBId\":2,\r\n            \"latestCheckinHubId\":2,\r\n            \"tripLineItemId\":2\r\n        },\r\n        {\r\n            \"AWBId\":3,\r\n            \"latestCheckinHubId\":2,\r\n            \"tripLineItemId\":1\r\n        }\r\n        ]\r\n}",
+									"raw": "{\r\n    \"tripId\":1,\r\n    \"checkinHub\":2,\r\n    \"awbIds\":[1,4]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -5507,7 +5646,70 @@
 								},
 								{
 									"key": "Date",
-									"value": "Fri, 14 Jun 2024 07:10:38 GMT"
+									"value": "Tue, 25 Jun 2024 05:56:05 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"success\"\n}"
+						},
+						{
+							"name": "succeess",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"tripId\":1,\r\n    \"checkinHub\":\"CONSIGNEE\",\r\n    \"awbIds\":[1,4]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/inwardedAWB",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"inwardedAWB"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "38"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"26-t+GXWTClmx36sI0qQsaZVYoQm0I\""
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 25 Jun 2024 05:43:26 GMT"
 								},
 								{
 									"key": "Connection",
@@ -5530,7 +5732,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"tripId\":1,\r\n    \"data\":[\r\n        {\r\n            \"AWBId\":3,\r\n            \"latestCheckinHubId\":2,\r\n            \"tripLineItemId\":1,\r\n            \"nextDestinationId\":1\r\n        }\r\n        ]\r\n}",
+							"raw": "{\r\n    \"tripId\":1,\r\n    \"checkinHub\":2,\r\n    \"data\":[\r\n        {\r\n            \"AWBId\":3,\r\n            \"unloadLocationId\":\"CONSIGNEE\"\r\n          \r\n        },\r\n      {\r\n            \"AWBId\":4,\r\n            \"unloadLocationId\":2\r\n        }\r\n        ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -5558,7 +5760,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"tripId\":1,\r\n    \"data\":[\r\n        {\r\n            \"AWBId\":3,\r\n            \"latestCheckinHubId\":2,\r\n            \"tripLineItemId\":1,\r\n            \"nextDestinationId\":1\r\n        }\r\n        ]\r\n}",
+									"raw": "{\r\n    \"tripId\":1,\r\n    \"checkinHub\":2,\r\n    \"data\":[\r\n        {\r\n            \"AWBId\":3,\r\n            \"unloadLocationId\":2\r\n          \r\n        },\r\n      {\r\n            \"AWBId\":4,\r\n            \"unloadLocationId\":2\r\n        }\r\n        ]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -5600,7 +5802,70 @@
 								},
 								{
 									"key": "Date",
-									"value": "Fri, 14 Jun 2024 12:49:58 GMT"
+									"value": "Tue, 25 Jun 2024 05:55:47 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 200,\n    \"message\": \"success\"\n}"
+						},
+						{
+							"name": "success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"tripId\":1,\r\n    \"checkinHub\":2,\r\n    \"data\":[\r\n        {\r\n            \"AWBId\":3,\r\n            \"unloadLocationId\":\"CONSIGNEE\"\r\n          \r\n        },\r\n      {\r\n            \"AWBId\":3,\r\n            \"unloadLocationId\":\"CONSIGNEE\"\r\n        }\r\n        ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/outwardedAWB",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"outwardedAWB"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "38"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"26-t+GXWTClmx36sI0qQsaZVYoQm0I\""
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 25 Jun 2024 05:21:27 GMT"
 								},
 								{
 									"key": "Connection",

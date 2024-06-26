@@ -106,6 +106,7 @@ export const getGeneratedAWB = async (consignorId: number, AWBStatus: any) => {
                     publicName: true,
                     legalName: true,
                     address1: true,
+                    wareHouseId:true,
                     disstrict: {
                         select: {
                             name: true,
@@ -162,7 +163,7 @@ export const getGeneratedAWB = async (consignorId: number, AWBStatus: any) => {
                 select: {
                     id: true,
                     tripId: true,
-                    nextDestinationId: true,
+                    unloadLocationId: true,
                     finalDestinationId: true,
                     status: true,
                     ePODReceived: true,
@@ -384,7 +385,7 @@ export const markAWBArticleAsDeleted = async (articleId: number, AWBId: number) 
     return deletedArticle;
 };
 
-export const assignedTriptoAWB = async (AWBId:number,tripId:number,finalDestinationId:number,status:string) => {
+export const assignedTriptoAWB = async (AWBId:number,tripId:number,finalDestinationId:number,status:string,loadLocationId:number) => {
     const existingTripLineItem = await prisma.tripLineItem.findFirst({
         where: {
             AWBId: AWBId
@@ -398,7 +399,8 @@ export const assignedTriptoAWB = async (AWBId:number,tripId:number,finalDestinat
             },
             data: {
                 tripId: tripId,
-                finalDestinationId: finalDestinationId
+                finalDestinationId: finalDestinationId,
+                loadLocationId:loadLocationId
             }
         });
     }
@@ -410,7 +412,8 @@ export const assignedTriptoAWB = async (AWBId:number,tripId:number,finalDestinat
             data: {
                 AWBId: AWBId,
                 tripId: tripId,
-                finalDestinationId: finalDestinationId
+                finalDestinationId: finalDestinationId,
+                loadLocationId:loadLocationId
             }
         });
     }
