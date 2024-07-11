@@ -13,8 +13,8 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       throwValidationError([{ message: "Employee ID and password are required" }]);
     }
 
-    const isValidUser = await userService.validateUser(employeeId, password);
-    if (!isValidUser) {
+    const { isValid, user } = await userService.validateUser(employeeId, password);
+    if (!isValid || !user) {
       throwValidationError([{ message: "Invalid Credentials" }]);
     }
 
@@ -22,10 +22,22 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       throw new Error('JWT_SECRET is not set in the environment');
     }
     
-    const token = jwt.sign({ employeeId }, process.env.JWT_SECRET, { expiresIn: '2d' });
+    const token = jwt.sign({ 
+      employeeId: user?.employeeId,
+      firstName: user?.firstName || '', 
+      lastName: user?.lastName || ''    
+    }, process.env.JWT_SECRET, { expiresIn: '2d' });
     const expirationTime = Date.now() + (2*24*60*60*1000); // 2 days in milliseconds
 
-    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse({ token, expirationTime      }));
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse({ 
+      token, 
+      expirationTime,
+      user: {
+        employeeId: user?.employeeId,
+        firstName: user?.firstName,
+        lastName: user?.lastName
+      }
+    }));
   } catch (err) {
     console.log("Error login", err);
     next(err);

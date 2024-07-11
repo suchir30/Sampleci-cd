@@ -1,12 +1,36 @@
 import bcrypt from 'bcrypt';
 
 import prisma from '../client';
+import logger from '../scripts/logger';
 
-export const validateUser = async (employeeId: string, password: string): Promise<boolean> => {
-  const user = await prisma.user.findUnique({ where: { employeeId } });
-  if (!user) return false;
+export const validateUser = async (employeeId: string, password: string): Promise<{ isValid: boolean; user?: { firstName: string | null; lastName: string | null; employeeId: string } }> => {
+  const user = await prisma.user.findUnique({ 
+    where: { employeeId },
+    select: {
+      employeeId: true,
+      hashedPassword: true,
+      firstName: true,
+      lastName: true,
+    }
+  });
 
-  return bcrypt.compare(password, user.hashedPassword);
+  if (!user) return { isValid: false };
+
+  const isPasswordValid = await bcrypt.compare(password, user.hashedPassword);
+  if (!isPasswordValid) return { isValid: false };
+
+  const validatedUser = {
+    firstName: user.firstName,
+    lastName: user.lastName,
+    employeeId: user.employeeId
+  };
+
+  logger.info(`User validated, Welcome: ${user.firstName}`);
+
+  return { 
+    isValid: true, 
+    user: validatedUser
+  };
 };
 
 export const checkIfUserExists = async (employeeId: string): Promise<{ exists: boolean, phoneNumber?: string|null }> => {
