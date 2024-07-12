@@ -67,6 +67,7 @@ model Branch {
   depsBrnachIds            DEPS[]               @relation("depsBrnachId")
   tripLatestCheckinHubs    TripDetails[]        @relation("tripLatestCheckinHub")
   consignorwareHouseIds    Consignor[]          @relation("consignorwareHouseId")
+  loadLocationCodes        TripLineItem[]       @relation("loadLocationCode")
 }
 
 model Consignor {
@@ -113,6 +114,7 @@ model Consignor {
   consignorRate         ConsignorRateTable[] @relation("rateTableConsignor")
   odaConsignorIds       ODA[]                @relation("odaConsignorId")
   contractConsignorIds  Contract[]           @relation("contractConsignorId")
+  SKUConsignorIds       SKU[]                @relation("SKUConsignorId")
 }
 
 model Consignee {
@@ -169,9 +171,13 @@ model AirWayBill {
   ratePerKg            Float?         @db.Float
   rollupVolume         Float?         @db.Float
   rollupWeight         Float?         @db.Float
-  rollupChargedWtInKgs Float?         @db.Float
   rollupArticleCnt     Int?
+  rollupArticleWeightKg Float?        @db.Float
+  rollupChargedWtInKgs  Float?         @db.Float
+  chargedWeightWithCeiling Float?     @db.Float
   grandTotal           Float?         @db.Float
+  rollupCwWeight       Float?         @db.Float    
+  rollupSKU            Float?         @db.Float     
   subTotal             Float?         @db.Float
   AWBStatus            AWBStatus      @default(PickUp)
   articleGenFlag       Boolean        @default(false)
@@ -195,12 +201,18 @@ model AwbLineItem {
   AWB                 AirWayBill @relation(fields: [AWBId], references: [id])
   lineItemDescription String?    @db.VarChar(255)
   numOfArticles       Int
-  ActualWeightKg      Float?     @db.Float
+  articleWeightKg     Float?     @db.Float
+  weightKgs           Float?     @db.Float
+  actualFactorWeight  Float?     @db.Float
+  volumetricFactorWeight Float?  @db.Float
   lengthCms           Float?     @db.Float
   breadthCms          Float?     @db.Float
   heightCms           Float?     @db.Float
   volume              Float?     @db.Float
-  chargedWeight       Float?     @db.Float
+  SKUId               Int?
+  SKUCode             String?
+  boxType             String?
+  ratePerBox          Float?     @db.Float
   createdOn           DateTime?  @default(now())
   modifiedOn          DateTime?  @updatedAt
 }
@@ -228,13 +240,20 @@ enum RateConsignorStatus {
   PendingApproval
 }
 
+enum BoxType {
+  Mattress
+  Pillow
+  Box
+}
 model ConsignorRateTable {
   id          Int                 @id @default(autoincrement())
-  consignorId Int
-  consignor   Consignor           @relation("rateTableConsignor", fields: [consignorId], references: [consignorId])
+  consignorId Int?
+  consignor   Consignor?          @relation("rateTableConsignor", fields: [consignorId], references: [consignorId])
   branchId    Int?
   branch      Branch?             @relation("consignorRateBranch", fields: [branchId], references: [id])
   ratePerKg   Float?
+  ratePerBox  Float?
+  boxType     BoxType?
   status      RateConsignorStatus @default(PendingApproval)
   createdOn   DateTime?           @default(now())
   modifiedOn  DateTime?           @updatedAt
@@ -332,7 +351,9 @@ model TripLineItem {
   status                   TripLineItemStatus   @default(Assigned)
   ePODReceived             Boolean              @default(false)
   loadLocationId           Int?
+  loadlocation             Branch?              @relation("loadLocationCode", fields: [loadLocationId], references: [id])
   rollupScanCount          Int?
+  rollupDepsCount          Int?
   latestScanTime           DateTime?
   originalPODReceived      Boolean              @default(false)
   createdOn                DateTime?            @default(now())
@@ -446,7 +467,7 @@ enum ContractConsignorType {
   Volumetric
   ActualVsVolumnetric
   BoxRate
-  SKURate
+  SKU
 }
 
 enum ContractType {
@@ -477,6 +498,9 @@ model Contract {
   articleChargeMandatory      Float?                @db.Float
   articleChargeMinAmount      Float?                @db.Float
   articleChargeMaxAmount      Float?                @db.Float
+  actualWeightFactor          Float?                @db.Float
+  volumetricWeightFactor      Float?                @db.Float
+  cwCeiling                   Int?                 
   createdOn                   DateTime              @default(now())
   modifiedOn                  DateTime?             @updatedAt
   AWBContractTypes            AirWayBill[]          @relation("AWBContractType")
@@ -497,6 +521,22 @@ model AwbArticleTripLogs {
   TripLineItem   TripLineItem?       @relation("AwbArticleTripLogsTLIId", fields: [tripLineItemId], references: [id])
   scanType       ArticleLogsScanType
   createdOn      DateTime            @default(now())
+}
+
+model SKU {
+  id            Int             @id @default(autoincrement())
+  consignorId   Int?
+  consignor     Consignor?      @relation("SKUConsignorId", fields: [consignorId], references: [consignorId])
+  SKUCode       String          @db.VarChar(255)
+  product       String?         @db.VarChar(255)
+  packSize      String?         @db.VarChar(255)
+  lengthCms     Float?          @db.Float
+  widthCms      Float?          @db.Float
+  heightCms     Float?          @db.Float
+  CDM           Float?          @db.Float
+  chargedWeight Float?          @db.Float
+  createdOn     DateTime        @default(now())
+  modifiedOn    DateTime?       @updatedAt
 }
 
 //MASTER TABLES

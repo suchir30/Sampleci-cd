@@ -136,6 +136,9 @@ export const getBranches = async (isHub:boolean) => {
             name: true
           }
         }
+      },
+      orderBy: {
+        branchName: 'asc' //sort the results by branchName 
       }
       
     });

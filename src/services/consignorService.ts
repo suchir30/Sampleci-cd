@@ -19,6 +19,9 @@ export const getConsignors = async (consignorId:number) => {
       },
       parentConsignor: true,
       branch: true
+    },
+    orderBy: {
+      publicName: 'asc'  // sort the results by publicName in ascending order
     }
 
   });

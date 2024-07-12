@@ -218,7 +218,6 @@ export const loadArticlesValidate = async (AWBId:string,AWBArticleId:string,trip
         scanType:"Load"
       }
     })
-    // console.log("check",checkDuplicateRes,AWBArticleIdRes?.id,)
     if(checkDuplicateRes.length>0){
       return "Duplicate"
     }
@@ -304,26 +303,71 @@ export const getTripDetails = async (tripId: number) => {
    
 };
 
-export const getTripLineItems = async (tripId: number, tripLineItemStatus: any,checkinHub:number) => {
+export const getTripLineItems = async (tripId: number, tripLineItemStatus: any, loadLocationId?: number, unloadLocationId?: number) => {
+  const whereClause: any = {
+    status: tripLineItemStatus,
+    tripId: tripId
+};
+
+if (loadLocationId) {
+    whereClause.loadLocationId = loadLocationId;
+}
+
+if (unloadLocationId) {
+    whereClause.unloadLocationId = unloadLocationId;
+}
+
     const result = await prisma.tripLineItem.findMany({
-      where:{
-        status:tripLineItemStatus,
-        tripId:tripId,
-        loadLocationId:checkinHub
-      },
+      where: whereClause,
       orderBy:{
         latestScanTime:'desc'
       },
       select:{
         id:true,
         rollupScanCount:true,
+        rollupDepsCount:true,
         latestScanTime:true,
         unloadLocationId:true,
+        loadLocationId:true,
         finalDestinationId:true,
         status:true,
         AirWayBill:{
           select:{
-            id:true,AWBCode:true,createdOn:true,numOfArticles:true
+            id:true,
+            AWBCode:true,
+            createdOn:true,
+            numOfArticles:true,
+            rollupWeight:true,
+            rollupChargedWtInKgs:true,
+            consignorId:true,
+            consignor:{
+              select:{
+                publicName:true,
+                consignorCode:true,
+              }
+            },
+            consigneeId:true,
+            consignee:{
+              select:{
+                consigneeName:true,
+                consigneeCode:true,
+              }
+            },
+            fromBranch:{
+              select:{
+                id:true,
+                branchName:true,
+                branchCode:true
+              }
+            },
+            toBranch:{
+              select:{
+                id:true,
+                branchName:true,
+                branchCode:true
+              }
+            }
+
           }
         },
         nextBranch:{
@@ -339,6 +383,13 @@ export const getTripLineItems = async (tripId: number, tripLineItemStatus: any,c
             branchCode:true,
             branchName:true
           }
+        },
+        loadlocation:{
+          select:{
+            id:true,
+            branchCode:true,
+            branchName:true
+          }
         }
       }
     })
@@ -347,12 +398,20 @@ export const getTripLineItems = async (tripId: number, tripLineItemStatus: any,c
       AWBCreatedOn: item.AirWayBill.createdOn,
       AWBId: item.AirWayBill.id,
       tripLineItemId: item.id,
-      nextDestinationCode:item.nextBranch?.branchCode,
+      consignorName:item.AirWayBill?.consignor?.publicName,
+      consigneeName:item.AirWayBill?.consignee?.consigneeName,
+      loadLocation:item.loadlocation?.branchName,
+      unloadLocation:item.nextBranch?.branchName,
       finalDestinationCode:item.finalBranch?.branchCode,
+      awbFromLocationCOde: item.AirWayBill.fromBranch.branchCode,
+      awbToLocationCOde: item.AirWayBill.toBranch.branchCode,
+      awbRollupActualWeighgtkgs: item.AirWayBill.rollupWeight,
+      awbRollupChargedWeighgtkgs: item.AirWayBill.rollupChargedWtInKgs,
       TripLineItemStatus: item.status,
       numOfScan:item.rollupScanCount||0,
+      rollupDepsCount:item.rollupDepsCount||0,
       numberOfArticles: item.AirWayBill.numOfArticles,
-      latestScanTime:item.latestScanTime 
+      latestScanTime:item.latestScanTime
     }));
     return finalResult;
 };
@@ -420,6 +479,7 @@ export const addAWBArticleLogs = async (AWBArticleCode: any, scanType: any, trip
 
   return result; 
 };
+
 export const fileUploadRes = async (normalizedFilePaths: string[], type: string) => {
   try {
     const createdRecords = await prisma.$transaction(async (prisma) => {
@@ -747,5 +807,3 @@ export const inwardedAWB = async (tripId: number, awbIds: number[], checkinHub: 
   
  
 };
-
-

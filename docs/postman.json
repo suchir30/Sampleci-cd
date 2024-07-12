@@ -2441,13 +2441,13 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "bAREAR eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoidnJvb21zdGVyMSIsImlhdCI6MTcxODE3ODIyNCwiZXhwIjoxNzE4MTgxODI0fQ.-Efnj3z6Gp779lya6_NHCWm2qrK2ytWXOXooC-xFlWM",
+								"value": "BAREAR eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoidnJvb21zdGVyMSIsImlhdCI6MTcxOTQ5NjYyMiwiZXhwIjoxNzE5NjY5NDIyfQ.-r6prBorSfezv1UVL7glbiCGmQ8qMCmk0K5a5M0Qdrk",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"consignorId\":1,\r\n    \"AWBStatus\":\"atHub\"\r\n}",
+							"raw": "{\r\n    \"consignorId\":1,\r\n    \"AWBStatus\":\"PickUp\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2455,10 +2455,13 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:3000/api/AWB/getAWBs",
+							"raw": "http://13.200.144.182:3000/api/AWB/getAWBs",
 							"protocol": "http",
 							"host": [
-								"localhost"
+								"13",
+								"200",
+								"144",
+								"182"
 							],
 							"port": "3000",
 							"path": [
@@ -2735,7 +2738,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Barear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoiZW1wbG95ZWUxMjMiLCJpYXQiOjE3MTA4MzI4NTQsImV4cCI6MTcxMDgzNjQ1NH0.hBtkDwYS-8XH8YE6_gpcRNNfo163-xDFLCCbSxdCqvo",
+								"value": "Barear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBsb3llZUlkIjoidnJvb21zdGVyMSIsImlhdCI6MTcxOTM5OTU4OSwiZXhwIjoxNzE5NTcyMzg5fQ.7o0gWL8pDLqgpnkieS1JewFG2PpfOQWBN8w6YxaaS_0",
 								"type": "text"
 							}
 						],
@@ -2749,10 +2752,13 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:3000/api/AWB/updateArticleCount",
+							"raw": "http://13.200.144.182:3000/api/AWB/updateArticleCount",
 							"protocol": "http",
 							"host": [
-								"localhost"
+								"13",
+								"200",
+								"144",
+								"182"
 							],
 							"port": "3000",
 							"path": [
@@ -4583,7 +4589,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"AWBCode\":\"SL-HY-A0004\",\r\n    \"AWBArticleCode\":\"SL-HY-A00040001\",\r\n    \"tripId\":1\r\n}",
+							"raw": "{\r\n    \"AWBCode\":\"SA-HY-A0649\",\r\n    \"AWBArticleCode\":\"SM-BL-A0919-103\",\r\n    \"tripId\":1\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4934,7 +4940,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n\r\n    \"scanType\":\"Unload\",\r\n    \"AWBArticleCode\":\"KARA133490001\",\r\n    \"tripId\":1,\r\n    \"tripLineItemId\":2\r\n}\r\n\r\n",
+							"raw": "{\r\n\r\n    \"scanType\":\"Load\",\r\n    \"AWBArticleCode\":\"SM-BL-A0919-103\",\r\n    \"tripId\":1,\r\n    \"tripLineItemId\":1\r\n}\r\n\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -5189,7 +5195,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"tripId\":1,\r\n    \"tripLineItemStatus\":\"Open\",\r\n    \"checkinHub\":2\r\n}",
+							"raw": "{\r\n    \"tripId\":1,\r\n    \"tripLineItemStatus\":\"Assigned\",\r\n    \"checkinHub\":3\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"

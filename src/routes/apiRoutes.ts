@@ -53,6 +53,9 @@ router.post('/fileUpload',upload.fields([{name: 'file', maxCount: 6}]),apiContro
 router.post('/getDepsLists',apiController.getDepsLists)
 router.post('/addDeps',apiController.addDeps)
 router.post('/generatePDF', apiController.generatePDF)
+router.post('/getSKUs', apiController.getSKUs)
+router.post('/getBoxTypes', apiController.getBoxTypes)
+
 
 
 

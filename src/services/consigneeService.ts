@@ -17,6 +17,9 @@ export const getConsignees = async (consignorId:number,toBranchId:number) => {
       district: true,
       state: true,
       branch: true
+    },
+    orderBy: {
+      consigneeName: 'asc'  // sort the results by publicName in ascending order
     }
 
   });

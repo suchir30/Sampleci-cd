@@ -1,5 +1,83 @@
-vendorCode,cityId,stateId
-ha,1,1
-rs,2,2
-hi,3,3
-th,4,4
+vendorCode,vendorName,address1,cityId,stateId
+VenA00001,CATBUS INFOLABS PRIVATE LIMITED,"3rd Floor, Enzyme Tech Park, #142, Koramangala Industrial Layout,, Hosur Main Road, Koramangala, Bengaluru - 560095, Bengaluru, Karnataka 560095",1,4
+VenA00002,Growth Associates,"Udayamangalam, P.O Chevayur",3,2
+VenA00003,Diptab ventures private limited,"6 C , Samrat commercial complex , Saifabad , Telangana , 500004",2,1
+VenA00004,BIGTRUCK TECHNOLOGIES PRIVATE LIMITED,"1st Floor, Sai Golden Nest, Talacauvery Layout,Vibhupura ,Basavanagar Main Road,
+Bangalore Karnataka - 560037",4,3
+VenA00005,PR TECHNO SOLUTIONS PVT LTD,"1-68/5, Plot No:80, Sri Sai Enclave, Above Federal Bank,Arunodaya Nagar, Madhapur",65,6
+VenA00006,CITY LINK PORTAL PRIVATE LIMITED,"Road No 10, Plot No 07, Logi Tech Park, Export Promotion Industrial
+Park, Whitefield, (Bangalore) Urban,",43,9
+VenA00007,WHISTLEDRIVE PRIVATE LIMITED,"Plot No.10/8, CDC Tower, 1st Floor, Road No.5, IDA, Nacharam, Secunderabad, Hyderabad, Telangana 500076",12,4
+VenA00008,GARUDA ROAD TRANSPORT,NO 14 PRAMILA 1ST NEW CROSS CP LAYOUT DEVINAGAR,1,5
+VenA00009,PHOENIX RIDE PRIVATE LIMITED,"
+
+1ST FLOOR, H No 12-13-480, FLAT NO 201,PLOT NO.3,
+SRIMANU HOME, STREET NO.1, TARNAKA,HYDERABAD,
+Medchal - Malkajgiri, Telangana, 500017",41,7
+VenA00010,SUBRAMANYA CHARI,no 80 muddepalli pulugurkote kolar karnataka 563135,23,8
+VenA00011,Maraboina Anil,warangal,3,10
+VenA00012,M/S JEEVAN MINI TRANSPORT,"ADHYA NAGAR, 1-9, Hawada, Mahabubnagar",31,10
+VenA00013,AJAZ SHAIK,"H.No : 11-23-1467 , Pochamma maidhan , LB Nagar",57,4
+VenA00014,BANDARI SHIVA,"HNO:2 16/2, WARANGAL",43,2
+VenA00015,Sarojana,warangal,11,6
+VenA00016,SP Transport,HENNUR,16,5
+VenA00017,Gangadara Rajaiah,"hno:7-7, geesugonda, elkurthy, warangal pin ode\;506330",56,1
+VenA00018,RAJESWARA RAO,"D.No - 10-109, Pasubhotlapalem, Kowtavaram, krishna, Andhra Pradesh - 521331",47,7
+VenA00019,SYED RIZWAN,"A2-12/1-62, Maseed Street, Labour Colony, Vijayawada(Urban), Vidyadharapuram, Krishna, Andhra Pradesh - 520012",49,8
+VenA00020,M GURUMURTHY,"D.No-53-1-290/1, opp film colony, Vijayawada(Urban), Vj polytechnic, Krisha, Andhra pradesh - 520 008",53,10
+VenA00021,A PRASAD BABU,"3-49, Marriwada, Pamidimukkala mandalam, Marrivada, Krishna, Anadhra Pradesh - 521256",12,9
+VenA00022,P VENKAT RAO,"7-41, Patel nagar, Ramavarappadu, Krishna, Andhra Pradesh - 521108",67,2
+VenA00023,MOHAN APPALA,"HNO.16-3-87, SHANTI NAGAR, WARANGAL",27,3
+VenA00024,Anumandla Sridhar,"20-9-101,VISHWAKARMA, VEEDI,MADYAKOTA FORT WARANGAL.",36,5
+VenA00025,ROUTEMATRICS LOGISTICS PRIVATE LIMITED,"4th Floor, UNIT NO.2, MJR MAGNIFIC, SY NO.75, 76,RAIDURG, HYDERABAD, Ranga Reddy.",42,10
+VenA00026,Janga Ramu,"H no:2-89, Gadepally, Sangem, Warangal",22,2
+VenA00027,N.RAJESH,"Block No-62/2GF,Nandanavanam,Karmanghat,Saroornagar,Ranagareddy,Telangana-500079",7,4
+VenA00028,RAMU KUPPILI,"54-20/6-1A,PLOT NO:16,2nd LINE,NEAR RAMESH HOSPITAL,DAIRY OFFICER'S COLONY,VIJAYAWADA (URBAN)KRISHNA-520008.",6,7
+VenA00029,Mr.SHAIK HUSSAIN,"S/o HUSSAIN,19-14-170/a, IPD COLONY,SANGADIGUNTA,GUNTUR,ANDRAPRADESH-522003",45,8
+VenA00030,Mr. CHIRIKA SHANKAR REDDY,"
+S/o CHIRIKA SATTIREDDY ,
+H.NO:4-15,SHERILLA,CHOUTUPPAL,VTC:MASJID GUDEM,NALGONDA-DISTRICT-508252
+
+
+
+
+
+",6,9
+VenA00031,Mr. MADTHAN RAJ (ABC LOGISTICS),"ABC LOGISTICS
+1/20, P H ROAD SIVABOOTHAM VANAGARAM CHENNAI 600095.
+",13,9
+VenA00032,SHIVA ROAD CARRIER,"
+#15 2nd cross,2nd floor,DDUTTL,Opp,Kanteerava Studio,Yashwanthpur,Bangalore - 560022
+",39,1
+VenA00033,SHOAIB (Individual),"
+S/O Shafiulla,#70,4th cross, umar nagar , 
+Nagavara, Bangalore - 560045
+",56,1
+VenA00034,Murughavilas Transport,"
+139/1,Murugan Kovil Back Side,Salem Road,Nammakkal-637001
+",55,3
+VenA00035,HANVIH ROADLINES,MR BHARGAV CHOWDARY NANNAPANENI NO 16 FLAT NO 4 KM RESIDENCY 3RD MAIN 14TH B CROSS HOSALA NAGAR BENGALURU BENGALURU KARNATAKA 560016,15,7
+VenA00036,MANI (INDIVIDUAL),"
+NO 786,2ND MAIN ROAD , BYAPPANAHALLIM S NAGAR , BANGALORE - 560033
+",23,5
+VenA00037,VIJAY KUMAR (INDIVIDUAL),"S/O KANDHA SWAMY , NO 5,7TH MAIN ROAD , VIDHYANAGARA CROSS , NORTH BANGALORE , KARNATAKA - 560097",34,1
+VenA00038,MANJUNATH (INDIVIDUAL),"
+#703,6TH MAIN , 8TH CROSS , GOKULA ,1ST STAGE 2ND CROSS,YESHWANTHPUR,BANGALORE,560054
+",23,2
+VenA00039,MANJU M K (INDIVIDUAL),"
+NO 6 C/O,JAYAMMA KALASTRI NAGAR , NRUPATHUNGA ROAD ,T DASARAHALLI,BANGALORE",63,6
+VenA00040,JAYA SHANKAR CARGO CARRIERS,"
+#58,4TH MAIN,VENKATESWARA REDDY LAYOUT,PARAPPNA AGRAHARA,BANGALORE - 560068
+",52,6
+VenA00041,SUDHIKKSHA SURFACE CARRIERS,"NO 168,S.P.C NAGAR,SEETHARAM MEDU,BYE PASS ROAD,HOSUR,NEAR ANAND ELECTRONICS , TAMIL NADU - 635109",31,3
+VenA00042,AMBARESH (INDIVIDUAL),"#133 6TH CROSS,2ND MAIN NR,DAIRY CRS,MATHRU LAYOUT,YELANKA NEW TOWN,GKVK,BANGALORE,KARNATAKA - 560065",53,2
+VenA00043,Manju,#27 CS Church front Nrupathunga road T dasrahalli 560057,54,4
+VenA00044,Venkanna,"Hno:1-8/1, Janpak ,Geesugonda Mandal, Warangal 506013",12,55
+VenA00045,KODAMANCHILI VARUN JOSH,"S/O Soloman Raju,
+4-38, Mandavalli, VTC Bhyravapatnam, Krishna District, Andhra Pradesh,
+521345
+",34,1
+VenA00046,Thadem Bikshapathi,"Hno:16-3-671,Karimabad , warangal",60,10
+VenA00047,Kumara Swamy,"hn no:16-5-89 peruka wada, warangal",11,9
+VenA00048,Sudhakar Reddy,Hyderabad,1,6
+VenA00049,GURNATHAM KAMAKAIAH,"AMBEDKAR NAGAR, SADAVARIPALEM, KALACAKATTO, MYPADU ROAD, NELLORE RURAL.",2,8

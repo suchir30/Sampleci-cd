@@ -1,5 +1,5 @@
 AWBCode,consignorId,consigneeId,fromBranchId,toBranchId,numOfArticles,invoiceValue,invoiceNumber,weightKgs,ratePerKg,grandTotal
-SA-HY-A0649,1,1,1,7,7,"40380",2184,85,6.19,646
+SA-HY-A0649,1,1,1,7,10,"40380",2184,85,6.19,646
 KARA13340,2,2,2,8,38,157852,2404780,836,11.83,10125
 FLX-A00592,3,3,3,9,2,6206,2516000002,50,4,200
 KARA13349,4,4,2,10,5,23256,2404234,105,8.62,1005

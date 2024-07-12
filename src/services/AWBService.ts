@@ -439,7 +439,7 @@ export const getUpdateAWB = async (AWBId: number) => {
           AWBLineItems: {
             select: {
               id: true,
-              ActualWeightKg: true,
+              articleWeightKg: true,
               lengthCms: true,
               breadthCms: true,
               heightCms: true,
@@ -481,61 +481,227 @@ export const getUpdateAWB = async (AWBId: number) => {
 
 };
 
+// export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem[]) => {
+//     try {
+//         const result = await prisma.$transaction(async (prisma) => {
+            
+//             let AWBConsignorId=await prisma.airWayBill.findUnique({
+//                 where: {id:AWBId}
+//             });
+//             let factorRes=await prisma.contract.findFirst({
+//                 where: {consignorId:AWBConsignorId?.consignorId}
+//             });
+//             console.log(AWBConsignorId,factorRes,factorRes?.actualWeightFactor,factorRes?.volumetricWeightFactor)
+            
+
+//                     await prisma.awbLineItem.deleteMany({
+//                         where: {AWBId:AWBId}
+
+//                     });
+
+//                     if(!factorRes?.actualWeightFactor || !factorRes?.volumetricWeightFactor){
+//                         return "f"
+//                     }
+                    
+//                     for (const item of awbLineItems) {
+//                         await prisma.awbLineItem.create({
+//                             data: {
+//                                 AWBId: AWBId,
+//                                 lineItemDescription: item.lineItemDescription,
+//                                 lengthCms: item.lengthCms ?? 0,
+//                                 breadthCms: item.breadthCms ?? 0,
+//                                 heightCms: item.heightCms ?? 0,
+//                                 numOfArticles: item.numOfArticles,
+//                                 articleWeightKg: item.articleWeightKg,
+//                                 weightKgs:(item.numOfArticles??0)*(item.articleWeightKg??0),
+//                                 volume: (item.lengthCms ?? 0) * (item.breadthCms ?? 0) * (item.heightCms ?? 0),
+//                                 actualFactorWeight:(item.numOfArticles??0)*(item.articleWeightKg??0)*(factorRes?.actualWeightFactor),
+//                                 volumetricFactorWeight:(item.numOfArticles??0)*(item.articleWeightKg??0)*(factorRes?.volumetricWeightFactor),
+//                                 SKUId:item.SKUId??0,
+//                                 SKUCode:item.SKUCode,
+//                                 SKUChargedWeight:item.SKUChargedWeight??0
+//                         }
+//                     });
+//             }
+//             const awbLineItemsList = await prisma.awbLineItem.findMany({
+//                 where: { AWBId: AWBId },
+//                 select: {
+//                     articleWeightKg: true,
+//                     numOfArticles: true,
+//                     volume: true,
+//                     SKUChargedWeight: true
+//                 }
+//             });
+
+//             // Calculate the total actual weight, total volume, and total SKUChargedWeight
+//             const totalActualWeight = awbLineItemsList.reduce((acc, item) => {
+//                 return acc + (item.articleWeightKg ?? 0) * item.numOfArticles;
+//             }, 0);
+
+//             const totalVolume = awbLineItemsList.reduce((acc, item) => {
+//                 return acc + (item.volume ?? 0) * item.numOfArticles;
+//             }, 0);
+
+//             const totalSKUChargedWeight = awbLineItemsList.reduce((acc, item) => {
+//                 return acc + (item.SKUChargedWeight ?? 0) * item.numOfArticles;
+//             }, 0);
+
+//             const aggregateResults = await prisma.awbLineItem.aggregate({
+//                 _sum: {
+//                     numOfArticles: true
+//                 },
+//                 where: {
+//                     AWBId: AWBId
+//                 }
+//             });
+//             const { numOfArticles } = aggregateResults._sum;
+
+       
+//         const updatedAirWayBill = await prisma.airWayBill.update({
+//             where: {
+//                 id: AWBId
+//             },
+//             data: {
+//                 rollupArticleCnt: numOfArticles || 0,
+//                 rollupWeight: totalActualWeight || 0,
+//                 rollupVolume: totalVolume || 0,
+//                 rollupSKU:totalSKUChargedWeight || 0
+                
+//             }
+//         });
+//         return true;
+//       });
+//     }
+//     catch (error) {
+//         console.error("Error in updateAWBLineItem", error);
+//         throw error;
+
+
+//   };
+// }
+
 export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem[]) => {
     try {
         const result = await prisma.$transaction(async (prisma) => {
+            const AWBConsignorId = await prisma.airWayBill.findUnique({
+                where: { id: AWBId }
+            });
 
-                    await prisma.awbLineItem.deleteMany({
-                        where: {AWBId:AWBId}
+            if (!AWBConsignorId) {
+                console.log("AWB not found");
+                return "Invalid AWB";
+            }
 
-                    });
-                    for (const item of awbLineItems) {
-                        await prisma.awbLineItem.create({
-                            data: {
-                                AWBId: AWBId,
-                                lineItemDescription: item.lineItemDescription,
-                                ActualWeightKg: item.ActualWeightKg,
-                                lengthCms: item.lengthCms ?? 0,
-                                breadthCms: item.breadthCms ?? 0,
-                                heightCms: item.heightCms ?? 0,
-                                numOfArticles: item.numOfArticles,
-                                volume: (item.lengthCms ?? 0) * (item.breadthCms ?? 0) * (item.heightCms ?? 0)
+            const factorRes = await prisma.contract.findFirst({
+                where: { consignorId: AWBConsignorId.consignorId }
+            });
+
+        
+
+            await prisma.awbLineItem.deleteMany({
+                where: { AWBId: AWBId }
+            });
+
+            if (factorRes?.consignorContractType == "BoxRate") {
+                console.log("boxrate")
+                const createPromises = awbLineItems.map(item => {
+                    return prisma.awbLineItem.create({
+                        data: {
+                            AWBId: AWBId,
+                            lineItemDescription: item.lineItemDescription,
+                            numOfArticles: item.numOfArticles,
+                            boxType:item.boxType,
+                            ratePerBox:item.ratePerBox,
+                            actualFactorWeight: (item.numOfArticles ?? 0) * (item.ratePerBox ?? 0),
+                            volumetricFactorWeight:0
                         }
                     });
+                });
+                
+            await Promise.all(createPromises);
             }
+            else{
 
+                if (factorRes?.actualWeightFactor == null || factorRes?.volumetricWeightFactor == null) {
+                    console.log("Invalid factors", factorRes);
+                    return "Invalid factors";
+                } 
+                
+                const createPromises = awbLineItems.map(item => {
+                    return prisma.awbLineItem.create({
+                        data: {
+                            AWBId: AWBId,
+                            lineItemDescription: item.lineItemDescription,
+                            lengthCms: item.lengthCms ?? 0,
+                            breadthCms: item.breadthCms ?? 0,
+                            heightCms: item.heightCms ?? 0,
+                            numOfArticles: item.numOfArticles,
+                            articleWeightKg: item.articleWeightKg,
+                            weightKgs: (item.numOfArticles ?? 0) * (item.articleWeightKg ?? 0),
+                            volume: (item.lengthCms ?? 0) * (item.breadthCms ?? 0) * (item.heightCms ?? 0),
+                            actualFactorWeight: (item.numOfArticles ?? 0) * (item.articleWeightKg ?? 0) * (factorRes.actualWeightFactor!),
+                            volumetricFactorWeight: (item.numOfArticles ?? 0) * (item.articleWeightKg ?? 0) * (factorRes.volumetricWeightFactor!),
+                            SKUId: item.SKUId,
+                            SKUCode: item.SKUCode
+                        }
+                    });
+                });
 
-        const aggregateResults = await prisma.awbLineItem.aggregate({
-            _sum: {
-                volume: true,
-                ActualWeightKg: true,
-                numOfArticles: true
-            },
-            where: {
-                AWBId: AWBId
+                
+            await Promise.all(createPromises);
             }
-        })
-        const { volume, ActualWeightKg, numOfArticles } = aggregateResults._sum;
-        const updatedAirWayBill = await prisma.airWayBill.update({
-            where: {
-                id: AWBId
-            },
-            data: {
-                rollupArticleCnt: numOfArticles || 0,
-                rollupWeight: ActualWeightKg || 0,
-                rollupVolume: volume || 0
-            }
+            
+            const aggregateResults = await prisma.awbLineItem.aggregate({
+                _sum: {
+                    articleWeightKg: true,
+                    numOfArticles: true,
+                    volume: true,
+                    weightKgs:true
+                },
+                where: {
+                    AWBId: AWBId
+                }
+            });
+
+            const { numOfArticles,articleWeightKg,volume,weightKgs} = aggregateResults._sum;
+
+            const awbLineItemsList = await prisma.awbLineItem.findMany({
+                where: { AWBId: AWBId },
+                select: {
+                    actualFactorWeight: true,
+                    volumetricFactorWeight: true
+                }
+            });
+
+            const rollupChargedWtInKgs = awbLineItemsList.reduce((acc, item) => {
+                const maxWeight = Math.max(item.actualFactorWeight ?? 0, item.volumetricFactorWeight ?? 0);
+                return acc + maxWeight;
+            }, 0);
+
+            const updatedAirWayBill = await prisma.airWayBill.update({
+                where: {
+                    id: AWBId
+                },
+                data: {
+                    rollupArticleCnt: numOfArticles || 0,
+                    rollupArticleWeightKg:articleWeightKg||0,
+                    rollupWeight: weightKgs|| 0,
+                    rollupVolume: volume || 0,
+                    rollupChargedWtInKgs: rollupChargedWtInKgs || 0
+                }
+            });
+
+            return updatedAirWayBill;
         });
-        return true;
-      });
-    }
-    catch (error) {
+
+        return result;
+    } catch (error) {
         console.error("Error in updateAWBLineItem", error);
         throw error;
+    }
+};
 
 
-  };
-}
 
 export const updateAWB = async (AWBId: number,consigneeId: number,appointmentDate: Date,invoiceNumber: string,invoiceValue: number,ewayBillNumber: string): Promise<string | boolean> => {
     try {
@@ -637,8 +803,8 @@ export const getAwbPdfData = async (AWBId: number) => {
                     breadthCms: true,
                     heightCms: true,
                     numOfArticles: true,
-                    ActualWeightKg: true,
-                    chargedWeight: true,
+                    articleWeightKg: true,
+                    // chargedWeight: true,
                     volume: true
                 }
             }
@@ -651,3 +817,34 @@ export const awbEntry = async (AWBId: number, fileId: number) => {
     const result = await prisma.airWayBill.update({ where: { id: AWBId }, data: { AWBPdf: fileId }, });
     return;
 };
+
+
+export const getSKUs = async (consignorId: number) => {
+    const SKUDetails = await prisma.sKU.findMany({
+      where: {
+        consignorId: consignorId,
+      },
+      select: {
+        id: true,
+        SKUCode: true,
+        product: true,
+        chargedWeight:true
+      },
+    });
+    return SKUDetails;
+     
+  };
+  
+  export const getBoxTypes = async (consignorId: number) => {
+    const results = await prisma.consignorRateTable.findMany({
+      where: {
+        consignorId: consignorId,
+      },
+      distinct: ['boxType'],
+      select:{
+        boxType:true
+      }
+    });
+  
+   return results;
+  };

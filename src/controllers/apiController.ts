@@ -6,6 +6,7 @@ import * as consignorService from '../services/consignorService';
 import * as consigneeService from '../services/consigneeService';
 import * as AWBService from '../services/AWBService';
 import * as tripService from '../services/tripService';
+import * as pricingServices from '../services/pricingServices';
 import { AWBCreateData } from '../types/awbTypes';
 import { HttpStatusCode } from '../types/apiTypes';
 import { MulterFile } from '../types/multerTypes';
@@ -455,6 +456,12 @@ export const updateAWBLineItem = async (req: Request, res: Response, next: NextF
     const AWBId:number=req.body.AWBId
     const awbLineItems: AwbLineItem[] = req.body.awbLineItems || [];
    const updateAWBLineItemResult = await AWBService.updateAWBLineItem(AWBId,awbLineItems);
+    if(updateAWBLineItemResult=="Invalid AWB"){
+      throwValidationError([{message: "Invalid AWB"}]);
+    }
+    if(updateAWBLineItemResult=="Invalid factors"){
+      throwValidationError([{message: "Invalid Factor: Actual/volumetric Weight Factor is misssing"}]);
+    }
     res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWB Line ITem Added Successfully"));
   } catch (err) {
     console.error('Error updateAWB', err);
@@ -636,11 +643,12 @@ export const getTripLineItems = async (req: Request, res: Response, next: NextFu
   try {
     const tripId:number=req.body.tripId
     const tripLineItemStatus:string=req.body.tripLineItemStatus;
-    const checkinHub:number=req.body.checkinHub
+    const loadLocationId:number=req.body.loadLocationId
+    const unloadLocationId:number=req.body.unloadLocationId
     if (!tripId) {
       throwValidationError([{message: "tripId is mandatory"}]);
     }
-    const getTripsResult = await tripService.getTripLineItems(tripId,tripLineItemStatus,checkinHub);
+    const getTripsResult = await tripService.getTripLineItems(tripId,tripLineItemStatus,loadLocationId,unloadLocationId);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getTripsResult));
   } catch (err) {
     console.error('Error getTripLineItems', err);
@@ -713,7 +721,7 @@ export const getScannedArticles = async (req: Request, res: Response, next: Next
     next(err)
   }
 }
-1
+
 export const outwardedAWB = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { tripId, data,checkinHub }: { tripId: number, data: Outwarded[],checkinHub:number } = req.body;
@@ -843,10 +851,26 @@ export const addDeps = async (req: Request, res: Response, next: NextFunction) =
 
 export const generatePDF = async (req: Request, res: Response, next: NextFunction) => {
   try {
+   
     const AWBId=req.body.AWBId
     if (!AWBId || AWBId.length==0) {
       throwValidationError([{message: "AWB ID is mandatory"}]);
     }
+    const pricing = await pricingServices.pricingModule(AWBId);
+    console.log(pricing,"pricing controller")
+    // if(pricing=="Invalid AWB"){
+    //   throwValidationError([{message: "Invalid AWB: consignorId or toBranch is missing"}]);
+    // }
+    // if(pricing=="Invalid cw"){
+    //   throwValidationError([{message: "Invalid contract: factor and ceiling missing"}]);
+    // }
+    // if(pricing=="Invalid ratePerKg"){
+    //   throwValidationError([{message: "Invalid consignorRate : ratePerKg is missing"}]);
+    // }
+    // if(pricing=="Invalid rollup"){
+    //   throwValidationError([{message: "Invalid AWB : rollupweight/volume is missing"}]);
+    // }
+
     const pdfData = await AWBService.getAwbPdfData(AWBId);
     const path = await pdfGenerator(pdfData);
 
@@ -860,6 +884,34 @@ export const generatePDF = async (req: Request, res: Response, next: NextFunctio
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(response));
   } catch (err) {
     console.error('Error generatePdf', err);
+    next(err)
+  }
+}
+
+export const getSKUs = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const consignorId:number=req.body.consignorId
+    if (!consignorId) {
+      throwValidationError([{message: "consignorId is mandatory"}]);
+    }
+    const getSKUsResult = await AWBService.getSKUs(consignorId);
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getSKUsResult));
+  } catch (err) {
+    console.error('Error getDepsLists', err);
+    next(err)
+  }
+}
+
+export const getBoxTypes = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const consignorId:number=req.body.consignorId
+    if (!consignorId) {
+      throwValidationError([{message: "consignorId is mandatory"}]);
+    }
+    const getBoxTypesResult = await AWBService.getBoxTypes(consignorId);
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getBoxTypesResult));
+  } catch (err) {
+    console.error('Error getDepsLists', err);
     next(err)
   }
 }
