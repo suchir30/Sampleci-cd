@@ -7,16 +7,16 @@
 
 */
 -- DropForeignKey
-ALTER TABLE `consignorratetable` DROP FOREIGN KEY `ConsignorRateTable_consignorId_fkey`;
+ALTER TABLE `ConsignorRateTable` DROP FOREIGN KEY `ConsignorRateTable_consignorId_fkey`;
 
 -- AlterTable
-ALTER TABLE `airwaybill` ADD COLUMN `chargedWeightWithCeiling` FLOAT NULL,
+ALTER TABLE `AirWayBill` ADD COLUMN `chargedWeightWithCeiling` FLOAT NULL,
     ADD COLUMN `rollupArticleWeightKg` FLOAT NULL,
     ADD COLUMN `rollupCwWeight` FLOAT NULL,
     ADD COLUMN `rollupSKU` FLOAT NULL;
 
 -- AlterTable
-ALTER TABLE `awblineitem` DROP COLUMN `ActualWeightKg`,
+ALTER TABLE `AwbLineItem` DROP COLUMN `ActualWeightKg`,
     DROP COLUMN `chargedWeight`,
     ADD COLUMN `SKUCode` VARCHAR(191) NULL,
     ADD COLUMN `SKUId` INTEGER NULL,
@@ -28,12 +28,12 @@ ALTER TABLE `awblineitem` DROP COLUMN `ActualWeightKg`,
     ADD COLUMN `weightKgs` FLOAT NULL;
 
 -- AlterTable
-ALTER TABLE `consignorratetable` ADD COLUMN `boxType` ENUM('Mattress', 'Pillow', 'Box') NULL,
+ALTER TABLE `ConsignorRateTable` ADD COLUMN `boxType` ENUM('Mattress', 'Pillow', 'Box') NULL,
     ADD COLUMN `ratePerBox` DOUBLE NULL,
     MODIFY `consignorId` INTEGER NULL;
 
 -- AlterTable
-ALTER TABLE `contract` ADD COLUMN `actualWeightFactor` FLOAT NULL,
+ALTER TABLE `Contract` ADD COLUMN `actualWeightFactor` FLOAT NULL,
     ADD COLUMN `cwCeiling` INTEGER NULL,
     ADD COLUMN `volumetricWeightFactor` FLOAT NULL,
     MODIFY `consignorContractType` ENUM('Actual', 'Volumetric', 'ActualVsVolumnetric', 'BoxRate', 'SKU') NOT NULL;
