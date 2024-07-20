@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE `AirWayBill` ADD COLUMN `CDM` FLOAT NULL,
+    ADD COLUMN `completeFlag` BOOLEAN NOT NULL DEFAULT false;

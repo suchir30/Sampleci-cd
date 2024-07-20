@@ -6,6 +6,8 @@
   - The values [SKURate] on the enum `Contract_consignorContractType` will be removed. If these variants are still used in the database, this will fail.
 
 */
+-- DropForeignKey
+ALTER TABLE `ConsignorRateTable` DROP FOREIGN KEY `ConsignorRateTable_consignorId_fkey`;
 
 -- AlterTable
 ALTER TABLE `AirWayBill` ADD COLUMN `chargedWeightWithCeiling` FLOAT NULL,
@@ -55,9 +57,7 @@ CREATE TABLE `SKU` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
+ALTER TABLE `ConsignorRateTable` ADD CONSTRAINT `ConsignorRateTable_consignorId_fkey` FOREIGN KEY (`consignorId`) REFERENCES `Consignor`(`consignorId`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE `SKU` ADD CONSTRAINT `SKU_consignorId_fkey` FOREIGN KEY (`consignorId`) REFERENCES `Consignor`(`consignorId`) ON DELETE SET NULL ON UPDATE CASCADE;
-
-
--- AlterTable
-ALTER TABLE `AirWayBill` ADD COLUMN `CDM` FLOAT NULL,
-    ADD COLUMN `completeFlag` BOOLEAN NOT NULL DEFAULT false;
