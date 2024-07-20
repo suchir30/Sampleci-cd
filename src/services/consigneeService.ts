@@ -11,13 +11,53 @@ export const getConsignees = async (consignorId:number,toBranchId:number) => {
         equals: toBranchId !== null ? toBranchId : undefined,
       },
     },
-    include: {
-      consignor: true,
-      city: true,
-      district: true,
-      state: true,
-      branch: true
+    select:{
+      consigneeId:true,
+      consigneeCode:true,
+      consigneeName:true,
+      address1:true,
+      consignor:{
+        select:{
+          consignorId:true,
+          consignorCode:true,
+          publicName:true,
+          address1:true
+        }
+      },
+      city:{
+        select:{
+          id:true,
+          name:true
+        }
+      },
+      district:{
+        select:{
+          id:true,
+          name:true
+        }
+      },
+      state:{
+        select:{
+          id:true,
+          name:true
+        }
+      },
+      branch:{
+        select:{
+          id:true,
+          branchCode:true,
+          branchName:true
+        }
+      }
+
     },
+    // include: {
+    //   consignor: true,
+    //   city: true,
+    //   district: true,
+    //   state: true,
+    //   branch: true
+    // },
     orderBy: {
       consigneeName: 'asc'  // sort the results by publicName in ascending order
     }

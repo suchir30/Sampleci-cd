@@ -100,6 +100,7 @@ export const getGeneratedAWB = async (consignorId: number, AWBStatus: any) => {
             AWBStatus:true,
             articleGenFlag:true,
             rollupArticleCnt:true,
+            completeFlag:true,
             consignor: {
                 select: {
                     consignorCode: true,
@@ -438,13 +439,18 @@ export const getUpdateAWB = async (AWBId: number) => {
           articleGenFlag:true,
           AWBLineItems: {
             select: {
-              id: true,
-              articleWeightKg: true,
-              lengthCms: true,
-              breadthCms: true,
-              heightCms: true,
-              numOfArticles: true,
-            },
+                id: true,
+                lineItemDescription: true,
+                articleWeightKg: true,
+                lengthCms: true,
+                breadthCms: true,
+                heightCms: true,
+                numOfArticles: true,
+                SKUCode:true,
+                boxType:true,
+                SKUId:true,
+                ratePerBox:true
+            }
           },
           consignor: {
             select: {
@@ -612,8 +618,8 @@ export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem
                             numOfArticles: item.numOfArticles,
                             boxType:item.boxType,
                             ratePerBox:item.ratePerBox,
-                            actualFactorWeight: (item.numOfArticles ?? 0) * (item.ratePerBox ?? 0),
-                            volumetricFactorWeight:0
+                         // actualFactorWeight: (item.numOfArticles ?? 0) * (item.ratePerBox ?? 0),
+                         // volumetricFactorWeight:0
                         }
                     });
                 });
@@ -691,9 +697,11 @@ export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem
                 }
             });
 
+
+          
             return updatedAirWayBill;
         });
-
+        await checkAWBComplete(AWBId)
         return result;
     } catch (error) {
         console.error("Error in updateAWBLineItem", error);
@@ -731,12 +739,74 @@ export const updateAWB = async (AWBId: number,consigneeId: number,appointmentDat
         return true;
       });
 
+      await checkAWBComplete(AWBId)
       return result;
     } catch (error) {
       console.error("Error in updateAWB", error);
       throw error;
     }
-  };
+};
+export const checkAWBComplete = async (AWBId: number) => {
+    const AWBDetails = await prisma.airWayBill.findFirst({
+        where: {
+            id: AWBId,
+        }
+    });
+
+    console.log(AWBDetails?.consignorId, "AWB DETAILS");
+
+    if (!AWBDetails) {
+        console.log("AWB details not found");
+        return;
+    }
+
+    const contractTypeDetails = await prisma.contract.findFirst({
+        where: {
+            consignorId: AWBDetails.consignorId,
+        }
+    });
+
+    console.log(contractTypeDetails?.consignorContractType, "contractTypeDetails");
+
+    if (!contractTypeDetails) {
+        console.log("Contract details not found");
+        return;
+    }
+
+    let isComplete = false;
+
+    if (contractTypeDetails.consignorContractType === "BoxRate") {
+        if (
+            AWBDetails.CDM &&
+            AWBDetails.numOfArticles === AWBDetails.rollupArticleCnt &&
+            AWBDetails.invoiceNumber &&
+            AWBDetails.invoiceValue
+        ) {
+            isComplete = true;
+        }
+    } else {
+        if (
+            AWBDetails.rollupChargedWtInKgs &&
+            AWBDetails.numOfArticles === AWBDetails.rollupArticleCnt &&
+            AWBDetails.invoiceNumber &&
+            AWBDetails.invoiceValue
+        ) {
+            isComplete = true;
+        }
+    }
+console.log(isComplete,"iscomplete")
+    if (isComplete) {
+        await prisma.airWayBill.update({
+            where: { id: AWBId },
+            data: { completeFlag: true },
+        });
+        console.log("completeFlag updated to true");
+    } else {
+        console.log("completeFlag not updated");
+    }
+
+    return AWBDetails;
+};
 
 export const getAwbPdfData = async (AWBId: number) => {
     const result = await prisma.airWayBill.findUnique({
@@ -835,16 +905,19 @@ export const getSKUs = async (consignorId: number) => {
      
   };
   
-  export const getBoxTypes = async (consignorId: number) => {
+export const getBoxTypes = async (consignorId: number) => {
     const results = await prisma.consignorRateTable.findMany({
       where: {
-        consignorId: consignorId,
+        consignorId: consignorId,  boxType: {
+        not: null,
+      },
       },
       distinct: ['boxType'],
       select:{
-        boxType:true
+        boxType:true,
+        ratePerBox:true
       }
     });
   
    return results;
-  };
+};

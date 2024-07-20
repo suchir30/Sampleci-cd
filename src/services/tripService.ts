@@ -4,12 +4,16 @@ import moment from 'moment';
 export const getTrips = async (tripStatus:any,latestCheckinHubId:number,latestCheckinType:string) => {
   const whereClause: any = { tripStatus: tripStatus, };
 
+  if (tripStatus !== undefined) {
+    whereClause.tripStatus = tripStatus;
+  }
   if (latestCheckinHubId !== undefined) {
     whereClause.latestCheckinHubId = latestCheckinHubId;
   }
   if (latestCheckinType !== undefined) {
     whereClause.latestCheckinType = latestCheckinType;
   }
+
     const openTrips = await prisma.tripDetails.findMany({
       where: whereClause,
         select: {
@@ -286,7 +290,7 @@ export const getTripDetails = async (tripId: number) => {
           driverName: true,
           phone1: true,
         },
-      },
+      }
     },
   });
   const modifiedTripDetails = tripDetails.map(trip => ({
@@ -296,7 +300,7 @@ export const getTripDetails = async (tripId: number) => {
     vehicleNum: trip.vehicle?.vehicleNum,
     driverName: trip.driver?.driverName,
     phone1: trip.driver?.phone1,
-    latestCheckinHub:trip.latestCheckinHubId,
+    latestCheckinHub:trip.latestCheckinHubId
   }));
 
   return modifiedTripDetails;
@@ -339,6 +343,7 @@ if (unloadLocationId) {
             numOfArticles:true,
             rollupWeight:true,
             rollupChargedWtInKgs:true,
+            completeFlag:true,
             consignorId:true,
             consignor:{
               select:{
@@ -407,6 +412,7 @@ if (unloadLocationId) {
       awbToLocationCOde: item.AirWayBill.toBranch.branchCode,
       awbRollupActualWeighgtkgs: item.AirWayBill.rollupWeight,
       awbRollupChargedWeighgtkgs: item.AirWayBill.rollupChargedWtInKgs,
+      completeFlag: item.AirWayBill.completeFlag,
       TripLineItemStatus: item.status,
       numOfScan:item.rollupScanCount||0,
       rollupDepsCount:item.rollupDepsCount||0,
@@ -654,7 +660,8 @@ export const getScannedArticles = async (AWBId:number,tripId:number,scanType:any
   return transformedResult;
 };
 
-export const outwardedAWB = async (tripId: number, data: any, checkinHub: number) => {
+export const outwardAWB = async (tripId: number, data: any, checkinHub: number) => {
+  const result = await prisma.$transaction(async (prisma) => {
   // Loop through each item in the data array
   for (const item of data) {
     if (item.unloadLocationId === "CONSIGNEE") {  // unloadLocationId is "CONSIGNEE"
@@ -678,7 +685,7 @@ export const outwardedAWB = async (tripId: number, data: any, checkinHub: number
       });
     } 
     else {// unloadLocationId is not "CONSIGNEE"
-      await prisma.$transaction(async (prisma) => {
+     
         await prisma.tripLineItem.updateMany({
           where: {
             AWBId: item.AWBId,
@@ -736,13 +743,15 @@ export const outwardedAWB = async (tripId: number, data: any, checkinHub: number
             },
           });
         }
-      });
     }
   }
+  })
+  await tripLineItemScanCountReset(tripId)
+  return result
 };
 
-export const inwardedAWB = async (tripId: number, awbIds: number[], checkinHub: any) => {
- 
+export const inwardAWB = async (tripId: number, awbIds: number[], checkinHub: any) => {
+  const result = await prisma.$transaction(async (prisma) => {
     if (checkinHub === "CONSIGNEE") {
       await Promise.all(awbIds.map(async (AWBId) => {
         await prisma.tripLineItem.updateMany({
@@ -768,7 +777,7 @@ export const inwardedAWB = async (tripId: number, awbIds: number[], checkinHub: 
       });
     }
      else {
-      await prisma.$transaction(async (prisma) => {
+     
         await prisma.tripLineItem.updateMany({
           where: {
             tripId: tripId,
@@ -801,9 +810,20 @@ export const inwardedAWB = async (tripId: number, awbIds: number[], checkinHub: 
             hlfLineStatus: 'Inwarded'
           }
         });
-      });
+      
     }
-
-  
- 
+    
+})
+ await tripLineItemScanCountReset(tripId)
+ return result
 };
+
+export const tripLineItemScanCountReset=async(tripId: number)=>{
+  await prisma.tripLineItem.updateMany({
+    where: {
+      tripId: tripId},
+    data: {
+      rollupScanCount:0
+    }
+  });
+}

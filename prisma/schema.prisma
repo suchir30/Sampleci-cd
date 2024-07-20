@@ -173,7 +173,7 @@ model AirWayBill {
   rollupWeight         Float?         @db.Float
   rollupArticleCnt     Int?
   rollupArticleWeightKg Float?        @db.Float
-  rollupChargedWtInKgs  Float?         @db.Float
+  rollupChargedWtInKgs  Float?        @db.Float
   chargedWeightWithCeiling Float?     @db.Float
   grandTotal           Float?         @db.Float
   rollupCwWeight       Float?         @db.Float    
@@ -186,6 +186,8 @@ model AirWayBill {
   appointmentDate      DateTime?
   AWBPdf               Int?
   FileUpload           FileUpload?    @relation("AWBFileAirWayBill", fields: [AWBPdf], references: [id])
+  CDM                  Float?         @db.Float
+  completeFlag         Boolean        @default(false)
   createdOn            DateTime?      @default(now())
   modifiedOn           DateTime?      @updatedAt
   AWBLineItems         AwbLineItem[]

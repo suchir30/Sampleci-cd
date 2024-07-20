@@ -6,7 +6,7 @@ import * as consignorService from '../services/consignorService';
 import * as consigneeService from '../services/consigneeService';
 import * as AWBService from '../services/AWBService';
 import * as tripService from '../services/tripService';
-import * as pricingServices from '../services/pricingServices';
+// import * as pricingServices from '../services/pricingServices';
 import { AWBCreateData } from '../types/awbTypes';
 import { HttpStatusCode } from '../types/apiTypes';
 import { MulterFile } from '../types/multerTypes';
@@ -454,7 +454,10 @@ export const updateAWB = async (req: Request, res: Response, next: NextFunction)
 export const updateAWBLineItem = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const AWBId:number=req.body.AWBId
-    const awbLineItems: AwbLineItem[] = req.body.awbLineItems || [];
+    const awbLineItems: AwbLineItem[] = req.body.awbLineItems;
+    if(!awbLineItems || awbLineItems.length==0){
+      throwValidationError([{message: "Atleast One AWB Line Item Required"}]);
+    }
    const updateAWBLineItemResult = await AWBService.updateAWBLineItem(AWBId,awbLineItems);
     if(updateAWBLineItemResult=="Invalid AWB"){
       throwValidationError([{message: "Invalid AWB"}]);
@@ -468,17 +471,20 @@ export const updateAWBLineItem = async (req: Request, res: Response, next: NextF
     next(err)
   }
 }
-
+ 
 export const getTrips = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const tripStatus:string=req.body.tripStatus;
     const latestCheckinHubId:number=req.body.latestCheckinHubId;
     const latestCheckinType:string=req.body.latestCheckinType;
-
-    const validtripStatus = ['Open','CompletedWithRemarks','Closed'];
-    if (!validtripStatus.includes(tripStatus)) {
-      throwValidationError([{message: "Invalid Trip Status provided",key:`Status Should be: ${validtripStatus}.`}]);
-    }
+    
+    if(tripStatus){
+  const validtripStatus = ['Open','CompletedWithRemarks','Closed'];
+  if (!validtripStatus.includes(tripStatus)) {
+    throwValidationError([{message: "Invalid Trip Status provided",key:`Status Should be: ${validtripStatus}.`}]);
+  }
+}
+    
     const getTripsResult = await tripService.getTrips(tripStatus,latestCheckinHubId,latestCheckinType);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getTripsResult));
   } catch (err) {
@@ -734,7 +740,7 @@ export const outwardedAWB = async (req: Request, res: Response, next: NextFuncti
     if(!checkinHub){
       throwValidationError([{message: "checkinHub is mandatory"}]);
     }
-    const getScannedArticlesResult = await tripService.outwardedAWB(tripId,data,checkinHub);
+    const getScannedArticlesResult = await tripService.outwardAWB(tripId,data,checkinHub);
     res.status(HttpStatusCode.OK).json(buildNoContentResponse("success"));
   } catch (err) {
     console.error('Error getScannedArticles', err);
@@ -755,7 +761,7 @@ export const inwardedAWB = async (req: Request, res: Response, next: NextFunctio
       throwValidationError([{message: "checkinHub is mandatory"}]);
     }
   
-    const getScannedArticlesResult = await tripService.inwardedAWB(tripId,awbIds,checkinHub);
+    const getScannedArticlesResult = await tripService.inwardAWB(tripId,awbIds,checkinHub);
     res.status(HttpStatusCode.OK).json(buildNoContentResponse("success"));
   } catch (err) {
     console.error('Error getScannedArticles', err);
@@ -837,6 +843,9 @@ export const getDepsLists = async (req: Request, res: Response, next: NextFuncti
 export const addDeps = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const DEPSData:DEPS[]=req.body.DEPSData
+    if(DEPSData.length>1){
+      throwValidationError([{message: "Add only one DEPS"}]);
+    }
     const fileIds:any=req.body.fileIds
     if (!DEPSData || DEPSData.length==0) {
       throwValidationError([{message: "DEPSData is mandatory"}]);
@@ -856,8 +865,8 @@ export const generatePDF = async (req: Request, res: Response, next: NextFunctio
     if (!AWBId || AWBId.length==0) {
       throwValidationError([{message: "AWB ID is mandatory"}]);
     }
-    const pricing = await pricingServices.pricingModule(AWBId);
-    console.log(pricing,"pricing controller")
+    // const pricing = await pricingServices.pricingModule(AWBId);
+    // console.log(pricing,"pricing controller")
     // if(pricing=="Invalid AWB"){
     //   throwValidationError([{message: "Invalid AWB: consignorId or toBranch is missing"}]);
     // }
