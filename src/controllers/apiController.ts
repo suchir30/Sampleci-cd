@@ -14,6 +14,7 @@ import { Inwarded, Outwarded } from '../types/outwardInwardTypes';
 import { buildNoContentResponse, buildObjectFetchResponse, throwValidationError} from '../utils/apiUtils';
 import { Consignee, Consignor,AwbLineItem, DEPS} from '@prisma/client';
 import {pdfGenerator} from "../services/pdfGenerator";
+import { tripsPdfGenerator } from '../services/tripsPdfGenerator';
 
 export const getIndustryTypes = async (_req: Request, res: Response, next: NextFunction) => {
   try {
@@ -924,3 +925,32 @@ export const getBoxTypes = async (req: Request, res: Response, next: NextFunctio
     next(err)
   }
 }
+
+export const generateTripsPDF = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const {tripId, tripLineItemStatus ,locationId } = req.body; 
+    if (!tripId || tripId.length==0) {
+      throwValidationError([{message: "Trip ID is mandatory"}]);
+    }
+    if (!tripLineItemStatus || tripLineItemStatus.length==0) {
+      throwValidationError([{message: "TripLineItemStatus is mandatory"}]);
+    }
+    if (!locationId || locationId.length==0) {
+      throwValidationError([{message: "Location ID Details is mandatory"}]);
+    }
+
+
+    const tripsData = await tripService.getTripsPdfData(tripId, tripLineItemStatus, locationId );
+    const path = await tripsPdfGenerator(tripsData);
+
+    let response = {
+      "fileName" : tripsData.length > 0 ? `${tripsData[0]?.tripDetails?.tripCode}` : 'trips_report.pdf',
+      "pdfPath" : path, 
+    };
+
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(response));
+  } catch (err) {
+    console.error('Error generating trips PDF', err);
+    next(err); 
+  }
+};

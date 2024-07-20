@@ -6,6 +6,7 @@
   - The values [SKURate] on the enum `Contract_consignorContractType` will be removed. If these variants are still used in the database, this will fail.
 
 */
+
 -- AlterTable
 ALTER TABLE `AirWayBill` ADD COLUMN `chargedWeightWithCeiling` FLOAT NULL,
     ADD COLUMN `rollupArticleWeightKg` FLOAT NULL,

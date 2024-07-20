@@ -1,3 +1,4 @@
+import { $Enums } from '@prisma/client';
 import prisma from '../client';
 import moment from 'moment';
 
@@ -290,6 +291,11 @@ export const getTripDetails = async (tripId: number) => {
           driverName: true,
           phone1: true,
         },
+      },
+      vendor:{
+        select:{vendorName:true,
+          vendorCode:true,
+        }
       }
     },
   });
@@ -300,14 +306,15 @@ export const getTripDetails = async (tripId: number) => {
     vehicleNum: trip.vehicle?.vehicleNum,
     driverName: trip.driver?.driverName,
     phone1: trip.driver?.phone1,
-    latestCheckinHub:trip.latestCheckinHubId
+    latestCheckinHub:trip.latestCheckinHubId,
+    vendorName:trip.vendor?.vendorName
   }));
 
   return modifiedTripDetails;
    
 };
 
-export const getTripLineItems = async (tripId: number, tripLineItemStatus: any, loadLocationId?: number, unloadLocationId?: number) => {
+export const getTripLineItems = async (tripId: number, tripLineItemStatus: any, loadLocationId?: any, unloadLocationId?: any) => {
   const whereClause: any = {
     status: tripLineItemStatus,
     tripId: tripId
@@ -414,8 +421,8 @@ if (unloadLocationId) {
       awbRollupChargedWeighgtkgs: item.AirWayBill.rollupChargedWtInKgs,
       completeFlag: item.AirWayBill.completeFlag,
       TripLineItemStatus: item.status,
-      numOfScan:item.rollupScanCount||0,
-      rollupDepsCount:item.rollupDepsCount||0,
+      numOfScan:item.rollupScanCount,
+      rollupDepsCount:item.rollupDepsCount  ,
       numberOfArticles: item.AirWayBill.numOfArticles,
       latestScanTime:item.latestScanTime
     }));
@@ -827,3 +834,33 @@ export const tripLineItemScanCountReset=async(tripId: number)=>{
     }
   });
 }
+
+export const getTripsPdfData = async (tripId: number, tripLineItemStatus: any , locationId: number) => {
+  try {
+    const trips = await getTripDetails(tripId);
+    const tripsPdfData = [];
+
+    for (const trip of trips) {
+      let tripLineItems
+      
+      if(tripLineItemStatus === "Assigned"){
+        const loadLocationId = locationId;
+        tripLineItems = await getTripLineItems(tripId, tripLineItemStatus,loadLocationId,null);
+      }else if(tripLineItemStatus === "Open")
+      {
+        const unloadLocationId = locationId;
+        tripLineItems = await getTripLineItems(tripId, tripLineItemStatus,null,unloadLocationId);
+      }
+      
+      const tripData = {
+        tripDetails: trip,
+        tripLineItems: tripLineItems,
+      };
+      tripsPdfData.push(tripData);
+    }
+    return tripsPdfData;
+  } catch (error) {
+    console.error('Error fetching trips PDF data:', error);
+    throw error;
+  }
+};
