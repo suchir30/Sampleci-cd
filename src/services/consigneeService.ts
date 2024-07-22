@@ -16,6 +16,11 @@ export const getConsignees = async (consignorId:number,toBranchId:number) => {
       consigneeCode:true,
       consigneeName:true,
       address1:true,
+      branchId:true,
+      consignorId:true,
+      cityId:true,
+      stateId:true,
+      districtId:true,
       consignor:{
         select:{
           consignorId:true,
