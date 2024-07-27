@@ -226,12 +226,20 @@ export const loadArticlesValidate = async (AWBId:string,AWBArticleId:string,trip
     if(checkDuplicateRes.length>0){
       return "Duplicate"
     }
+
+
       const tripLineItemRes = await prisma.tripLineItem.findFirst({
           select:{
               id:true,
               AWBId:true,
               tripId:true,
-              unloadLocationId:true,
+              loadLocationId:true,
+              loadlocation:{
+                select:{
+                  branchCode:true,
+                  branchName:true
+                }
+              },
               status:true,
               nextBranch:{
                   select:{
@@ -259,13 +267,30 @@ export const loadArticlesValidate = async (AWBId:string,AWBArticleId:string,trip
         if(tripLineItemRes==null){
           return 'AWBIDInvalid'
         }
-        if(tripLineItemRes?.status=="Assigned"){
+
+        const tripDetailsRes = await prisma.tripDetails.findFirst({
+          where: {
+            id: tripId
+          }, 
+          orderBy: {
+              id: 'desc',
+          },
+        });
+
+        if(tripLineItemRes?.status=="Assigned" && tripLineItemRes?.loadLocationId==tripDetailsRes?.latestCheckinHubId){
           console.log("valid")
           return `Valid+${tripLineItemRes?.id}`
         }
         else{
+          if(tripLineItemRes?.status!="Assigned"){
           console.log("invalid")
-          return tripLineItemRes?.trip?.tripCode
+          return 'status'
+          }
+          else{
+            console.log("invalid")
+            return tripLineItemRes?.loadlocation?.branchName
+          }
+        
         }
       })
       return result

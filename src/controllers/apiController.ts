@@ -391,7 +391,7 @@ export const assignedTriptoAWB = async (req: Request, res: Response, next: NextF
     }
     const finalDestinationId:number=req.body.finalDestinationId  //toBranch(ConsigneeBranch)
 
-    if (!AWBId || !tripId || !finalDestinationId) {
+    if (!AWBId || !tripId || !finalDestinationId || !loadLocationId) {
       throwValidationError([{message: "Mandatory fields are missing"}]);
     }
     const assignedTriptoAWBResult = await AWBService.assignedTriptoAWB(AWBId,tripId,finalDestinationId,status,loadLocationId);
@@ -430,6 +430,7 @@ export const updateAWB = async (req: Request, res: Response, next: NextFunction)
     const invoiceValue:number = req.body.invoiceValue;
     const ewayBillNumber:string=req.body.ewayBillNumber;
     const appointmentDate = new Date(req.body.appointmentDate);
+    const CDM:number=req.body.CDM
 
     if (isNaN(appointmentDate.getTime())) {
       throwValidationError([{ message: "Invalid appointment date(YYYY/MM/DD)" }]);
@@ -438,7 +439,7 @@ export const updateAWB = async (req: Request, res: Response, next: NextFunction)
     if (!AWBId) {
       throwValidationError([{ message: "AWB ID is required" }]);
     }
-    const updateAWBRes = await AWBService.updateAWB(AWBId,consigneeId,appointmentDate,invoiceNumber,invoiceValue,ewayBillNumber);
+    const updateAWBRes = await AWBService.updateAWB(AWBId,consigneeId,appointmentDate,invoiceNumber,invoiceValue,ewayBillNumber,CDM);
     if(updateAWBRes=="NotExists"){
       throwValidationError([{message: "Invalid AWB ID"}]);
     }
@@ -623,8 +624,12 @@ export const loadArticlesValidate = async (req: Request, res: Response, next: Ne
       res.status(HttpStatusCode.OK).json(buildNoContentResponse(`Invalid AWB Article,Please check the Article.`));
       return
     }
+    else if(loadArticlesValidateResult=='status'){
+      res.status(HttpStatusCode.OK).json(buildNoContentResponse(`AWB is being loaded into incorrect trip. Please check assigned trip for AWB`));
+      return
+    }
     else{
-      res.status(HttpStatusCode.OK).json(buildNoContentResponse(`TripCode ${loadArticlesValidateResult} not in Assigned Status. Please do not load.`));
+      res.status(HttpStatusCode.OK).json(buildNoContentResponse(`Incorrect load location. AWB should be loaded in ${loadArticlesValidateResult}`));
       return
 
     }

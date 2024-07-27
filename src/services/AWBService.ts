@@ -437,6 +437,7 @@ export const getUpdateAWB = async (AWBId: number) => {
           consigneeId:true,
           AWBStatus:true,
           articleGenFlag:true,
+          CDM:true,
           AWBLineItems: {
             select: {
                 id: true,
@@ -711,7 +712,7 @@ export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem
 
 
 
-export const updateAWB = async (AWBId: number,consigneeId: number,appointmentDate: Date,invoiceNumber: string,invoiceValue: number,ewayBillNumber: string): Promise<string | boolean> => {
+export const updateAWB = async (AWBId: number,consigneeId: number,appointmentDate: Date,invoiceNumber: string,invoiceValue: number,ewayBillNumber: string,CDM:any): Promise<string | boolean> => {
     try {
       const result = await prisma.$transaction(async (prisma) => {
         const AWBRes = await prisma.airWayBill.findMany({
@@ -734,6 +735,7 @@ export const updateAWB = async (AWBId: number,consigneeId: number,appointmentDat
             invoiceNumber: invoiceNumber,
             invoiceValue: invoiceValue,
             ewayBillNumber: ewayBillNumber,
+            CDM:CDM
           },
         });
         return true;
@@ -811,7 +813,7 @@ console.log(isComplete,"iscomplete")
 export const getAwbPdfData = async (AWBId: number) => {
     const result = await prisma.airWayBill.findUnique({
         where: {
-            id: 1
+            id: AWBId
         },
         select: {
             id: true,
