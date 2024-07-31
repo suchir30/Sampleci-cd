@@ -11,10 +11,11 @@ import { AWBCreateData } from '../types/awbTypes';
 import { HttpStatusCode } from '../types/apiTypes';
 import { MulterFile } from '../types/multerTypes';
 import { Inwarded, Outwarded } from '../types/outwardInwardTypes';
-import { buildNoContentResponse, buildObjectFetchResponse, throwValidationError} from '../utils/apiUtils';
-import { Consignee, Consignor,AwbLineItem, DEPS} from '@prisma/client';
-import {pdfGenerator} from "../services/pdfGenerator";
-import { tripsPdfGenerator } from '../services/tripsPdfGenerator';
+import { buildNoContentResponse, buildObjectFetchResponse, throwValidationError } from '../utils/apiUtils';
+import { Consignee, Consignor, AwbLineItem, DEPS } from '@prisma/client';
+import { AWBPdfGenerator } from "../services/pdfGeneratorAWB";
+import { tripsPdfGenerator } from '../services/pdfGeneratorTrips';
+import { tripHirePdfGenerator } from '../services/pdfGeneratorTripHire';
 
 export const getIndustryTypes = async (_req: Request, res: Response, next: NextFunction) => {
   try {
@@ -110,7 +111,7 @@ export const getConsignorBranches = async (req: Request, res: Response, next: Ne
   try {
     const consignorId: number = req.body.consignorId;
     if (!consignorId) {
-      throwValidationError([{message: "No Consignor Id Provided."}]);
+      throwValidationError([{ message: "No Consignor Id Provided." }]);
     }
     const getConsignorBranchesRes = await masterDataService.getConsignorBranches(consignorId);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getConsignorBranchesRes));
@@ -122,15 +123,15 @@ export const getConsignorBranches = async (req: Request, res: Response, next: Ne
 export const addConsignorBranch = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const consignorId: number = req.body.consignorId;
-    const branchId:number=req.body.branchId;
+    const branchId: number = req.body.branchId;
     if (!consignorId) {
-      throwValidationError([{message: "No Consignor Id Provided."}]);
+      throwValidationError([{ message: "No Consignor Id Provided." }]);
     }
-    const addConsignorBranchRes = await masterDataService.addConsignorBranch(consignorId,branchId);
-    if(addConsignorBranchRes=='Already Exists'){
-      throwValidationError([{message: "Branch Already Exists "}]);
+    const addConsignorBranchRes = await masterDataService.addConsignorBranch(consignorId, branchId);
+    if (addConsignorBranchRes == 'Already Exists') {
+      throwValidationError([{ message: "Branch Already Exists " }]);
     }
-    else{
+    else {
       res.status(HttpStatusCode.OK).json(buildNoContentResponse("Added Successfully"));
     }
   } catch (err) {
@@ -140,7 +141,7 @@ export const addConsignorBranch = async (req: Request, res: Response, next: Next
 }
 export const getConsignors = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const consignorId:number=req.body.consignorId
+    const consignorId: number = req.body.consignorId
     const consignors = await consignorService.getConsignors(consignorId);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(consignors));
   } catch (err) {
@@ -154,7 +155,7 @@ export const createConsignors = async (req: Request, res: Response, next: NextFu
     const errors: { message: string, key?: string }[] = [];
 
     if (!consignorsData.length) {
-      throwValidationError([{message: "No consignors provided."}]);
+      throwValidationError([{ message: "No consignors provided." }]);
     }
     consignorsData.forEach((consignor: Consignor, index: number) => {
       if (!consignor.legalName) {
@@ -169,12 +170,12 @@ export const createConsignors = async (req: Request, res: Response, next: NextFu
     if (errors.length > 0) {
       throwValidationError(errors);
     }
-    const createConsignorsRes =await consignorService.createConsignors(consignorsData);
-    console.log(createConsignorsRes,"ctrl**")
-    if(createConsignorsRes=="alreadyExists"){
-      throwValidationError([{message: "Provided Consignor Code Already Exists"}]);
+    const createConsignorsRes = await consignorService.createConsignors(consignorsData);
+    console.log(createConsignorsRes, "ctrl**")
+    if (createConsignorsRes == "alreadyExists") {
+      throwValidationError([{ message: "Provided Consignor Code Already Exists" }]);
     }
-    else{
+    else {
       res.status(HttpStatusCode.OK).json(buildNoContentResponse("Consignor Created Successful"));
     }
   } catch (err) {
@@ -188,9 +189,9 @@ export const getConsignees = async (req: Request, res: Response, next: NextFunct
     const toBranchId: number = req.body.toBranchId;
 
     if (!consignorId) {
-      throwValidationError([{message: "No Consignor Id Provided."}]);
+      throwValidationError([{ message: "No Consignor Id Provided." }]);
     }
-    const consignees = await consigneeService.getConsignees(consignorId,toBranchId);
+    const consignees = await consigneeService.getConsignees(consignorId, toBranchId);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(consignees));
   } catch (err) {
     console.error('Error retrieving consignees:', err);
@@ -218,11 +219,11 @@ export const createConsignees = async (req: Request, res: Response, next: NextFu
     if (errors.length > 0) {
       throwValidationError(errors);
     }
-    const createConsigneesRes=await consigneeService.createConsignees(consigneesData);
-    if(createConsigneesRes=="alreadyExists"){
-      throwValidationError([{message: "Provided Consignee Code Already Exists"}]);
+    const createConsigneesRes = await consigneeService.createConsignees(consigneesData);
+    if (createConsigneesRes == "alreadyExists") {
+      throwValidationError([{ message: "Provided Consignee Code Already Exists" }]);
     }
-    else{
+    else {
       res.status(HttpStatusCode.OK).json(buildNoContentResponse("Consignee Created Successful"));
     }
 
@@ -237,9 +238,9 @@ export const getGeneratedAWB = async (req: Request, res: Response, next: NextFun
     const AWBStatus: string = req.body.AWBStatus;
     const validAWBStatusValues = ['PickUp', 'InTransit', 'atHub', 'Delivered'];
     if (!AWBStatus || !validAWBStatusValues.includes(AWBStatus)) {
-      throwValidationError([{message: "Invalid AWBStatus provided."}]);
+      throwValidationError([{ message: "Invalid AWBStatus provided." }]);
     }
-    const getGeneratedAWBRes = await AWBService.getGeneratedAWB(consignorId,AWBStatus);
+    const getGeneratedAWBRes = await AWBService.getGeneratedAWB(consignorId, AWBStatus);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getGeneratedAWBRes));
   } catch (err) {
     console.error('Error retrieving consignees:', err);
@@ -297,7 +298,7 @@ export const getAWBArticles = async (req: Request, res: Response, next: NextFunc
   try {
     const AWBId: number = req.body.AWBId;
     if (!AWBId) {
-      throwValidationError([{message: "No AWBId Provided."}]);
+      throwValidationError([{ message: "No AWBId Provided." }]);
     }
     const getAWBArticlesRes = await AWBService.getAWBArticles(AWBId);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getAWBArticlesRes));
@@ -376,29 +377,29 @@ export const markAWBArticleAsDeleted = async (req: Request, res: Response, next:
 }
 export const assignedTriptoAWB = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const AWBId:number=req.body.AWBId
-    const tripId:number=req.body.tripId
-    const status:string=req.body.status
-    const loadLocationId:number=req.body.loadLocationId
+    const AWBId: number = req.body.AWBId
+    const tripId: number = req.body.tripId
+    const status: string = req.body.status
+    const loadLocationId: number = req.body.loadLocationId
     if (!AWBId) {
       throwValidationError([{ message: `Mandatory field AWBId is missing` }]);
     }
     if (!tripId) {
       throwValidationError([{ message: `Mandatory field AWBId is missing` }]);
     }
-    if (status!="Assigned") {
+    if (status != "Assigned") {
       throwValidationError([{ message: `Please check the status, it should be Assigned` }]);
     }
-    const finalDestinationId:number=req.body.finalDestinationId  //toBranch(ConsigneeBranch)
+    const finalDestinationId: number = req.body.finalDestinationId  //toBranch(ConsigneeBranch)
 
-    if (!AWBId || !tripId || !finalDestinationId || !loadLocationId) {
-      throwValidationError([{message: "Mandatory fields are missing"}]);
+    if (!AWBId || !tripId || !finalDestinationId) {
+      throwValidationError([{ message: "Mandatory fields are missing" }]);
     }
-    const assignedTriptoAWBResult = await AWBService.assignedTriptoAWB(AWBId,tripId,finalDestinationId,status,loadLocationId);
-    if(assignedTriptoAWBResult=="Already EXists"){
-      throwValidationError([{message: "Already Trip Assigned to AWB"}]);
+    const assignedTriptoAWBResult = await AWBService.assignedTriptoAWB(AWBId, tripId, finalDestinationId, status, loadLocationId);
+    if (assignedTriptoAWBResult == "Already EXists") {
+      throwValidationError([{ message: "Already Trip Assigned to AWB" }]);
     }
-    else{
+    else {
       res.status(HttpStatusCode.OK).json(buildNoContentResponse("Trip Assigned to AWB"));
     }
 
@@ -412,7 +413,7 @@ export const getUpdateAWB = async (req: Request, res: Response, next: NextFuncti
   try {
     const AWBId: number = req.body.AWBId;
     if (!AWBId) {
-      throwValidationError([{message: "No AWBId Provided."}]);
+      throwValidationError([{ message: "No AWBId Provided." }]);
     }
     const getUpdateAWBRes = await AWBService.getUpdateAWB(AWBId);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getUpdateAWBRes));
@@ -424,11 +425,11 @@ export const getUpdateAWB = async (req: Request, res: Response, next: NextFuncti
 
 export const updateAWB = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const AWBId:number=req.body.AWBId
-    const consigneeId:number=req.body.consigneeId
-    const invoiceNumber:string=req.body.invoiceNumber;
-    const invoiceValue:number = req.body.invoiceValue;
-    const ewayBillNumber:string=req.body.ewayBillNumber;
+    const AWBId: number = req.body.AWBId
+    const consigneeId: number = req.body.consigneeId
+    const invoiceNumber: string = req.body.invoiceNumber;
+    const invoiceValue: number = req.body.invoiceValue;
+    const ewayBillNumber: string = req.body.ewayBillNumber;
     const appointmentDate = new Date(req.body.appointmentDate);
     const CDM:number=req.body.CDM
 
@@ -439,11 +440,11 @@ export const updateAWB = async (req: Request, res: Response, next: NextFunction)
     if (!AWBId) {
       throwValidationError([{ message: "AWB ID is required" }]);
     }
-    const updateAWBRes = await AWBService.updateAWB(AWBId,consigneeId,appointmentDate,invoiceNumber,invoiceValue,ewayBillNumber,CDM);
-    if(updateAWBRes=="NotExists"){
-      throwValidationError([{message: "Invalid AWB ID"}]);
+    const updateAWBRes = await AWBService.updateAWB(AWBId, consigneeId, appointmentDate, invoiceNumber, invoiceValue, ewayBillNumber);
+    if (updateAWBRes == "NotExists") {
+      throwValidationError([{ message: "Invalid AWB ID" }]);
     }
-    else{
+    else {
       res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWB Updated Successfully"));
     }
 
@@ -455,17 +456,17 @@ export const updateAWB = async (req: Request, res: Response, next: NextFunction)
 
 export const updateAWBLineItem = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const AWBId:number=req.body.AWBId
+    const AWBId: number = req.body.AWBId
     const awbLineItems: AwbLineItem[] = req.body.awbLineItems;
-    if(!awbLineItems || awbLineItems.length==0){
-      throwValidationError([{message: "Atleast One AWB Line Item Required"}]);
+    if (!awbLineItems || awbLineItems.length == 0) {
+      throwValidationError([{ message: "Atleast One AWB Line Item Required" }]);
     }
-   const updateAWBLineItemResult = await AWBService.updateAWBLineItem(AWBId,awbLineItems);
-    if(updateAWBLineItemResult=="Invalid AWB"){
-      throwValidationError([{message: "Invalid AWB"}]);
+    const updateAWBLineItemResult = await AWBService.updateAWBLineItem(AWBId, awbLineItems);
+    if (updateAWBLineItemResult == "Invalid AWB") {
+      throwValidationError([{ message: "Invalid AWB" }]);
     }
-    if(updateAWBLineItemResult=="Invalid factors"){
-      throwValidationError([{message: "Invalid Factor: Actual/volumetric Weight Factor is misssing"}]);
+    if (updateAWBLineItemResult == "Invalid factors") {
+      throwValidationError([{ message: "Invalid Factor: Actual/volumetric Weight Factor is misssing" }]);
     }
     res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWB Line ITem Added Successfully"));
   } catch (err) {
@@ -473,21 +474,21 @@ export const updateAWBLineItem = async (req: Request, res: Response, next: NextF
     next(err)
   }
 }
- 
+
 export const getTrips = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const tripStatus:string=req.body.tripStatus;
-    const latestCheckinHubId:number=req.body.latestCheckinHubId;
-    const latestCheckinType:string=req.body.latestCheckinType;
-    
-    if(tripStatus){
-  const validtripStatus = ['Open','CompletedWithRemarks','Closed'];
-  if (!validtripStatus.includes(tripStatus)) {
-    throwValidationError([{message: "Invalid Trip Status provided",key:`Status Should be: ${validtripStatus}.`}]);
-  }
-}
-    
-    const getTripsResult = await tripService.getTrips(tripStatus,latestCheckinHubId,latestCheckinType);
+    const tripStatus: string = req.body.tripStatus;
+    const latestCheckinHubId: number = req.body.latestCheckinHubId;
+    const latestCheckinType: string = req.body.latestCheckinType;
+
+    if (tripStatus) {
+      const validtripStatus = ['Open', 'CompletedWithRemarks', 'Closed'];
+      if (!validtripStatus.includes(tripStatus)) {
+        throwValidationError([{ message: "Invalid Trip Status provided", key: `Status Should be: ${validtripStatus}.` }]);
+      }
+    }
+
+    const getTripsResult = await tripService.getTrips(tripStatus, latestCheckinHubId, latestCheckinType);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getTripsResult));
   } catch (err) {
     console.error('Error getTrips', err);
@@ -497,28 +498,28 @@ export const getTrips = async (req: Request, res: Response, next: NextFunction) 
 
 export const addTripCheckin = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const inwardTime:string  =req.body.inwardTime;
-    const tripId:number  =req.body.tripId;
-    const hubId:number=req.body.hubId
-    const odometerReading:number=req.body.odometerReading
-    const tripType:string=req.body.tripType
-    const fileId:number=req.body.fileId
+    const inwardTime: string = req.body.inwardTime;
+    const tripId: number = req.body.tripId;
+    const hubId: number = req.body.hubId
+    const odometerReading: number = req.body.odometerReading
+    const tripType: string = req.body.tripType
+    const fileId: number = req.body.fileId
     if (!inwardTime) {
-      throwValidationError([{message: "inwardTime is Mandatory"}]);
+      throwValidationError([{ message: "inwardTime is Mandatory" }]);
     }
     if (!tripId) {
-      throwValidationError([{message: "tripId is Mandatory"}]);
+      throwValidationError([{ message: "tripId is Mandatory" }]);
     }
     if (!hubId) {
-      throwValidationError([{message: "hubId is Mandatory"}]);
+      throwValidationError([{ message: "hubId is Mandatory" }]);
     }
     if (!odometerReading) {
-      throwValidationError([{message: "odometerReading is Mandatory"}]);
+      throwValidationError([{ message: "odometerReading is Mandatory" }]);
     }
     if (!tripType) {
-      throwValidationError([{message: "tripType is Mandatory"}]);
+      throwValidationError([{ message: "tripType is Mandatory" }]);
     }
-    const getTripsResult = await tripService.addTripCheckin(inwardTime,tripId,hubId,odometerReading,tripType,fileId);
+    const getTripsResult = await tripService.addTripCheckin(inwardTime, tripId, hubId, odometerReading, tripType, fileId);
     res.status(HttpStatusCode.OK).json(buildNoContentResponse("Trip Checkin Successfully"));
   } catch (err) {
     console.error('Error addTripCheckin', err);
@@ -528,10 +529,10 @@ export const addTripCheckin = async (req: Request, res: Response, next: NextFunc
 
 export const getTripCheckin = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const tripType:string=req.body.tripType
-    const validtripType = ['Inwarded','Outwarded'];
+    const tripType: string = req.body.tripType
+    const validtripType = ['Inwarded', 'Outwarded'];
     if (!validtripType.includes(tripType)) {
-      throwValidationError([{message: "Invalid Trip Type provided",key:`Status Should be: ${validtripType}.`}]);
+      throwValidationError([{ message: "Invalid Trip Type provided", key: `Status Should be: ${validtripType}.` }]);
     }
     const getTripsResult = await tripService.getTripCheckin(tripType);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getTripsResult));
@@ -542,40 +543,40 @@ export const getTripCheckin = async (req: Request, res: Response, next: NextFunc
 }
 export const unloadArticlesValidate = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const AWBId:string=req.body.AWBCode
-    const AWBArticleId:string=req.body.AWBArticleCode
-    const tripId:number=req.body.tripId
+    const AWBId: string = req.body.AWBCode
+    const AWBArticleId: string = req.body.AWBArticleCode
+    const tripId: number = req.body.tripId
     if (!AWBId) {
-      throwValidationError([{message: "AWBCode is mandatoryq"}]);
+      throwValidationError([{ message: "AWBCode is mandatoryq" }]);
     }
     if (!AWBArticleId) {
-      throwValidationError([{message: "AWBArticeCode is mandatory"}]);
+      throwValidationError([{ message: "AWBArticeCode is mandatory" }]);
     }
-    const unloadArticlesValidateResult = await tripService.unloadArticlesValidate(AWBId,AWBArticleId,tripId);
+    const unloadArticlesValidateResult = await tripService.unloadArticlesValidate(AWBId, AWBArticleId, tripId);
 
-    if (unloadArticlesValidateResult?.split('+')[0]=== "Valid"){
+    if (unloadArticlesValidateResult?.split('+')[0] === "Valid") {
       res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(
-        {"TripLineItemId":parseInt(unloadArticlesValidateResult?.split('+')[1])},"Success"));
+        { "TripLineItemId": parseInt(unloadArticlesValidateResult?.split('+')[1]) }, "Success"));
       return
     }
 
-    else if(unloadArticlesValidateResult=='AWBIDInvalid'){
+    else if (unloadArticlesValidateResult == 'AWBIDInvalid') {
       res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWBID has no Trip Items,Please check the AWBID"));
       return
     }
-    else if(unloadArticlesValidateResult=='Duplicate'){
+    else if (unloadArticlesValidateResult == 'Duplicate') {
       res.status(HttpStatusCode.OK).json(buildNoContentResponse(`Article ${AWBArticleId} Already Scanned`));
       return
     }
-    else if(unloadArticlesValidateResult=='InvalidAWB'){
+    else if (unloadArticlesValidateResult == 'InvalidAWB') {
       res.status(HttpStatusCode.OK).json(buildNoContentResponse(`Invalid AirWayBill,Please check the AWB.`));
       return
     }
-    else if(unloadArticlesValidateResult=='InvalidArticle'){
+    else if (unloadArticlesValidateResult == 'InvalidArticle') {
       res.status(HttpStatusCode.OK).json(buildNoContentResponse(`Invalid AWB Article,Please check the Article.`));
       return
     }
-    else{
+    else {
       res.status(HttpStatusCode.OK).json(buildNoContentResponse(`AWBID next destination is ${unloadArticlesValidateResult}. Please do not unload.`));
       return
     }
@@ -588,48 +589,44 @@ export const unloadArticlesValidate = async (req: Request, res: Response, next: 
 
 export const loadArticlesValidate = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const AWBId:string=req.body.AWBCode
-    const AWBArticleId:string=req.body.AWBArticleCode
-    const tripId:number=req.body.tripId
+    const AWBId: string = req.body.AWBCode
+    const AWBArticleId: string = req.body.AWBArticleCode
+    const tripId: number = req.body.tripId
     if (!AWBId) {
-      throwValidationError([{message: "AWBCode is mandatory"}]);
+      throwValidationError([{ message: "AWBCode is mandatory" }]);
     }
     if (!AWBArticleId) {
-      throwValidationError([{message: "AWBArticeCode is mandatory"}]);
+      throwValidationError([{ message: "AWBArticeCode is mandatory" }]);
     }
-    const loadArticlesValidateResult = await tripService.loadArticlesValidate(AWBId,AWBArticleId,tripId);
-    console.log(loadArticlesValidateResult,"res")
-    if (loadArticlesValidateResult?.split('+')[0]=== "Valid"){
+    const loadArticlesValidateResult = await tripService.loadArticlesValidate(AWBId, AWBArticleId, tripId);
+    console.log(loadArticlesValidateResult, "res")
+    if (loadArticlesValidateResult?.split('+')[0] === "Valid") {
       res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(
-        {"TripLineItemId":parseInt(loadArticlesValidateResult?.split('+')[1])},"Success"));
+        { "TripLineItemId": parseInt(loadArticlesValidateResult?.split('+')[1]) }, "Success"));
       return
     }
-    if(loadArticlesValidateResult=='Valid'){
+    if (loadArticlesValidateResult == 'Valid') {
       res.status(HttpStatusCode.OK).json(buildNoContentResponse("Success"));
       return
     }
-    else if(loadArticlesValidateResult=='AWBIDInvalid'){
+    else if (loadArticlesValidateResult == 'AWBIDInvalid') {
       res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWBID has no Checkin Trips,Please check the AWBID and TripId"));
       return
     }
-    else if(loadArticlesValidateResult=='Duplicate'){
+    else if (loadArticlesValidateResult == 'Duplicate') {
       res.status(HttpStatusCode.OK).json(buildNoContentResponse(`Article ${AWBArticleId} Already Scanned`));
       return
     }
-    else if(loadArticlesValidateResult=='InvalidAWB'){
+    else if (loadArticlesValidateResult == 'InvalidAWB') {
       res.status(HttpStatusCode.OK).json(buildNoContentResponse(`Invalid AirWayBill,Please check the AWB.`));
       return
     }
-    else if(loadArticlesValidateResult=='InvalidArticle'){
+    else if (loadArticlesValidateResult == 'InvalidArticle') {
       res.status(HttpStatusCode.OK).json(buildNoContentResponse(`Invalid AWB Article,Please check the Article.`));
       return
     }
-    else if(loadArticlesValidateResult=='status'){
-      res.status(HttpStatusCode.OK).json(buildNoContentResponse(`AWB is being loaded into incorrect trip. Please check assigned trip for AWB`));
-      return
-    }
-    else{
-      res.status(HttpStatusCode.OK).json(buildNoContentResponse(`Incorrect load location. AWB should be loaded in ${loadArticlesValidateResult}`));
+    else {
+      res.status(HttpStatusCode.OK).json(buildNoContentResponse(`TripCode ${loadArticlesValidateResult} not in Assigned Status. Please do not load.`));
       return
 
     }
@@ -642,7 +639,7 @@ export const loadArticlesValidate = async (req: Request, res: Response, next: Ne
 
 export const getTripDetails = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const tripId:number=req.body.tripId
+    const tripId: number = req.body.tripId
     const getTripsResult = await tripService.getTripDetails(tripId);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getTripsResult));
   } catch (err) {
@@ -653,14 +650,14 @@ export const getTripDetails = async (req: Request, res: Response, next: NextFunc
 
 export const getTripLineItems = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const tripId:number=req.body.tripId
-    const tripLineItemStatus:string=req.body.tripLineItemStatus;
-    const loadLocationId:number=req.body.loadLocationId
-    const unloadLocationId:number=req.body.unloadLocationId
+    const tripId: number = req.body.tripId
+    const tripLineItemStatus: string = req.body.tripLineItemStatus;
+    const loadLocationId: number = req.body.loadLocationId
+    const unloadLocationId: number = req.body.unloadLocationId
     if (!tripId) {
-      throwValidationError([{message: "tripId is mandatory"}]);
+      throwValidationError([{ message: "tripId is mandatory" }]);
     }
-    const getTripsResult = await tripService.getTripLineItems(tripId,tripLineItemStatus,loadLocationId,unloadLocationId);
+    const getTripsResult = await tripService.getTripLineItems(tripId, tripLineItemStatus, loadLocationId, unloadLocationId);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getTripsResult));
   } catch (err) {
     console.error('Error getTripLineItems', err);
@@ -669,8 +666,8 @@ export const getTripLineItems = async (req: Request, res: Response, next: NextFu
 }
 
 export const addAWBArticleLogs = async (
-  req: Request, 
-  res: Response, 
+  req: Request,
+  res: Response,
   next: NextFunction
 ) => {
   try {
@@ -700,7 +697,7 @@ export const addAWBArticleLogs = async (
     } else {
       res.status(HttpStatusCode.OK).json(buildNoContentResponse("Success"));
     }
-  
+
   } catch (err) {
     console.error('Error addAWBArticleLogs', err);
     next(err);
@@ -710,23 +707,23 @@ export const addAWBArticleLogs = async (
 
 export const getScannedArticles = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const AWBId:number=req.body.AWBId
-    const tripId:number=req.body.tripId
-    const scanType:string=req.body.scanType
+    const AWBId: number = req.body.AWBId
+    const tripId: number = req.body.tripId
+    const scanType: string = req.body.scanType
     if (!AWBId) {
-      throwValidationError([{message: "AWBCode is mandatory"}]);
+      throwValidationError([{ message: "AWBCode is mandatory" }]);
     }
     if (!tripId) {
-      throwValidationError([{message: "TripId is mandatory"}]);
+      throwValidationError([{ message: "TripId is mandatory" }]);
     }
     if (!scanType) {
-      throwValidationError([{message: "scanType is mandatory"}]);
+      throwValidationError([{ message: "scanType is mandatory" }]);
     }
-    const validScanType = ['Load','Unload'];
+    const validScanType = ['Load', 'Unload'];
     if (!validScanType.includes(scanType)) {
-      throwValidationError([{message: "Invalid scanType provided",key:`scanType Should be: ${validScanType}.`}]);
+      throwValidationError([{ message: "Invalid scanType provided", key: `scanType Should be: ${validScanType}.` }]);
     }
-    const getScannedArticlesResult = await tripService.getScannedArticles(AWBId,tripId,scanType);
+    const getScannedArticlesResult = await tripService.getScannedArticles(AWBId, tripId, scanType);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getScannedArticlesResult));
   } catch (err) {
     console.error('Error getScannedArticles', err);
@@ -736,17 +733,17 @@ export const getScannedArticles = async (req: Request, res: Response, next: Next
 
 export const outwardedAWB = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { tripId, data,checkinHub }: { tripId: number, data: Outwarded[],checkinHub:number } = req.body;
-    if(!data){
-      throwValidationError([{message: "Data is mandatory"}]);
+    const { tripId, data, checkinHub }: { tripId: number, data: Outwarded[], checkinHub: number } = req.body;
+    if (!data) {
+      throwValidationError([{ message: "Data is mandatory" }]);
     }
-    if(!tripId){
-      throwValidationError([{message: "tripId is mandatory"}]);
+    if (!tripId) {
+      throwValidationError([{ message: "tripId is mandatory" }]);
     }
-    if(!checkinHub){
-      throwValidationError([{message: "checkinHub is mandatory"}]);
+    if (!checkinHub) {
+      throwValidationError([{ message: "checkinHub is mandatory" }]);
     }
-    const getScannedArticlesResult = await tripService.outwardAWB(tripId,data,checkinHub);
+    const getScannedArticlesResult = await tripService.outwardAWB(tripId, data, checkinHub);
     res.status(HttpStatusCode.OK).json(buildNoContentResponse("success"));
   } catch (err) {
     console.error('Error getScannedArticles', err);
@@ -756,18 +753,18 @@ export const outwardedAWB = async (req: Request, res: Response, next: NextFuncti
 
 export const inwardedAWB = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { tripId, awbIds,checkinHub }: { tripId: number, awbIds:[] ,checkinHub:any } = req.body;
-    if(!awbIds){
-      throwValidationError([{message: "AWBID is mandatory"}]);
+    const { tripId, awbIds, checkinHub }: { tripId: number, awbIds: [], checkinHub: any } = req.body;
+    if (!awbIds) {
+      throwValidationError([{ message: "AWBID is mandatory" }]);
     }
-    if(!tripId){
-      throwValidationError([{message: "tripId is mandatory"}]);
+    if (!tripId) {
+      throwValidationError([{ message: "tripId is mandatory" }]);
     }
-    if(!checkinHub){
-      throwValidationError([{message: "checkinHub is mandatory"}]);
+    if (!checkinHub) {
+      throwValidationError([{ message: "checkinHub is mandatory" }]);
     }
-  
-    const getScannedArticlesResult = await tripService.inwardAWB(tripId,awbIds,checkinHub);
+
+    const getScannedArticlesResult = await tripService.inwardAWB(tripId, awbIds, checkinHub);
     res.status(HttpStatusCode.OK).json(buildNoContentResponse("success"));
   } catch (err) {
     console.error('Error getScannedArticles', err);
@@ -780,7 +777,7 @@ export const inwardedAWB = async (req: Request, res: Response, next: NextFunctio
 export const fileUpload = async (req: Request & { files?: { file: MulterFile[] } }, res: Response, next: NextFunction) => {
   try {
     if (!req.files || !req.files.file || req.files.file.length === 0) {
-      throwValidationError([{message: "No file uploaded"}]);
+      throwValidationError([{ message: "No file uploaded" }]);
       return
     }
 
@@ -789,20 +786,20 @@ export const fileUpload = async (req: Request & { files?: { file: MulterFile[] }
       return;
     }
     const type: string = req.body.type || 'defaultScreen';
-    const validType = ['DEPS','AWB','GST','ShippingLabel','TripCheckin'];
+    const validType = ['DEPS', 'AWB', 'GST', 'ShippingLabel', 'TripCheckin'];
     if (!validType.includes(type)) {
-      throwValidationError([{message: "Invalid type provided",key:`Type Should be: ${validType}.`}]);
+      throwValidationError([{ message: "Invalid type provided", key: `Type Should be: ${validType}.` }]);
     }
     const currentTimestamp: string = new Date().getTime().toString();
     const fileUploadPromises: Promise<string>[] = [];
 
-    const uploadDir = path.join(__dirname, '..','..', process.env.UPLOAD_DIR ||'uploads', type);
+    const uploadDir = path.join(__dirname, '..', '..', process.env.UPLOAD_DIR || 'uploads', type);
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
     }
 
     req.files.file.forEach((item: MulterFile) => {
-      const filePath = path.join( 'uploads', type, `${currentTimestamp}_${item.originalname}`);
+      const filePath = path.join('uploads', type, `${currentTimestamp}_${item.originalname}`);
 
       fileUploadPromises.push(
         new Promise((resolve, reject) => {
@@ -822,7 +819,7 @@ export const fileUpload = async (req: Request & { files?: { file: MulterFile[] }
     console.log(filePaths);
     const normalizedFilePaths = filePaths.map((filePath) => filePath.replace(/\\/g, '/'));
     console.log(normalizedFilePaths);
-    const fileUploadRes = await tripService.fileUploadRes(normalizedFilePaths,type);
+    const fileUploadRes = await tripService.fileUploadRes(normalizedFilePaths, type);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(fileUploadRes));
     return
 
@@ -834,9 +831,9 @@ export const fileUpload = async (req: Request & { files?: { file: MulterFile[] }
 
 export const getDepsLists = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const AWBId:number=req.body.AWBId
+    const AWBId: number = req.body.AWBId
     if (!AWBId) {
-      throwValidationError([{message: "AWBCode is mandatory"}]);
+      throwValidationError([{ message: "AWBCode is mandatory" }]);
     }
     const getDepsListsResult = await tripService.getDepsLists(AWBId);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getDepsListsResult));
@@ -848,15 +845,15 @@ export const getDepsLists = async (req: Request, res: Response, next: NextFuncti
 
 export const addDeps = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const DEPSData:DEPS[]=req.body.DEPSData
-    if(DEPSData.length>1){
-      throwValidationError([{message: "Add only one DEPS"}]);
+    const DEPSData: DEPS[] = req.body.DEPSData
+    if (DEPSData.length > 1) {
+      throwValidationError([{ message: "Add only one DEPS" }]);
     }
-    const fileIds:any=req.body.fileIds
-    if (!DEPSData || DEPSData.length==0) {
-      throwValidationError([{message: "DEPSData is mandatory"}]);
+    const fileIds: any = req.body.fileIds
+    if (!DEPSData || DEPSData.length == 0) {
+      throwValidationError([{ message: "DEPSData is mandatory" }]);
     }
-    const addDepsResult = await tripService.addDeps(DEPSData,fileIds);
+    const addDepsResult = await tripService.addDeps(DEPSData, fileIds);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(addDepsResult));
   } catch (err) {
     console.error('Error getDepsLists', err);
@@ -864,12 +861,12 @@ export const addDeps = async (req: Request, res: Response, next: NextFunction) =
   }
 }
 
-export const generatePDF = async (req: Request, res: Response, next: NextFunction) => {
+export const pdfGenerateAWB = async (req: Request, res: Response, next: NextFunction) => {
   try {
-   
-    const AWBId=req.body.AWBId
-    if (!AWBId || AWBId.length==0) {
-      throwValidationError([{message: "AWB ID is mandatory"}]);
+
+    const AWBId = req.body.AWBId
+    if (!AWBId || AWBId.length == 0) {
+      throwValidationError([{ message: "AWB ID is mandatory" }]);
     }
     // const pricing = await pricingServices.pricingModule(AWBId);
     // console.log(pricing,"pricing controller")
@@ -887,14 +884,14 @@ export const generatePDF = async (req: Request, res: Response, next: NextFunctio
     // }
 
     const pdfData = await AWBService.getAwbPdfData(AWBId);
-    const path = await pdfGenerator(pdfData);
+    const path = await AWBPdfGenerator(pdfData);
 
-    const fileUploadRes = await tripService.fileUploadRes([path],'AWB');
+    const fileUploadRes = await tripService.fileUploadRes([path], 'AWB');
     await AWBService.awbEntry(AWBId, fileUploadRes[0].fileId);
 
-    let response= {
-      "fileName":`${pdfData?.AWBCode}`,
-      "pdfPath":path
+    let response = {
+      "fileName": `${pdfData?.AWBCode}`,
+      "pdfPath": path
     }
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(response));
   } catch (err) {
@@ -905,9 +902,9 @@ export const generatePDF = async (req: Request, res: Response, next: NextFunctio
 
 export const getSKUs = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const consignorId:number=req.body.consignorId
+    const consignorId: number = req.body.consignorId
     if (!consignorId) {
-      throwValidationError([{message: "consignorId is mandatory"}]);
+      throwValidationError([{ message: "consignorId is mandatory" }]);
     }
     const getSKUsResult = await AWBService.getSKUs(consignorId);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getSKUsResult));
@@ -919,9 +916,9 @@ export const getSKUs = async (req: Request, res: Response, next: NextFunction) =
 
 export const getBoxTypes = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const consignorId:number=req.body.consignorId
+    const consignorId: number = req.body.consignorId
     if (!consignorId) {
-      throwValidationError([{message: "consignorId is mandatory"}]);
+      throwValidationError([{ message: "consignorId is mandatory" }]);
     }
     const getBoxTypesResult = await AWBService.getBoxTypes(consignorId);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getBoxTypesResult));
@@ -931,31 +928,74 @@ export const getBoxTypes = async (req: Request, res: Response, next: NextFunctio
   }
 }
 
-export const generateTripsPDF = async (req: Request, res: Response, next: NextFunction) => {
+export const pdfGenerateTrips = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const {tripId, tripLineItemStatus ,locationId } = req.body; 
-    if (!tripId || tripId.length==0) {
-      throwValidationError([{message: "Trip ID is mandatory"}]);
+    const { tripId, tripLineItemStatus, locationId } = req.body;
+    if (!tripId || tripId.length == 0) {
+      throwValidationError([{ message: "Trip ID is mandatory" }]);
     }
-    if (!tripLineItemStatus || tripLineItemStatus.length==0) {
-      throwValidationError([{message: "TripLineItemStatus is mandatory"}]);
+    if (!tripLineItemStatus || tripLineItemStatus.length == 0) {
+      throwValidationError([{ message: "TripLineItemStatus is mandatory" }]);
     }
-    if (!locationId || locationId.length==0) {
-      throwValidationError([{message: "Location ID Details is mandatory"}]);
+    if (!locationId || locationId.length == 0) {
+      throwValidationError([{ message: "Location ID Details is mandatory" }]);
+    }
+
+    const tripDetails = await tripService.getTripDetails(tripId);
+    const tripsPdfData = [];
+
+    for (const trip of tripDetails) {
+      let tripLineItems
+
+      if (tripLineItemStatus === "Assigned") {
+        const loadLocationId = locationId;
+        tripLineItems = await tripService.getTripLineItems(tripId, tripLineItemStatus, loadLocationId, null);
+      } else if (tripLineItemStatus === "Open") {
+        const unloadLocationId = locationId;
+        tripLineItems = await tripService.getTripLineItems(tripId, tripLineItemStatus, null, unloadLocationId);
+      }
+
+      const tripData = {
+        tripDetails: trip,
+        tripLineItems: tripLineItems,
+      };
+      tripsPdfData.push(tripData);
     }
 
 
-    const tripsData = await tripService.getTripsPdfData(tripId, tripLineItemStatus, locationId );
-    const path = await tripsPdfGenerator(tripsData);
+    const path = await tripsPdfGenerator(tripsPdfData);
 
     let response = {
-      "fileName" : tripsData.length > 0 ? `${tripsData[0]?.tripDetails?.tripCode}` : 'trips_report.pdf',
-      "pdfPath" : path, 
+      "fileName": tripsPdfData.length > 0 ? `${tripsPdfData[0]?.tripDetails?.tripCode}` : 'trips_report.pdf',
+      "pdfPath": path,
     };
 
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(response));
   } catch (err) {
     console.error('Error generating trips PDF', err);
-    next(err); 
+    next(err);
+  }
+};
+
+
+export const pdfGenerateTripHire = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { tripId } = req.body;
+    if (!tripId || tripId.length == 0) {
+      throwValidationError([{ message: "Trip ID is mandatory" }]);
+    }
+
+    const tripsData = await tripService.getTripDetails(tripId);
+    const path = await tripHirePdfGenerator(tripsData);
+
+    let response = {
+      "fileName": 'trip_hire.pdf',
+      "pdfPath": path,
+    };
+
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(response));
+  } catch (err) {
+    console.error('Error generating trips PDF', err);
+    next(err);
   }
 };

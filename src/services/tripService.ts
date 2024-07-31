@@ -860,32 +860,4 @@ export const tripLineItemScanCountReset=async(tripId: number)=>{
   });
 }
 
-export const getTripsPdfData = async (tripId: number, tripLineItemStatus: any , locationId: number) => {
-  try {
-    const trips = await getTripDetails(tripId);
-    const tripsPdfData = [];
 
-    for (const trip of trips) {
-      let tripLineItems
-      
-      if(tripLineItemStatus === "Assigned"){
-        const loadLocationId = locationId;
-        tripLineItems = await getTripLineItems(tripId, tripLineItemStatus,loadLocationId,null);
-      }else if(tripLineItemStatus === "Open")
-      {
-        const unloadLocationId = locationId;
-        tripLineItems = await getTripLineItems(tripId, tripLineItemStatus,null,unloadLocationId);
-      }
-      
-      const tripData = {
-        tripDetails: trip,
-        tripLineItems: tripLineItems,
-      };
-      tripsPdfData.push(tripData);
-    }
-    return tripsPdfData;
-  } catch (error) {
-    console.error('Error fetching trips PDF data:', error);
-    throw error;
-  }
-};

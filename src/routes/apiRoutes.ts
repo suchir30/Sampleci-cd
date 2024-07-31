@@ -52,10 +52,11 @@ router.post('/inwardedAWB',apiController.inwardedAWB)
 router.post('/fileUpload',upload.fields([{name: 'file', maxCount: 6}]),apiController.fileUpload)
 router.post('/getDepsLists',apiController.getDepsLists)
 router.post('/addDeps',apiController.addDeps)
-router.post('/generatePDF', apiController.generatePDF)
+router.post('/generatePDF', apiController.pdfGenerateAWB)
 router.post('/getSKUs', apiController.getSKUs)
 router.post('/getBoxTypes', apiController.getBoxTypes)
-router.post('/generateTripsPDF', apiController.generateTripsPDF)
+router.post('/generateTripsPDF', apiController.pdfGenerateTrips)
+router.post('/generateTripHirePDF', apiController.pdfGenerateTripHire)
 
 
 

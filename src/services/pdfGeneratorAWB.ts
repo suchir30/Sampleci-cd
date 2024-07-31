@@ -13,7 +13,7 @@ type VfsFonts = {
 
 (pdfMake as any).vfs = vfsFonts.pdfMake.vfs;
 
-export const pdfGenerator = async (pdfData: any): Promise<string> => {
+export const AWBPdfGenerator = async (pdfData: any): Promise<string> => {
     const logoPath = path.join(__dirname, '../assests/logo.jpg');
     const logoBase64 = fs.readFileSync(logoPath, { encoding: 'base64' });
 
