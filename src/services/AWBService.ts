@@ -645,7 +645,7 @@ export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem
                             numOfArticles: item.numOfArticles,
                             articleWeightKg: item.articleWeightKg,
                             weightKgs: (item.numOfArticles ?? 0) * (item.articleWeightKg ?? 0),
-                            volume: (item.lengthCms ?? 0) * (item.breadthCms ?? 0) * (item.heightCms ?? 0),
+                            volume: ((item.lengthCms ?? 0) * (item.breadthCms ?? 0) * (item.heightCms ?? 0)) * (item.numOfArticles ?? 0),
                             actualFactorWeight: (item.numOfArticles ?? 0) * (item.articleWeightKg ?? 0) * (factorRes.actualWeightFactor!),
                             volumetricFactorWeight: (item.numOfArticles ?? 0) * (item.articleWeightKg ?? 0) * (factorRes.volumetricWeightFactor!),
                             SKUId: item.SKUId,

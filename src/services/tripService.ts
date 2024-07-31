@@ -157,7 +157,7 @@ export const unloadArticlesValidate = async (AWBId:string,AWBArticleId:string,tr
               AWBId:true,
               tripId:true,
               unloadLocationId:true,
-              nextBranch:{
+              unloadLocation:{
                   select:{
                       id:true,
                       branchName:true
@@ -193,7 +193,7 @@ export const unloadArticlesValidate = async (AWBId:string,AWBArticleId:string,tr
         }
         else{
           console.log("invalid")
-          return tripLineItemRes?.nextBranch?.branchName
+          return tripLineItemRes?.unloadLocation?.branchName
         }
       })
       return result
@@ -241,7 +241,7 @@ export const loadArticlesValidate = async (AWBId:string,AWBArticleId:string,trip
                 }
               },
               status:true,
-              nextBranch:{
+              unloadLocation:{
                   select:{
                       id:true,
                       branchName:true
@@ -356,13 +356,13 @@ if (unloadLocationId) {
     const result = await prisma.tripLineItem.findMany({
       where: whereClause,
       orderBy:{
-        latestScanTime:'desc'
+        latestArticleScanTime:'desc'
       },
       select:{
         id:true,
         rollupScanCount:true,
         rollupDepsCount:true,
-        latestScanTime:true,
+        latestArticleScanTime:true,
         unloadLocationId:true,
         loadLocationId:true,
         finalDestinationId:true,
@@ -407,7 +407,7 @@ if (unloadLocationId) {
 
           }
         },
-        nextBranch:{
+        unloadLocation:{
           select:{
             id:true,
             branchName:true,
@@ -438,7 +438,7 @@ if (unloadLocationId) {
       consignorName:item.AirWayBill?.consignor?.publicName,
       consigneeName:item.AirWayBill?.consignee?.consigneeName,
       loadLocation:item.loadlocation?.branchName,
-      unloadLocation:item.nextBranch?.branchName,
+      unloadLocation:item.unloadLocation?.branchName,
       finalDestinationCode:item.finalBranch?.branchCode,
       awbFromLocationCOde: item.AirWayBill.fromBranch.branchCode,
       awbToLocationCOde: item.AirWayBill.toBranch.branchCode,
@@ -449,7 +449,7 @@ if (unloadLocationId) {
       numOfScan:item.rollupScanCount,
       rollupDepsCount:item.rollupDepsCount  ,
       numberOfArticles: item.AirWayBill.numOfArticles,
-      latestScanTime:item.latestScanTime
+      latestScanTime:item.latestArticleScanTime
     }));
     return finalResult;
 };
@@ -502,7 +502,7 @@ export const addAWBArticleLogs = async (AWBArticleCode: any, scanType: any, trip
         },
         data: {
           rollupScanCount: countQuery.length,
-          latestScanTime: today
+          latestArticleScanTime: today
         }
       });
 
@@ -637,7 +637,7 @@ export const getScannedArticles = async (AWBId:number,tripId:number,scanType:any
     where: {
       tripId: tripId,
       scanType:scanType,
-      AwbArticle: {
+      AWBArticle: {
         AWB: {
           id: AWBId,
         },
@@ -645,7 +645,7 @@ export const getScannedArticles = async (AWBId:number,tripId:number,scanType:any
     },
     select: {
       scanType:true,
-      AwbArticle: {
+      AWBArticle: {
         select: {
           id: true,
           articleCode: true,
@@ -673,7 +673,7 @@ export const getScannedArticles = async (AWBId:number,tripId:number,scanType:any
     },
   });
   const transformedResult = getScannedArticlesRes.map((log,index) => {
-    const awb = log.AwbArticle.AWB;
+    const awb = log.AWBArticle.AWB;
     return {
       scanType:log.scanType,
       awbId: awb.id,
@@ -685,8 +685,8 @@ export const getScannedArticles = async (AWBId:number,tripId:number,scanType:any
       numOfScan:index+1,
       numOfArticles: awb.numOfArticles,
       count:index+1 +"/"+awb.numOfArticles,
-      articleCode: log.AwbArticle.articleCode,
-      articleId: log.AwbArticle.id 
+      articleCode: log.AWBArticle.articleCode,
+      articleId: log.AWBArticle.id 
     };
   });
   return transformedResult;
@@ -740,7 +740,7 @@ export const outwardAWB = async (tripId: number, data: any, checkinHub: number) 
 
         const existingRecord = await prisma.hLFLineItem.findFirst({
           where: {
-            hlfLineItemAWBId: item.AWBId,
+            HLFLineItemAWBId: item.AWBId,
           },
           orderBy: {
             id: 'desc',
@@ -748,20 +748,20 @@ export const outwardAWB = async (tripId: number, data: any, checkinHub: number) 
         });
 
         if (existingRecord) {
-          if (existingRecord.hlfLineStatus == "Inwarded") {
+          if (existingRecord.HLFLineStatus == "Inwarded") {
             await prisma.hLFLineItem.updateMany({
               where: {
-                hlfLineItemAWBId: item.AWBId,
+                HLFLineItemAWBId: item.AWBId,
               },
               data: {
-                hlfLineStatus: 'Outwarded',
+                HLFLineStatus: 'Outwarded',
               },
             });
 
             await prisma.hLFLineItem.create({
               data: {
-                hlfLineItemAWBId: item.AWBId,
-                hlfLineStatus: 'ToBeInwarded',
+                HLFLineItemAWBId: item.AWBId,
+                HLFLineStatus: 'ToBeInwarded',
                 branchId: item.unloadLocationId,
               },
             });
@@ -769,8 +769,8 @@ export const outwardAWB = async (tripId: number, data: any, checkinHub: number) 
         } else {
           await prisma.hLFLineItem.create({
             data: {
-              hlfLineItemAWBId: item.AWBId,
-              hlfLineStatus: 'ToBeInwarded',
+              HLFLineItemAWBId: item.AWBId,
+              HLFLineStatus: 'ToBeInwarded',
               branchId: item.unloadLocationId,
             },
           });
@@ -833,13 +833,13 @@ export const inwardAWB = async (tripId: number, awbIds: number[], checkinHub: an
   
         await prisma.hLFLineItem.updateMany({
           where: {
-            hlfLineItemAWBId: {
+            HLFLineItemAWBId: {
               in: awbIds
             },
-            hlfLineStatus: "ToBeInwarded"
+            HLFLineStatus: "ToBeInwarded"
           },
           data: {
-            hlfLineStatus: 'Inwarded'
+            HLFLineStatus: 'Inwarded'
           }
         });
       

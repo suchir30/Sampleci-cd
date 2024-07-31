@@ -139,6 +139,7 @@ model Consignee {
   distanceToBranchKms Int?
   odaType             String?         @db.VarChar(255)
   tatNumber           Int?
+  PINCodeId           Int?
   createdOn           DateTime?       @default(now())
   modifiedOn          DateTime?       @updatedAt
   AWBs                AirWayBill[]    @relation("AWBConsignee")
@@ -153,70 +154,76 @@ enum AWBStatus {
 }
 
 model AirWayBill {
-  id                   Int            @id @default(autoincrement())
-  AWBCode              String         @db.VarChar(255)
-  consignorId          Int
-  consignor            Consignor      @relation("AWBConsignor", fields: [consignorId], references: [consignorId])
-  consigneeId          Int?
-  consignee            Consignee?     @relation("AWBConsignee", fields: [consigneeId], references: [consigneeId])
-  fromBranchId         Int
-  toBranchId           Int
-  fromBranch           Branch         @relation("AWBFromBranch", fields: [fromBranchId], references: [id])
-  toBranch             Branch         @relation("AWBToBranch", fields: [toBranchId], references: [id])
-  numOfArticles        Int
-  invoiceNumber        String?        @db.VarChar(255)
-  invoiceValue         Float?         @db.Float
-  ewayBillNumber       String?        @db.VarChar(255)
-  weightKgs            Float?         @db.Float
-  ratePerKg            Float?         @db.Float
-  rollupVolume         Float?         @db.Float
-  rollupWeight         Float?         @db.Float
-  rollupArticleCnt     Int?
-  rollupArticleWeightKg Float?        @db.Float
-  rollupChargedWtInKgs  Float?        @db.Float
-  chargedWeightWithCeiling Float?     @db.Float
-  grandTotal           Float?         @db.Float
-  rollupCwWeight       Float?         @db.Float    
-  rollupSKU            Float?         @db.Float     
-  subTotal             Float?         @db.Float
-  AWBStatus            AWBStatus      @default(PickUp)
-  articleGenFlag       Boolean        @default(false)
-  contractTypeId       Int?
-  contract             Contract?      @relation("AWBContractType", fields: [contractTypeId], references: [id])
-  appointmentDate      DateTime?
-  AWBPdf               Int?
-  FileUpload           FileUpload?    @relation("AWBFileAirWayBill", fields: [AWBPdf], references: [id])
-  CDM                  Float?         @db.Float
-  completeFlag         Boolean        @default(false)
-  createdOn            DateTime?      @default(now())
-  modifiedOn           DateTime?      @updatedAt
-  AWBLineItems         AwbLineItem[]
-  AWBArticles          AwbArticle[]
-  AWBIdTripLineItems   TripLineItem[] @relation("AWBIdTripLineItem")
-  hlfLineAWBIds        HLFLineItem[]  @relation("hlfLineAWBId")
-  depsAWBIds           DEPS[]         @relation("depsAWBId")
+  id                       Int            @id @default(autoincrement())
+  AWBCode                  String         @db.VarChar(255)
+  consignorId              Int
+  consignor                Consignor      @relation("AWBConsignor", fields: [consignorId], references: [consignorId])
+  consigneeId              Int?
+  consignee                Consignee?     @relation("AWBConsignee", fields: [consigneeId], references: [consigneeId])
+  fromBranchId             Int
+  toBranchId               Int
+  fromBranch               Branch         @relation("AWBFromBranch", fields: [fromBranchId], references: [id])
+  toBranch                 Branch         @relation("AWBToBranch", fields: [toBranchId], references: [id])
+  numOfArticles            Int
+  invoiceNumber            String?        @db.VarChar(255)
+  invoiceValue             Float?         @db.Float
+  ewayBillNumber           String?        @db.VarChar(255)
+ 
+  ratePerKg                Float?         @db.Float
+  rollupVolume             Float?         @db.Float
+  rollupWeight             Float?         @db.Float
+  rollupArticleCnt         Int?
+ 
+  rollupChargedWtInKgs     Float?         @db.Float
+  chargedWeightWithCeiling Float?         @db.Float
+  grandTotal               Float?         @db.Float
+ 
+  subTotal                 Float?         @db.Float
+  AWBStatus                AWBStatus      @default(PickUp)
+  articleGenFlag           Boolean        @default(false)
+  contractTypeId           Int?
+  contract                 Contract?      @relation("AWBContractType", fields: [contractTypeId], references: [id])
+  appointmentDate          DateTime?
+  AWBPdf                   Int?
+  FileUpload               FileUpload?    @relation("AWBFileAirWayBill", fields: [AWBPdf], references: [id])
+  CDM                      Float?         @db.Float
+  completeFlag             Boolean        @default(false)
+  createdOn                DateTime?      @default(now())
+  modifiedOn               DateTime?      @updatedAt
+  AWBLineItems             AwbLineItem[]
+  AWBArticles              AwbArticle[]
+  AWBIdTripLineItems       TripLineItem[] @relation("AWBIdTripLineItem")
+  hlfLineAWBIds            HLFLineItem[]  @relation("hlfLineAWBId")
+  depsAWBIds               DEPS[]         @relation("depsAWBId")
+   
+
+   
+  weightKgs                Float?         @db.Float
+  rollupArticleWeightKg    Float?         @db.Float
+  rollupCwWeight           Float?         @db.Float
+  rollupSKU                Float?         @db.Float
 }
 
 model AwbLineItem {
-  id                  Int        @id @default(autoincrement())
-  AWBId               Int
-  AWB                 AirWayBill @relation(fields: [AWBId], references: [id])
-  lineItemDescription String?    @db.VarChar(255)
-  numOfArticles       Int
-  articleWeightKg     Float?     @db.Float
-  weightKgs           Float?     @db.Float
-  actualFactorWeight  Float?     @db.Float
-  volumetricFactorWeight Float?  @db.Float
-  lengthCms           Float?     @db.Float
-  breadthCms          Float?     @db.Float
-  heightCms           Float?     @db.Float
-  volume              Float?     @db.Float
-  SKUId               Int?
-  SKUCode             String?
-  boxType             String?
-  ratePerBox          Float?     @db.Float
-  createdOn           DateTime?  @default(now())
-  modifiedOn          DateTime?  @updatedAt
+  id                     Int        @id @default(autoincrement())
+  AWBId                  Int
+  AWB                    AirWayBill @relation(fields: [AWBId], references: [id])
+  lineItemDescription    String?    @db.VarChar(255)
+  numOfArticles          Int
+  articleWeightKg        Float?     @db.Float
+  weightKgs              Float?     @db.Float
+  actualFactorWeight     Float?     @db.Float
+  volumetricFactorWeight Float?     @db.Float
+  lengthCms              Float?     @db.Float
+  breadthCms             Float?     @db.Float
+  heightCms              Float?     @db.Float
+  volume                 Float?     @db.Float
+  SKUId                  Int?
+  SKUCode                String?
+  boxType                String?
+  ratePerBox             Float?     @db.Float
+  createdOn              DateTime?  @default(now())
+  modifiedOn             DateTime?  @updatedAt
 }
 
 enum ArticleStatus {
@@ -247,6 +254,7 @@ enum BoxType {
   Pillow
   Box
 }
+
 model ConsignorRateTable {
   id          Int                 @id @default(autoincrement())
   consignorId Int?
@@ -284,15 +292,15 @@ model TripDetails {
   vehicle               VehicleMaster?       @relation("tripVehicleId", fields: [vehicleId], references: [id])
   driverId              Int?
   driver                DriverMaster?        @relation("tripDriverId", fields: [driverId], references: [id])
-  ftlLocalNumber        String?              @db.VarChar(255)
+  FTLLocalNumber        String?              @db.VarChar(255)
   originBranchId        Int?
-  branch                Branch?              @relation("tripBranchId", fields: [originBranchId], references: [id])
+  originBranch          Branch?              @relation("tripBranchId", fields: [originBranchId], references: [id])
   numberOfAwb           Int?
   numberOfArticles      Int?
   chargedWeight         Float?               @db.Float
   hireAmount            Float?               @db.Float
   advanceAmount         Float?               @db.Float
-  tdsAmount             Float?               @db.Float
+  TDSAmount             Float?               @db.Float
   balance               Float?               @db.Float
   openingKms            Float?               @db.Float
   closingKms            Float?               @db.Float
@@ -302,9 +310,9 @@ model TripDetails {
   invoiceStatus         String?              @db.VarChar(255)
   remarks               String?              @db.VarChar(255)
   paymentReqDate        DateTime?
-  utrDetails            String?              @db.VarChar(255)
+  UTRDetails            String?              @db.VarChar(255)
   ePODsCleared          Boolean?
-  originalPODReceived   Boolean?
+  originalPODsReceived   Boolean?
   createdOn             DateTime?            @default(now())
   modifiedOn            DateTime?            @updatedAt
   tripIdCheckins        TripCheckIn[]        @relation("tripIdCheckin")
@@ -347,7 +355,7 @@ model TripLineItem {
   tripId                   Int
   trip                     TripDetails          @relation("tripIdTripLineItem", fields: [tripId], references: [id])
   unloadLocationId         Int?
-  nextBranch               Branch?              @relation("nextBranchTripLineItem", fields: [unloadLocationId], references: [id])
+  unloadLocation           Branch?              @relation("nextBranchTripLineItem", fields: [unloadLocationId], references: [id])
   finalDestinationId       Int?
   finalBranch              Branch?              @relation("finalBranchTripLineItem", fields: [finalDestinationId], references: [id])
   status                   TripLineItemStatus   @default(Assigned)
@@ -356,7 +364,7 @@ model TripLineItem {
   loadlocation             Branch?              @relation("loadLocationCode", fields: [loadLocationId], references: [id])
   rollupScanCount          Int?
   rollupDepsCount          Int?
-  latestScanTime           DateTime?
+  latestArticleScanTime    DateTime?
   originalPODReceived      Boolean              @default(false)
   createdOn                DateTime?            @default(now())
   modifiedOn               DateTime?            @updatedAt
@@ -385,12 +393,12 @@ enum HLFLineItemStatus {
 
 model HLFLineItem {
   id               Int               @id @default(autoincrement())
-  hlfLineItemAWBId Int
-  AirWayBill       AirWayBill        @relation("hlfLineAWBId", fields: [hlfLineItemAWBId], references: [id])
-  hlfLineStatus    HLFLineItemStatus
+  HLFLineItemAWBId Int
+  AWB       AirWayBill        @relation("hlfLineAWBId", fields: [HLFLineItemAWBId], references: [id])
+  HLFLineStatus    HLFLineItemStatus
   branchId         Int?
   branch           Branch?           @relation("hlfLineBranchId", fields: [branchId], references: [id])
-  AWBCWeightInKgs  Float?            @db.Float
+  AWBWeightInKgs  Float?            @db.Float
   AWBVolumeInKgs   Float?            @db.Float
   createdOn        DateTime?         @default(now())
   modifiedOn       DateTime?         @updatedAt
@@ -413,7 +421,6 @@ model DEPS {
   id                   Int            @id @default(autoincrement())
   DEPSType             DEPSTypeList
   DEPSSubType          String         @db.VarChar(255)
-  createdOn            DateTime?      @default(now())
   AWBId                Int
   AirWayBill           AirWayBill     @relation("depsAWBId", fields: [AWBId], references: [id])
   loadingHubId         Int?
@@ -433,6 +440,8 @@ model DEPS {
   sealNumber           String?        @db.VarChar(255)
   depsStatus           DEPSStatus?
   caseComment          String         @db.VarChar(255)
+  createdOn            DateTime?      @default(now())
+  modifiedOn           DateTime?      @updatedAt
   depsImages           DEPSImages[]   @relation("depsImage")
 }
 
@@ -442,6 +451,7 @@ model DEPSImages {
   DEPS       DEPS       @relation("depsImage", fields: [depsId], references: [id])
   fileId     Int
   FileUpload FileUpload @relation("DEPSFiles", fields: [fileId], references: [id])
+  createdOn            DateTime?      @default(now())
 }
 
 enum FilesType {
@@ -458,6 +468,8 @@ model FileUpload {
   path                            String        @db.VarChar(255)
   sourceId                        String?       @db.VarChar(255)
   isDeleted                       Boolean       @default(false)
+  createdOn                       DateTime?     @default(now())
+  modifiedOn                      DateTime?     @updatedAt
   odometerImageTripCheckInRecords TripCheckIn[] @relation("odometerImageTripCheckInRecord")
   AWBFileAirWayBills              AirWayBill[]  @relation("AWBFileAirWayBill")
   DEPSFiles                       DEPSImages[]  @relation("DEPSFiles")
@@ -496,13 +508,13 @@ model Contract {
   minimumAWBValue             Float?                @db.Float
   docketChargeValue           Float?                @db.Float
   fovOfCoustomersInvoiceValue Float?
-  liabilityClause             String?             
+  liabilityClause             String?
   articleChargeMandatory      Float?                @db.Float
   articleChargeMinAmount      Float?                @db.Float
   articleChargeMaxAmount      Float?                @db.Float
   actualWeightFactor          Float?                @db.Float
   volumetricWeightFactor      Float?                @db.Float
-  cwCeiling                   Int?                 
+  cwCeiling                   Int?
   createdOn                   DateTime              @default(now())
   modifiedOn                  DateTime?             @updatedAt
   AWBContractTypes            AirWayBill[]          @relation("AWBContractType")
@@ -516,7 +528,7 @@ enum ArticleLogsScanType {
 model AwbArticleTripLogs {
   id             Int                 @id @default(autoincrement())
   AWBArticleId   Int
-  AwbArticle     AwbArticle          @relation("AWBArtId", fields: [AWBArticleId], references: [id])
+  AWBArticle     AwbArticle          @relation("AWBArtId", fields: [AWBArticleId], references: [id])
   tripId         Int
   TripDetails    TripDetails         @relation("AWBArticleLogsTripId", fields: [tripId], references: [id])
   tripLineItemId Int?
@@ -526,19 +538,19 @@ model AwbArticleTripLogs {
 }
 
 model SKU {
-  id            Int             @id @default(autoincrement())
+  id            Int        @id @default(autoincrement())
   consignorId   Int?
-  consignor     Consignor?      @relation("SKUConsignorId", fields: [consignorId], references: [consignorId])
-  SKUCode       String          @db.VarChar(255)
-  product       String?         @db.VarChar(255)
-  packSize      String?         @db.VarChar(255)
-  lengthCms     Float?          @db.Float
-  widthCms      Float?          @db.Float
-  heightCms     Float?          @db.Float
-  CDM           Float?          @db.Float
-  chargedWeight Float?          @db.Float
-  createdOn     DateTime        @default(now())
-  modifiedOn    DateTime?       @updatedAt
+  consignor     Consignor? @relation("SKUConsignorId", fields: [consignorId], references: [consignorId])
+  SKUCode       String     @db.VarChar(255)
+  product       String?    @db.VarChar(255)
+  packSize      String?    @db.VarChar(255)
+  lengthCms     Float?     @db.Float
+  widthCms      Float?     @db.Float
+  heightCms     Float?     @db.Float
+  CDM           Float?     @db.Float
+  chargedWeight Float?     @db.Float
+  createdOn     DateTime   @default(now())
+  modifiedOn    DateTime?  @updatedAt
 }
 
 //MASTER TABLES
@@ -623,8 +635,8 @@ model VendorMaster {
   stateId           Int?
   state             StateMaster?    @relation("vendorState", fields: [stateId], references: [id])
   Pincode           String?         @db.VarChar(255)
-  gstNumber         String?         @db.VarChar(255)
-  panNumber         String?         @db.VarChar(255)
+  GSTNumber         String?         @db.VarChar(255)
+  PANNumber         String?         @db.VarChar(255)
   contactPerson     String?         @db.VarChar(255)
   phone1            String?         @db.VarChar(255)
   phone2            String?         @db.VarChar(255)
@@ -635,10 +647,10 @@ model VendorMaster {
   bankAddress       String?         @db.VarChar(255)
   branchPincode     Int?
   accountNumber     Int?
-  ifscCode          String?         @db.VarChar(255)
-  tanNumber         String?         @db.VarChar(255)
+  IFSCCode          String?         @db.VarChar(255)
+  TANNumber         String?         @db.VarChar(255)
   servicesOffered   String?         @db.VarChar(255)
-  tdsPercentageSlab String?         @db.VarChar(255)
+  TDSPercentageSlab String?         @db.VarChar(255)
   createdOn         DateTime        @default(now())
   modifiedOn        DateTime?       @updatedAt
   vendorIDs         VehicleMaster[] @relation("vendorID")
@@ -647,10 +659,16 @@ model VendorMaster {
 
 model VehicleMaster {
   id                   Int           @id @default(autoincrement())
-  vehicleNum           String        @unique @db.VarChar(255)
+  vehicleNum        String           @unique @db.VarChar(255)
   vehicleType          String?       @db.VarChar(255)
   vehicleCapacity      String?       @db.VarChar(255)
   vehiclePermit        String?       @db.VarChar(255)
+  engineNumber         String?
+  chassisNumber        String?
+  insuranceValidDate   DateTime?
+  ownerName            String?
+  ownerPANCardNumber   String?
+  ownerAddress         String?
   createdOn            DateTime      @default(now())
   modifiedOn           DateTime?     @updatedAt
   vendorId             Int?
@@ -664,7 +682,9 @@ model DriverMaster {
   driverName    String          @db.VarChar(255)
   phone1        String?         @db.VarChar(255)
   licenseNumber String?         @db.VarChar(255)
-  panNumber     String?         @db.VarChar(255)
+  licenseExpiryDate DateTime?
+  placeOfIssueRTA      String?
+  PANNumber     String?         @db.VarChar(255)
   aadharNumber  String?         @db.VarChar(255)
   address1      String?         @db.VarChar(255)
   cityId        Int?

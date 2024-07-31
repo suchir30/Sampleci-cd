@@ -1,4 +1,4 @@
-driverName,phone1,licenseNumber,panNumber,aadharNumber,address1,cityId,stateId,districtId
+driverName,phone1,licenseNumber,PANNumber,aadharNumber,address1,cityId,stateId,districtId
 Nadiminti Satyanarayana,9949908731,a,BRHPN8632E,,"S/O APPALANAIDU,MR APPARAO COLONY,NUZUVID,KRISHNA,ANDHRA PRADESH-521201",1,1,1
 Edla Prashanth,9063229457,b,ENEPP9985C,,"C-140,MARIPEDA,RAMAPURAM,RAMPUR,WARANGAL,TELANGANA-506315",2,3,2
 Thonta Beemaiah,9948719668,c,CGLPB1777Q,,"2-63-1,KESARAM,MAMIDIPALLY,SHABAD,KV RANGAREDDY,TELANGANA-509217",3,1,4
