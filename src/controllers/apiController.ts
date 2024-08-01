@@ -440,7 +440,7 @@ export const updateAWB = async (req: Request, res: Response, next: NextFunction)
     if (!AWBId) {
       throwValidationError([{ message: "AWB ID is required" }]);
     }
-    const updateAWBRes = await AWBService.updateAWB(AWBId, consigneeId, appointmentDate, invoiceNumber, invoiceValue, ewayBillNumber);
+    const updateAWBRes = await AWBService.updateAWB(AWBId, consigneeId, appointmentDate, invoiceNumber, invoiceValue, ewayBillNumber,CDM);
     if (updateAWBRes == "NotExists") {
       throwValidationError([{ message: "Invalid AWB ID" }]);
     }

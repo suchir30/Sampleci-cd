@@ -306,20 +306,46 @@ export const getTripDetails = async (tripId: number) => {
       tripCode: true,
       route: true,
       latestCheckinHubId:true,
+      hireAmount:true,
+      advanceAmount:true,
+      TDSAmount:true,
+      balance:true,
+      originBranchId:true,
+      originBranch:{
+        select:{
+          id:true,
+          branchName:true
+        }
+      },
+      FTLLocalNumber:true,
       vehicle: {
         select: {
           vehicleNum: true,
+          vehicleType:true,
+          engineNumber:true,
+          chassisNumber:true,
+          insuranceValidDate:true,
+          ownerName:true,
+          ownerAddress:true,
+          ownerPANCardNumber:true
         },
       },
       driver: {
         select: {
           driverName: true,
           phone1: true,
+          address1:true,
+          licenseNumber:true,
+          licenseExpiryDate:true,
+          placeOfIssueRTA:true
         },
       },
       vendor:{
-        select:{vendorName:true,
+        select:{
+          vendorName:true,
           vendorCode:true,
+          address1:true,
+          phone1:true,
         }
       }
     },
@@ -329,14 +355,34 @@ export const getTripDetails = async (tripId: number) => {
     tripCode: trip.tripCode,
     route: trip.route,
     vehicleNum: trip.vehicle?.vehicleNum,
+    vehicleType: trip.vehicle?.vehicleType,
+    engineNumber: trip.vehicle?.engineNumber,
+    chassisNumber: trip.vehicle?.chassisNumber,
+    insuranceValidDate: trip.vehicle?.insuranceValidDate,
+    vehicleOwnerName: trip.vehicle?.ownerName,
+    vechicleOwnerAddress: trip.vehicle?.ownerAddress,
+    vehicleOwnerPANCardNumber: trip.vehicle?.ownerPANCardNumber,
+    hireAmount:trip.hireAmount,
+    advanceAmount:trip.advanceAmount,
+    TDSAmount:trip.TDSAmount,
+    balanceAmount:trip.balance,
+    originBrnachName:trip.originBranch?.branchName,
     driverName: trip.driver?.driverName,
     phone1: trip.driver?.phone1,
+    driverAddress:trip.driver?.address1,
+    driverlicenseNumber:trip.driver?.licenseNumber,
+    driverlicenseExpiryDate:trip.driver?.licenseExpiryDate,
+    placeOfIssueRTA:trip.driver?.placeOfIssueRTA,
     latestCheckinHub:trip.latestCheckinHubId,
-    vendorName:trip.vendor?.vendorName
+    FTLLocalNumber:trip.FTLLocalNumber,
+    vendorName:trip.vendor?.vendorName,
+    vendorCode:trip.vendor?.vendorCode,
+    vendorAddress:trip.vendor?.address1,
+    vendorPhone:trip.vendor?.phone1
+
   }));
 
-  return modifiedTripDetails;
-   
+  return modifiedTripDetails;   
 };
 
 export const getTripLineItems = async (tripId: number, tripLineItemStatus: any, loadLocationId?: any, unloadLocationId?: any) => {
