@@ -57,6 +57,7 @@ router.post('/getSKUs', apiController.getSKUs)
 router.post('/getBoxTypes', apiController.getBoxTypes)
 router.post('/generateTripsPDF', apiController.pdfGenerateTrips)
 router.post('/generateTripHirePDF', apiController.pdfGenerateTripHire)
+router.post('/insertConnectivityPlan', apiController.insertConnectivityPlan)
 
 
 

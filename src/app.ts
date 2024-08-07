@@ -9,7 +9,9 @@ import logger from './scripts/logger'; // Ensure logger import
 
 const app = express();
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads'))); // Serve static files
-app.use(express.json());// JSON body parser
+// app.use(express.json());// JSON body parser
+app.use(express.json({ limit: '10mb' })); // JSON body parser
+app.use(express.urlencoded({ limit: '10mb', extended: true })); // URL-encoded body parser
 // app.use(logRequests); // Log requests
 app.use(logResponses); // Log responses
 // app.use(logErrors); // Log errors

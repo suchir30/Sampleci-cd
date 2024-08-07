@@ -907,3 +907,92 @@ export const tripLineItemScanCountReset=async(tripId: number)=>{
 }
 
 
+
+import { connectivityPlanData } from '../types/connectivityDataType';
+async function fetchIds(connectivityPlan: connectivityPlanData) {
+  const awb = await prisma.airWayBill.findFirst({ where: { AWBCode: connectivityPlan.AWBCode } });
+  const trip = await prisma.tripDetails.findFirst({ where: { tripCode: connectivityPlan.tripCode } });
+  const loadLocation = await prisma.branch.findFirst({ where: { branchCode: connectivityPlan.loadLocation } });
+  const unloadLocation = await prisma.branch.findFirst({ where: { branchCode: connectivityPlan.unloadLocation } });
+
+  const errors: string[] = [];
+
+  if (!awb) errors.push('Invalid AWBCode');
+  if (!trip) errors.push('Invalid tripCode');
+  if (!loadLocation) errors.push('Invalid loadLocation');
+  if (!unloadLocation) errors.push('Invalid unloadLocation');
+
+  if (errors.length > 0) {
+    return { errors };
+  }
+
+  return {
+    AWBId: awb!.id,
+    tripId: trip!.id,
+    loadLocationId: loadLocation!.id,
+    unloadLocationId: unloadLocation!.id,
+  };
+}
+
+function removeDuplicates(connectivityPlans: connectivityPlanData[]) {
+  const seen = new Set();
+  const uniquePlans = [];
+  const duplicates = [];
+
+  for (const plan of connectivityPlans) {
+    const identifier = `${plan.AWBCode}-${plan.tripCode}-${plan.loadLocation}-${plan.unloadLocation}`;
+    if (!seen.has(identifier)) {
+      seen.add(identifier);
+      uniquePlans.push(plan);
+    } else {
+      duplicates.push(plan);
+    }
+  }
+
+  return { uniquePlans, duplicates };
+}
+
+export async function insertConnectivityPlan(connectivityPlans: connectivityPlanData[]) {
+  const { uniquePlans, duplicates } = removeDuplicates(connectivityPlans);
+
+  const totalCount = connectivityPlans.length;
+  const responseObjects: (connectivityPlanData & { message: string, databaseId: number | null })[] = [];
+
+  for (const plan of uniquePlans) {
+    const ids = await fetchIds(plan);
+
+    if (ids && 'errors' in ids) {
+      responseObjects.push({ ...plan, message: `${ids.errors!.join(', ')}`, databaseId: null });
+    } else if (ids) {
+      try {
+        const insertedItem = await prisma.tripLineItem.create({
+          data: {
+            AWBId: ids.AWBId,
+            tripId: ids.tripId,
+            loadLocationId: ids.loadLocationId,
+            unloadLocationId: ids.unloadLocationId,
+          },
+        });
+        responseObjects.push({ ...plan,databaseId: insertedItem.id, message: 'Success' });
+      } catch (error) {
+        responseObjects.push({ ...plan,databaseId: null, message: 'Database Error' });
+      }
+    }
+  }
+
+  for (const plan of duplicates) {
+    responseObjects.push({ ...plan,databaseId: null, message: 'Duplicate'});
+  }
+
+  const successCount = responseObjects.filter(obj => obj.message === 'Success').length;
+  const failureCount = responseObjects.filter(obj => obj.message.startsWith('Invalid') || obj.message === 'Database Error').length;
+  const duplicateCount = responseObjects.filter(obj => obj.message === 'Duplicate').length;
+
+  return {
+    totalCount,
+    successCount,
+    failureCount,
+    duplicateCount,
+    responseObjects
+  };
+}

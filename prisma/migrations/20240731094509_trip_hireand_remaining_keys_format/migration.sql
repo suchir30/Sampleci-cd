@@ -38,7 +38,7 @@ ALTER TABLE `TripLineItem`
     CHANGE COLUMN `latestScanTime` `latestArticleScanTime` DATETIME(3) NULL;
 
 -- AlterTable
-ALTER TABLE `VehicleMaster` ADD COLUMN `ChassisNumber` VARCHAR(191) NULL,
+ALTER TABLE `VehicleMaster` ADD COLUMN `chassisNumber` VARCHAR(191) NULL,
     ADD COLUMN `engineNumber` VARCHAR(191) NULL,
     ADD COLUMN `insuranceValidDate` DATETIME(3) NULL,
     ADD COLUMN `ownerAddress` VARCHAR(191) NULL,

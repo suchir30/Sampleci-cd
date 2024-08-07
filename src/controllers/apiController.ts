@@ -10,6 +10,7 @@ import * as tripService from '../services/tripService';
 import { AWBCreateData } from '../types/awbTypes';
 import { HttpStatusCode } from '../types/apiTypes';
 import { MulterFile } from '../types/multerTypes';
+import { connectivityPlanData } from '../types/connectivityDataType';
 import { Inwarded, Outwarded } from '../types/outwardInwardTypes';
 import { buildNoContentResponse, buildObjectFetchResponse, throwValidationError } from '../utils/apiUtils';
 import { Consignee, Consignor, AwbLineItem, DEPS } from '@prisma/client';
@@ -381,6 +382,7 @@ export const assignedTriptoAWB = async (req: Request, res: Response, next: NextF
     const tripId: number = req.body.tripId
     const status: string = req.body.status
     const loadLocationId: number = req.body.loadLocationId
+    const finalDestinationId: number = req.body.finalDestinationId  //toBranch(ConsigneeBranch)
     if (!AWBId) {
       throwValidationError([{ message: `Mandatory field AWBId is missing` }]);
     }
@@ -390,10 +392,11 @@ export const assignedTriptoAWB = async (req: Request, res: Response, next: NextF
     if (status != "Assigned") {
       throwValidationError([{ message: `Please check the status, it should be Assigned` }]);
     }
-    const finalDestinationId: number = req.body.finalDestinationId  //toBranch(ConsigneeBranch)
-
-    if (!AWBId || !tripId || !finalDestinationId) {
-      throwValidationError([{ message: "Mandatory fields are missing" }]);
+    if (!loadLocationId) {
+      throwValidationError([{ message: "Mandatory field loadLocation is missing" }]);
+    }
+    if (!finalDestinationId) {
+      throwValidationError([{ message: "Mandatory field finalDestination is missing" }]);
     }
     const assignedTriptoAWBResult = await AWBService.assignedTriptoAWB(AWBId, tripId, finalDestinationId, status, loadLocationId);
     if (assignedTriptoAWBResult == "Already EXists") {
@@ -996,6 +999,38 @@ export const pdfGenerateTripHire = async (req: Request, res: Response, next: Nex
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(response));
   } catch (err) {
     console.error('Error generating trips PDF', err);
+    next(err);
+  }
+};
+
+const validKeys = ['AWBCode', 'tripCode', 'loadLocation', 'unloadLocation'];
+const validateConnectivityPlanKeys = (plans: connectivityPlanData[]) => {
+  plans.forEach(plan => {
+    const keys = Object.keys(plan);
+    keys.forEach(key => {
+      if (!validKeys.includes(key)) {
+        throwValidationError([{ message: `Invalid key found: ${key}` }]);
+      }
+    });
+  });
+};
+
+export const insertConnectivityPlan = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const connectivityPlans:connectivityPlanData[] = req.body.connectivityPlans;
+
+    if (!Array.isArray(connectivityPlans) || connectivityPlans.length === 0) {
+      throwValidationError([{ message: "At least one record is mandatory" }]);
+    }
+
+    validateConnectivityPlanKeys(connectivityPlans);
+
+
+
+    const connectedDataRes = await tripService.insertConnectivityPlan(connectivityPlans);
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(connectedDataRes));
+  } catch (err) {
+    console.error('Error generating addBulkConnectivityPlan', err);
     next(err);
   }
 };
