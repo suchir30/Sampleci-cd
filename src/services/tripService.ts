@@ -962,26 +962,44 @@ export async function insertConnectivityPlan(connectivityPlans: connectivityPlan
     const ids = await fetchIds(plan);
 
     if (ids && 'errors' in ids) {
-      responseObjects.push({ ...plan, message: `${ids.errors!.join(', ')}`, databaseId: null });
+      responseObjects.push({ ...plan,databaseId: null, message: `${ids.errors!.join(', ')}` });
     } else if (ids) {
-      try {
-        const insertedItem = await prisma.tripLineItem.create({
-          data: {
-            AWBId: ids.AWBId,
-            tripId: ids.tripId,
-            loadLocationId: ids.loadLocationId,
-            unloadLocationId: ids.unloadLocationId,
-          },
-        });
-        responseObjects.push({ ...plan,databaseId: insertedItem.id, message: 'Success' });
-      } catch (error) {
-        responseObjects.push({ ...plan,databaseId: null, message: 'Database Error' });
+      // Check if tripId and AWBId already exist with status 'Assigned'
+      const existingItem = await prisma.tripLineItem.findFirst({
+        where: {
+          tripId: ids.tripId,
+          AWBId: ids.AWBId,
+          status: 'Assigned',
+        },
+        include:{
+          trip:{
+            select:{
+              tripCode:true
+            }
+          }
+        }
+      });
+      if (existingItem) {
+        responseObjects.push({ ...plan, databaseId: null, message: `AirWayBill is already assigned to another trip - ${existingItem.trip.tripCode}. Please close the AWB in the previous trip` });
+      } else {
+        try {
+          const insertedItem = await prisma.tripLineItem.create({
+            data: {
+              AWBId: ids.AWBId,
+              tripId: ids.tripId,
+              loadLocationId: ids.loadLocationId,
+              unloadLocationId: ids.unloadLocationId,
+            },
+          });
+          responseObjects.push({ ...plan, databaseId: insertedItem.id, message: 'Success' });
+        } catch (error) {
+          responseObjects.push({ ...plan, databaseId: null, message: 'Database Error' });
+        }
       }
     }
   }
-
   for (const plan of duplicates) {
-    responseObjects.push({ ...plan,databaseId: null, message: 'Duplicate'});
+    responseObjects.push({ ...plan, databaseId: null, message: 'Duplicate' });
   }
 
   const successCount = responseObjects.filter(obj => obj.message === 'Success').length;
