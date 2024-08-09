@@ -459,7 +459,10 @@ export const getUpdateAWB = async (AWBId: number) => {
               contractConsignorIds:{
                 select:{
                     consignorContractType:true,
-                    ContractType:true
+                    ContractType:true,
+                    actualWeightFactor:true,
+                    volumetricWeightFactor:true,
+                    cwCeiling:true
                 }
               }
             },
@@ -900,7 +903,10 @@ export const getSKUs = async (consignorId: number) => {
         id: true,
         SKUCode: true,
         product: true,
-        chargedWeight:true
+        chargedWeight:true,
+        lengthCms:true,
+        widthCms:true,
+        heightCms:true
       },
     });
     return SKUDetails;
