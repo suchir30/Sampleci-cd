@@ -1014,3 +1014,14 @@ export async function insertConnectivityPlan(connectivityPlans: connectivityPlan
     responseObjects
   };
 }
+
+
+export const updateTripLineItem=async(tripLineItemId:number,unloadLocationId:number)=>{
+  await prisma.tripLineItem.update({
+    where: {
+      id: tripLineItemId},
+    data: {
+      unloadLocationId:unloadLocationId
+    }
+  });
+}

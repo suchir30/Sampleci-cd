@@ -1034,3 +1034,23 @@ export const insertConnectivityPlan = async (req: Request, res: Response, next: 
     next(err);
   }
 };
+
+export const updateTripLineItem = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const tripLineItemId:number= req.body.tripLineItemId;
+    const unloadLocationId:number=req.body.unloadLocationId
+
+    if (!tripLineItemId) {
+      throwValidationError([{ message: "tripLineItemId is mandatory" }]);
+    }
+    
+    if (!unloadLocationId) {
+      throwValidationError([{ message: "unloadLocationId is mandatory" }]);
+    }
+    const connectedDataRes = await tripService.updateTripLineItem(tripLineItemId,unloadLocationId);
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(connectedDataRes));
+  } catch (err) {
+    console.error('Error updateTripLineItem', err);
+    next(err);
+  }
+};
