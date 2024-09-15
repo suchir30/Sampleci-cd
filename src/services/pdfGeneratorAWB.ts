@@ -2,9 +2,6 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import vfsFonts from 'pdfmake/build/vfs_fonts';
 import fs from 'fs';
 import path from 'path';
-import * as url from 'url';
-
-const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 type VfsFonts = {
     pdfMake: {

@@ -18,7 +18,6 @@ import { Consignee, Consignor, AwbLineItem, DEPS } from '@prisma/client';
 import { AWBPdfGenerator } from "../services/pdfGeneratorAWB";
 import { tripsPdfGenerator } from '../services/pdfGeneratorTrips';
 import { tripHirePdfGenerator } from '../services/pdfGeneratorTripHire';
-import * as url from 'url';
 
 
 import * as fileService from '../services/fileService'
@@ -26,16 +25,9 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import {
   S3Client,
   PutObjectCommand,
-  CreateBucketCommand,
-  DeleteObjectCommand,
-  DeleteBucketCommand,
-  paginateListObjectsV2,
-  GetObjectCommand,
+  GetObjectCommand
 } from "@aws-sdk/client-s3";
 import {UploadResult} from "../services/fileService.js";
-
-
-const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 export const getIndustryTypes = async (_req: Request, res: Response, next: NextFunction) => {
   try {
@@ -796,14 +788,15 @@ export const inwardAWBs = async (req: Request, res: Response, next: NextFunction
   }
 }
 
-export const fileUpload = async (req: Request & { files?: { file: MulterFile[] } }, res: Response, next: NextFunction) => {
+export const fileUpload = async (req: Request, res: Response, next: NextFunction) => {
+  const {files} = req as Request & { files?: { file: MulterFile[] } };
   try {
-    if (!req.files || !req.files.file || req.files.file.length === 0) {
+    if (!files || !files.file || files.file.length === 0) {
       throwValidationError([{ message: "No file uploaded" }]);
       return
     }
 
-    if (req.files.file.length > 6) {
+    if (files.file.length > 6) {
       throwValidationError([{ message: "Number of files exceeded. Maximum allowed: 6" }]);
       return;
     }
@@ -823,15 +816,15 @@ export const fileUpload = async (req: Request & { files?: { file: MulterFile[] }
     if (process.env.FILE_SOURCE === 'S3Bucket') {
       const s3Client = new S3Client({
         credentials:{
-          accessKeyId: process.env.S3_ACCESS_KEY_ID,
-          secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+          accessKeyId: process.env.S3_ACCESS_KEY_ID || "na",
+          secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || "na",
         },
-        region: process.env.S3_BUCKET_REGION
+        region: process.env.S3_BUCKET_REGION || "na"
       });
-      const expirationTime = eval(process.env.URL_EXPIRTAION_TIME);
+      const expirationTime = eval(process.env.URL_EXPIRTAION_TIME || "");
       const expirationDate = new Date(Date.now() + expirationTime * 1000);
 
-      for (const item of req.files.file) {
+      for (const item of files.file) {
         const fileName = `${currentTimestamp}_${item.originalname}`;
         const fileKey = `${type}/${fileName}`;
         let fileUrl ='';
@@ -863,7 +856,7 @@ export const fileUpload = async (req: Request & { files?: { file: MulterFile[] }
         }
       }
     } else if (process.env.FILE_SOURCE == 'Local'){
-      req.files.file.forEach((item: MulterFile) => {
+      files.file.forEach((item: MulterFile) => {
         const filePath = path.join('uploads', type, `${currentTimestamp}_${item.originalname}`);
         const uri = `${process.env.BASE_URL}/${filePath}`;
 
@@ -912,17 +905,17 @@ export const getFile = async (req: Request, res: Response, next: NextFunction) =
     let fileURI = file.uri;
 
     if (file.sourceType === 'S3Bucket') {
-      const expirationTime = eval(process.env.URL_EXPIRATION_TIME);
-      const fileExpiresInSeconds = (new Date(file.expiresOn).getTime() - Date.now()) / 1000;
+      const expirationTime = eval(process.env.URL_EXPIRATION_TIME || "na");
+      const fileExpiresInSeconds = (new Date(file.expiresOn || "na").getTime() - Date.now()) / 1000;
       const twoHoursInSeconds = 2 * 60 * 60;
 
       if (fileExpiresInSeconds <= twoHoursInSeconds) {
         const s3Client = new S3Client({
           credentials: {
-            accessKeyId: process.env.S3_ACCESS_KEY_ID,
-            secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+            accessKeyId: process.env.S3_ACCESS_KEY_ID || "na",
+            secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || "na",
           },
-          region: process.env.S3_BUCKET_REGION
+          region: process.env.S3_BUCKET_REGION || "na"
         });
 
         const getObjectParams = {
@@ -1002,7 +995,7 @@ export const pdfGenerateAWB = async (req: Request, res: Response, next: NextFunc
     const pdfData = await AWBService.getAwbPdfData(AWBId);
     const path = await AWBPdfGenerator(pdfData);
 
-    const fileUploadRes = await fileService.fileUploadRes([path], 'AWB');
+    const fileUploadRes = await fileService.fileUploadRes([], 'AWB');
     await AWBService.awbEntry(AWBId, fileUploadRes[0].fileId);
 
     let response = {
