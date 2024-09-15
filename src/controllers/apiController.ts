@@ -6,6 +6,7 @@ import * as consignorService from '../services/consignorService';
 import * as consigneeService from '../services/consigneeService';
 import * as AWBService from '../services/AWBService';
 import * as tripService from '../services/tripService';
+
 // import * as pricingServices from '../services/pricingServices';
 import { AWBCreateData } from '../types/awbTypes';
 import { HttpStatusCode } from '../types/apiTypes';
@@ -17,6 +18,24 @@ import { Consignee, Consignor, AwbLineItem, DEPS } from '@prisma/client';
 import { AWBPdfGenerator } from "../services/pdfGeneratorAWB";
 import { tripsPdfGenerator } from '../services/pdfGeneratorTrips';
 import { tripHirePdfGenerator } from '../services/pdfGeneratorTripHire';
+import * as url from 'url';
+
+
+import * as fileService from '../services/fileService'
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import {
+  S3Client,
+  PutObjectCommand,
+  CreateBucketCommand,
+  DeleteObjectCommand,
+  DeleteBucketCommand,
+  paginateListObjectsV2,
+  GetObjectCommand,
+} from "@aws-sdk/client-s3";
+import {UploadResult} from "../services/fileService.js";
+
+
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 export const getIndustryTypes = async (_req: Request, res: Response, next: NextFunction) => {
   try {
@@ -77,10 +96,12 @@ export const getPincodes = async (_req: Request, res: Response, next: NextFuncti
   }
 }
 
+
 export const getBranches = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const isHub: boolean = req.body.isHub;
-    const branches = await masterDataService.getBranches(isHub);
+    const isConsignorPickupPoint: boolean = req.body.isConsignorPickupPoint;
+    const branches = await masterDataService.getBranches(isHub,isConsignorPickupPoint);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(branches));
   } catch (err) {
     console.error('Error retrieving branches:', err);
@@ -733,8 +754,7 @@ export const getScannedArticles = async (req: Request, res: Response, next: Next
     next(err)
   }
 }
-
-export const outwardedAWB = async (req: Request, res: Response, next: NextFunction) => {
+export const outwardAWBs = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { tripId, data, checkinHub }: { tripId: number, data: Outwarded[], checkinHub: number } = req.body;
     if (!data) {
@@ -746,7 +766,7 @@ export const outwardedAWB = async (req: Request, res: Response, next: NextFuncti
     if (!checkinHub) {
       throwValidationError([{ message: "checkinHub is mandatory" }]);
     }
-    const getScannedArticlesResult = await tripService.outwardAWB(tripId, data, checkinHub);
+    const getScannedArticlesResult = await tripService.outwardAWBs(tripId, data, checkinHub);
     res.status(HttpStatusCode.OK).json(buildNoContentResponse("success"));
   } catch (err) {
     console.error('Error getScannedArticles', err);
@@ -754,11 +774,12 @@ export const outwardedAWB = async (req: Request, res: Response, next: NextFuncti
   }
 }
 
-export const inwardedAWB = async (req: Request, res: Response, next: NextFunction) => {
+export const inwardAWBs = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { tripId, awbIds, checkinHub }: { tripId: number, awbIds: [], checkinHub: any } = req.body;
-    if (!awbIds) {
-      throwValidationError([{ message: "AWBID is mandatory" }]);
+    const { tripId, data, checkinHub }: { tripId: number, data: { AWBId: number, tripLineItemId: number }[], checkinHub: any } = req.body;
+
+    if (!data || data.length === 0) {
+      throwValidationError([{ message: "AWB data is mandatory" }]);
     }
     if (!tripId) {
       throwValidationError([{ message: "tripId is mandatory" }]);
@@ -767,15 +788,13 @@ export const inwardedAWB = async (req: Request, res: Response, next: NextFunctio
       throwValidationError([{ message: "checkinHub is mandatory" }]);
     }
 
-    const getScannedArticlesResult = await tripService.inwardAWB(tripId, awbIds, checkinHub);
+    const getScannedArticlesResult = await tripService.inwardAWBs(tripId, data, checkinHub);
     res.status(HttpStatusCode.OK).json(buildNoContentResponse("success"));
   } catch (err) {
     console.error('Error getScannedArticles', err);
-    next(err)
+    next(err);
   }
 }
-
-
 
 export const fileUpload = async (req: Request & { files?: { file: MulterFile[] } }, res: Response, next: NextFunction) => {
   try {
@@ -794,43 +813,137 @@ export const fileUpload = async (req: Request & { files?: { file: MulterFile[] }
       throwValidationError([{ message: "Invalid type provided", key: `Type Should be: ${validType}.` }]);
     }
     const currentTimestamp: string = new Date().getTime().toString();
-    const fileUploadPromises: Promise<string>[] = [];
+    const fileUploadPromises: Promise<UploadResult>[] = [];
 
     const uploadDir = path.join(__dirname, '..', '..', process.env.UPLOAD_DIR || 'uploads', type);
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
     }
 
-    req.files.file.forEach((item: MulterFile) => {
-      const filePath = path.join('uploads', type, `${currentTimestamp}_${item.originalname}`);
+    if (process.env.FILE_SOURCE === 'S3Bucket') {
+      const s3Client = new S3Client({
+        credentials:{
+          accessKeyId: process.env.S3_ACCESS_KEY_ID,
+          secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+        },
+        region: process.env.S3_BUCKET_REGION
+      });
+      const expirationTime = eval(process.env.URL_EXPIRTAION_TIME);
+      const expirationDate = new Date(Date.now() + expirationTime * 1000);
 
-      fileUploadPromises.push(
-        new Promise((resolve, reject) => {
-          fs.writeFile(filePath, item.buffer, (err) => {
-            if (err) {
-              console.error('Error writing file:', err);
-              reject(err);
-            } else {
-              console.log(`File ${item.originalname} uploaded successfully`);
-              resolve(filePath);
-            }
-          });
-        })
-      );
-    });
-    const filePaths = await Promise.all(fileUploadPromises);
-    console.log(filePaths);
-    const normalizedFilePaths = filePaths.map((filePath) => filePath.replace(/\\/g, '/'));
-    console.log(normalizedFilePaths);
-    const fileUploadRes = await tripService.fileUploadRes(normalizedFilePaths, type);
+      for (const item of req.files.file) {
+        const fileName = `${currentTimestamp}_${item.originalname}`;
+        const fileKey = `${type}/${fileName}`;
+        let fileUrl ='';
+
+        const uploadParams = {
+          Bucket: process.env.S3_BUCKET_NAME,
+          Key: fileKey,
+          Body: item.buffer,
+          ContentType: item.mimetype,
+        };
+
+        try {
+          await s3Client.send(new PutObjectCommand(uploadParams))
+              .then((response) => {
+                fileUrl = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.S3_BUCKET_REGION}.amazonaws.com/${fileKey}`;
+                console.log(`File ${item.originalname} uploaded successfully to S3`);
+              })
+
+          const getObjectParams = {
+            Bucket: process.env.S3_BUCKET_NAME,
+            Key: fileKey,
+          };
+          const command = new GetObjectCommand(getObjectParams);
+          const signedUrl = await getSignedUrl(s3Client, command, {expiresIn: expirationTime});
+          fileUploadPromises.push(Promise.resolve({filePath: fileUrl, uri: signedUrl, expiresOn: expirationDate}));
+
+        } catch (err) {
+          fileUploadPromises.push(Promise.reject(err));
+        }
+      }
+    } else if (process.env.FILE_SOURCE == 'Local'){
+      req.files.file.forEach((item: MulterFile) => {
+        const filePath = path.join('uploads', type, `${currentTimestamp}_${item.originalname}`);
+        const uri = `${process.env.BASE_URL}/${filePath}`;
+
+        fileUploadPromises.push(
+            new Promise((resolve, reject) => {
+              fs.writeFile(filePath, item.buffer, (err) => {
+                if (err) {
+                  console.error('Error writing file:', err);
+                  reject(err);
+                } else {
+                  console.log(`File ${item.originalname} uploaded successfully`);
+                  resolve({filePath: filePath, uri:uri});
+                }
+              });
+            })
+        );
+      });
+    }
+
+    const results = await Promise.all(fileUploadPromises);
+    const fileUploadRes = await fileService.fileUploadRes(results, type);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(fileUploadRes));
-    return
 
   } catch (error) {
     console.error('Error in fileUpload:', error);
     next(error);
   }
 };
+
+export const getFile = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { fileId } = req.query;
+    if (!fileId || isNaN(Number(fileId))) {
+      throwValidationError([{ message: "Invalid or missing File ID" }]);
+    }
+    const numFileId = parseInt(fileId as string, 10);
+
+    const baseURL = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.S3_BUCKET_REGION}.amazonaws.com/`;
+    const fileDetails = await fileService.getFileDetails([numFileId]);
+
+    if (!fileDetails || fileDetails.length === 0) {
+      throwValidationError([{ message: "File not found" }]);
+    }
+
+    const file = fileDetails[0];
+    let fileURI = file.uri;
+
+    if (file.sourceType === 'S3Bucket') {
+      const expirationTime = eval(process.env.URL_EXPIRATION_TIME);
+      const fileExpiresInSeconds = (new Date(file.expiresOn).getTime() - Date.now()) / 1000;
+      const twoHoursInSeconds = 2 * 60 * 60;
+
+      if (fileExpiresInSeconds <= twoHoursInSeconds) {
+        const s3Client = new S3Client({
+          credentials: {
+            accessKeyId: process.env.S3_ACCESS_KEY_ID,
+            secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+          },
+          region: process.env.S3_BUCKET_REGION
+        });
+
+        const getObjectParams = {
+          Bucket: process.env.S3_BUCKET_NAME,
+          Key: file.path.replace(baseURL, ''),
+        };
+        const command = new GetObjectCommand(getObjectParams);
+        fileURI = await getSignedUrl(s3Client, command, { expiresIn: expirationTime });
+
+        const newExpirationTime = new Date(Date.now() + expirationTime * 1000);
+        await fileService.updateFileExpiration(file.id, newExpirationTime);
+      }
+    }
+
+    res.redirect(fileURI);
+  } catch (error) {
+    console.error('Error redirecting to file URI:', error);
+    next(error);
+  }
+}
+
 
 export const getDepsLists = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -889,7 +1002,7 @@ export const pdfGenerateAWB = async (req: Request, res: Response, next: NextFunc
     const pdfData = await AWBService.getAwbPdfData(AWBId);
     const path = await AWBPdfGenerator(pdfData);
 
-    const fileUploadRes = await tripService.fileUploadRes([path], 'AWB');
+    const fileUploadRes = await fileService.fileUploadRes([path], 'AWB');
     await AWBService.awbEntry(AWBId, fileUploadRes[0].fileId);
 
     let response = {
@@ -1043,7 +1156,7 @@ export const updateTripLineItem = async (req: Request, res: Response, next: Next
     if (!tripLineItemId) {
       throwValidationError([{ message: "tripLineItemId is mandatory" }]);
     }
-    
+
     if (!unloadLocationId) {
       throwValidationError([{ message: "unloadLocationId is mandatory" }]);
     }

@@ -22,22 +22,22 @@ export const getTrips = async (tripStatus:any,latestCheckinHubId:number,latestCh
           tripCode: true,
           route: true,
           tripStatus: true,
-          numberOfAwb:true, 
-          numberOfArticles:true, 
-          chargedWeight:true, 
-          openingKms:true, 
-          closingKms:true, 
-          totalKms:true, 
+          numberOfAwb:true,
+          numberOfArticles:true,
+          chargedWeight:true,
+          openingKms:true,
+          closingKms:true,
+          totalKms:true,
           tripClosingTime:true,
-          latestCheckinHubId:true, 
-          latestCheckinTime:true, 
+          latestCheckinHubId:true,
+          latestCheckinTime:true,
           latestCheckinType:true,
           driver:{
             select:{
                 id:true,
                 driverName:true,
                 phone1:true,
-                
+
             }
           },
           vehicle:{
@@ -48,13 +48,13 @@ export const getTrips = async (tripStatus:any,latestCheckinHubId:number,latestCh
             }
           },
         }
-       
+
       });
     return openTrips;
 };
 
 export const addTripCheckin = async (inwardTime:string, tripId:number, hubId:number, odometerReading:number,tripType:any,fileId:number) => {
-    const today =moment().toISOString();  
+    const today =moment().toISOString();
     const result=await prisma.$transaction(async prisma => {
         await prisma.tripCheckIn.create({
             data:{
@@ -83,11 +83,11 @@ export const addTripCheckin = async (inwardTime:string, tripId:number, hubId:num
 export const getTripCheckin = async (tripType:any) => {
     const openTrips = await prisma.tripCheckIn.findMany({
         select: {
-            id:true, 
-            tripId:true, 
-            type:true, 
-            locationBranchId:true, 
-            odometerReading:true, 
+            id:true,
+            tripId:true,
+            type:true,
+            locationBranchId:true,
+            odometerReading:true,
             time:true,
             trip:{
                 select:{
@@ -100,7 +100,7 @@ export const getTripCheckin = async (tripType:any) => {
                           id:true,
                           driverName:true,
                           phone1:true,
-                          
+
                       }
                     },
                     vehicle:{
@@ -112,8 +112,8 @@ export const getTripCheckin = async (tripType:any) => {
                     },
                 }
             }
-          
-            
+
+
         },
         where: {
             type:tripType
@@ -167,7 +167,7 @@ export const unloadArticlesValidate = async (AWBId:string,AWBArticleId:string,tr
           where: {
             AWBId:AWBIdRes?.id,
             tripId:tripId
-          }, 
+          },
           orderBy: {
               id: 'desc',
           },
@@ -180,14 +180,14 @@ export const unloadArticlesValidate = async (AWBId:string,AWBArticleId:string,tr
         const tripDetailsRes = await prisma.tripDetails.findFirst({
           where: {
             id: tripId
-          }, 
+          },
           orderBy: {
               id: 'desc',
           },
         });
         console.log(tripDetailsRes?.latestCheckinHubId,"validConditionss",tripLineItemRes?.unloadLocationId)
         if(tripDetailsRes?.latestCheckinHubId==tripLineItemRes?.unloadLocationId){
-       
+
           console.log("valid",tripLineItemRes?.id)
           return `Valid+${tripLineItemRes?.id}`
         }
@@ -259,7 +259,7 @@ export const loadArticlesValidate = async (AWBId:string,AWBArticleId:string,trip
           where: {
             AWBId: AWBIdRes?.id,
             tripId:tripId
-          }, 
+          },
           orderBy: {
               id: 'desc',
           },
@@ -271,7 +271,7 @@ export const loadArticlesValidate = async (AWBId:string,AWBArticleId:string,trip
         const tripDetailsRes = await prisma.tripDetails.findFirst({
           where: {
             id: tripId
-          }, 
+          },
           orderBy: {
               id: 'desc',
           },
@@ -290,7 +290,7 @@ export const loadArticlesValidate = async (AWBId:string,AWBArticleId:string,trip
             console.log("invalid")
             return tripLineItemRes?.loadlocation?.branchName
           }
-        
+
         }
       })
       return result
@@ -382,7 +382,7 @@ export const getTripDetails = async (tripId: number) => {
 
   }));
 
-  return modifiedTripDetails;   
+  return modifiedTripDetails;
 };
 
 export const getTripLineItems = async (tripId: number, tripLineItemStatus: any, loadLocationId?: any, unloadLocationId?: any) => {
@@ -493,7 +493,8 @@ if (unloadLocationId) {
       completeFlag: item.AirWayBill.completeFlag,
       TripLineItemStatus: item.status,
       numOfScan:item.rollupScanCount,
-      rollupDepsCount:item.rollupDepsCount  ,
+      rollupDepsCount:item.rollupDepsCount,
+      unloadLocationId:item.unloadLocationId,
       numberOfArticles: item.AirWayBill.numOfArticles,
       latestScanTime:item.latestArticleScanTime
     }));
@@ -501,7 +502,7 @@ if (unloadLocationId) {
 };
 
 export const addAWBArticleLogs = async (AWBArticleCode: any, scanType: any, tripId: number, tripLineItemId: number): Promise<string | void> => {
-  const today = moment().toISOString();  
+  const today = moment().toISOString();
 
   const result = await prisma.$transaction(async prisma => {
     const AWBArticleRes = await prisma.awbArticle.findFirst({
@@ -552,52 +553,16 @@ export const addAWBArticleLogs = async (AWBArticleCode: any, scanType: any, trip
         }
       });
 
-      
+
       return "Success";
     }
     else{
       return "Duplicate"
     }
-    return; 
+    return;
   });
 
-  return result; 
-};
-
-export const fileUploadRes = async (normalizedFilePaths: string[], type: string) => {
-  try {
-    const createdRecords = await prisma.$transaction(async (prisma) => {
-      const createPromises = normalizedFilePaths.map(async (filePath) => {
-        let data: any = {
-          path: filePath,
-          type: type,
-        };
-
-       
-        const result = await prisma.fileUpload.create({
-          data: data,
-        });
-
-        console.log(`Created ImageLinks record with ID: ${result.id}`);
-
-        return {
-          fileId: result.id,
-          filePath: result.path,
-          fileType: result.type,
-        }; 
-      });
-
-      const createdFiles = await Promise.all(createPromises);
-
-      return createdFiles; 
-     
-    });
-
-    return createdRecords;
-  } catch (error) {
-    console.error('Error creating or updating records:', error);
-    throw new Error('Failed to create or update records');
-  }
+  return result;
 };
 
 export const getDepsLists = async (AWBId: number) => {
@@ -631,12 +596,12 @@ export const getDepsLists = async (AWBId: number) => {
           }
         },
         AirWayBill:{select:{AWBCode:true}},
-        depsImages: { 
+        depsImages: {
           select: {
             id: true,
             fileId: true,
             depsId:true,
-            FileUpload: { 
+            FileUpload: {
               select: {
                 path: true,
                 type:true
@@ -644,7 +609,7 @@ export const getDepsLists = async (AWBId: number) => {
             }
           }
         }
-       
+
 
       }
     })
@@ -652,7 +617,7 @@ export const getDepsLists = async (AWBId: number) => {
 };
 
 export const addDeps = async (DEPSData:any,fileIds:any) => {
-   
+
    const result=await prisma.$transaction(async prisma => {
       const addDepsRes=await prisma.dEPS.createMany({
           data:DEPSData
@@ -661,7 +626,7 @@ export const addDeps = async (DEPSData:any,fileIds:any) => {
         const firstRecordId = (await prisma.dEPS.findFirst({
             where: { AWBId: DEPSData.AWBId },
             orderBy: { id: 'desc' },select: { id: true },
-            
+
         }));
         if (firstRecordId) {
           for (const fileId of fileIds) {
@@ -732,13 +697,13 @@ export const getScannedArticles = async (AWBId:number,tripId:number,scanType:any
       numOfArticles: awb.numOfArticles,
       count:index+1 +"/"+awb.numOfArticles,
       articleCode: log.AWBArticle.articleCode,
-      articleId: log.AWBArticle.id 
+      articleId: log.AWBArticle.id
     };
   });
   return transformedResult;
 };
 
-export const outwardAWB = async (tripId: number, data: any, checkinHub: number) => {
+export const outwardAWBs = async (tripId: number, data: any, checkinHub: number) => {
   const result = await prisma.$transaction(async (prisma) => {
   // Loop through each item in the data array
   for (const item of data) {
@@ -747,6 +712,7 @@ export const outwardAWB = async (tripId: number, data: any, checkinHub: number) 
         where: {
           AWBId: item.AWBId,
           tripId: tripId,
+          id:item.tripLineItemId
         },
         data: {
           status: 'Open',
@@ -761,12 +727,13 @@ export const outwardAWB = async (tripId: number, data: any, checkinHub: number) 
           AWBStatus: "outForDelivery",
         },
       });
-    } 
+    }
     else {// unloadLocationId is not "CONSIGNEE"
-     
+
         await prisma.tripLineItem.updateMany({
           where: {
             AWBId: item.AWBId,
+            id:item.tripLineItemId,
             tripId: tripId,
           },
           data: {
@@ -828,73 +795,133 @@ export const outwardAWB = async (tripId: number, data: any, checkinHub: number) 
   return result
 };
 
-export const inwardAWB = async (tripId: number, awbIds: number[], checkinHub: any) => {
+export const inwardAWBs = async (tripId: number, data: { AWBId: number, tripLineItemId: number }[], checkinHub: any) => {
   const result = await prisma.$transaction(async (prisma) => {
     if (checkinHub === "CONSIGNEE") {
-      await Promise.all(awbIds.map(async (AWBId) => {
-        await prisma.tripLineItem.updateMany({
+      await Promise.all(data.map(async (item) => {
+        await prisma.tripLineItem.update({
           where: {
-            tripId: tripId,
-            AWBId: AWBId
+            id: item.tripLineItemId,
           },
           data: {
             status: "Closed"
+          }
+        });
+
+        await prisma.airWayBill.update({
+          where: {
+            id: item.AWBId,
+          },
+          data: {
+            AWBStatus: "Delivered"
           }
         });
       }));
-  
-      await prisma.airWayBill.updateMany({
-        where: {
-          id: {
-            in: awbIds
-          }
-        },
-        data: {
-          AWBStatus: "Delivered"
-        }
-      });
-    }
-     else {
-     
-        await prisma.tripLineItem.updateMany({
+    } else {
+      await Promise.all(data.map(async (item) => {
+        await prisma.tripLineItem.update({
           where: {
-            tripId: tripId,
-            unloadLocationId: checkinHub
+            id: item.tripLineItemId,
           },
           data: {
             status: "Closed"
           }
         });
-  
-        await prisma.airWayBill.updateMany({
+
+        await prisma.airWayBill.update({
           where: {
-            id: {
-              in: awbIds
-            }
+            id: item.AWBId,
           },
           data: {
             AWBStatus: 'atHub'
           }
         });
-  
+
         await prisma.hLFLineItem.updateMany({
           where: {
-            HLFLineItemAWBId: {
-              in: awbIds
-            },
+            HLFLineItemAWBId: item.AWBId,
             HLFLineStatus: "ToBeInwarded"
           },
           data: {
             HLFLineStatus: 'Inwarded'
           }
         });
-      
+      }));
     }
-    
-})
- await tripLineItemScanCountReset(tripId)
- return result
+  });
+
+  await tripLineItemScanCountReset(tripId);
+  return result;
 };
+
+
+// export const inwardAWBs = async (tripId: number, awbIds: number[], checkinHub: any) => {
+//   const result = await prisma.$transaction(async (prisma) => {
+//     if (checkinHub === "CONSIGNEE") {
+//       await Promise.all(awbIds.map(async (AWBId) => {
+//         await prisma.tripLineItem.updateMany({
+//           where: {
+//             tripId: tripId,
+//             AWBId: AWBId
+//           },
+//           data: {
+//             status: "Closed"
+//           }
+//         });
+//       }));
+
+//       await prisma.airWayBill.updateMany({
+//         where: {
+//           id: {
+//             in: awbIds
+//           }
+//         },
+//         data: {
+//           AWBStatus: "Delivered"
+//         }
+//       });
+//     }
+//      else {
+
+//         await prisma.tripLineItem.updateMany({
+//           where: {
+//             tripId: tripId,
+//             unloadLocationId: checkinHub
+//           },
+//           data: {
+//             status: "Closed"
+//           }
+//         });
+
+//         await prisma.airWayBill.updateMany({
+//           where: {
+//             id: {
+//               in: awbIds
+//             }
+//           },
+//           data: {
+//             AWBStatus: 'atHub'
+//           }
+//         });
+
+//         await prisma.hLFLineItem.updateMany({
+//           where: {
+//             HLFLineItemAWBId: {
+//               in: awbIds
+//             },
+//             HLFLineStatus: "ToBeInwarded"
+//           },
+//           data: {
+//             HLFLineStatus: 'Inwarded'
+//           }
+//         });
+
+//     }
+
+// })
+//  await tripLineItemScanCountReset(tripId)
+//  return result
+// };
 
 export const tripLineItemScanCountReset=async(tripId: number)=>{
   await prisma.tripLineItem.updateMany({

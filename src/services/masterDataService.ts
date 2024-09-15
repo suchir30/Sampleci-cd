@@ -109,11 +109,18 @@ export const getPincodes = async () => {
   }
 }
 
-
-
-export const getBranches = async (isHub:boolean) => {
+export const getBranches = async (isHub?: boolean, isConsignorPickupPoint?: boolean) => {
   try {
-    const whereClause = isHub !== undefined ? { isHub: isHub } : {};
+    const whereClause: any = {};
+
+    // Add conditions dynamically based on the values of isHub and isPickupPoint
+    if (isHub !== undefined) {
+      whereClause.isHub = isHub;
+    }
+    if (isConsignorPickupPoint !== undefined) {
+      whereClause.isConsignorPickupPoint = isConsignorPickupPoint;
+    }
+
     const branches = await prisma.branch.findMany({
       where: whereClause,
       select: {
@@ -126,6 +133,7 @@ export const getBranches = async (isHub:boolean) => {
         phone1: true,
         phone2: true,
         isHub: true,
+        isConsignorPickupPoint: true, // Assuming you have this field in your schema
         district: {
           select: {
             name: true
@@ -136,11 +144,7 @@ export const getBranches = async (isHub:boolean) => {
             name: true
           }
         }
-      },
-      orderBy: {
-        branchName: 'asc' //sort the results by branchName 
       }
-      
     });
     return branches;
   } catch (error) {

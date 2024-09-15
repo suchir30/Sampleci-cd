@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import * as apiController from '../controllers/apiController';
-const multer = require('multer');
+import multer from 'multer';
+import {getFile} from "../controllers/apiController";
 const upload = multer({
   storage: multer.memoryStorage() // Use memory storage instead of disk storage
 });
@@ -19,6 +20,8 @@ router.get('/branch', apiController.getBranches);
 router.get('/consignor', apiController.getConsignors);
 router.get('/gstList', apiController.getGstList);
 router.get('/getEmployees', apiController.getEmployees);
+router.get('/getFile', apiController.getFile)
+
 
 // Model POST
 router.post('/getConsignorBranches', apiController.getConsignorBranches);
@@ -47,8 +50,8 @@ router.post('/getTripDetails',apiController.getTripDetails)
 router.post('/getTripLineItems',apiController.getTripLineItems)
 router.post('/addAWBArticleLogs',apiController.addAWBArticleLogs)
 router.post('/getScannedArticles',apiController.getScannedArticles)
-router.post('/outwardedAWB',apiController.outwardedAWB)
-router.post('/inwardedAWB',apiController.inwardedAWB)
+router.post('/outwardAWBs',apiController.outwardAWBs)
+router.post('/inwardAWBs',apiController.inwardAWBs)
 router.post('/fileUpload',upload.fields([{name: 'file', maxCount: 6}]),apiController.fileUpload)
 router.post('/getDepsLists',apiController.getDepsLists)
 router.post('/addDeps',apiController.addDeps)
@@ -59,7 +62,6 @@ router.post('/generateTripsPDF', apiController.pdfGenerateTrips)
 router.post('/generateTripHirePDF', apiController.pdfGenerateTripHire)
 router.post('/insertConnectivityPlan', apiController.insertConnectivityPlan)
 router.post('/updateTripLineItem', apiController.updateTripLineItem)
-
 
 
 export default router;

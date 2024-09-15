@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["views"]
 }
 
 datasource db {
@@ -50,8 +51,8 @@ model Branch {
   state                    StateMaster?         @relation("branchState", fields: [stateId], references: [id])
   phone1                   String?              @db.VarChar(255)
   phone2                   String?              @db.VarChar(255)
-  isHub                    Boolean
-  isWareHouse              Boolean?
+  isHub                    Boolean?             @default(false)
+  isConsignorPickupPoint   Boolean?
   isActive                 Boolean              @default(true)
   createdOn                DateTime             @default(now())
   consignors               Consignor[]          @relation("consignorBranch")
@@ -168,16 +169,16 @@ model AirWayBill {
   invoiceNumber            String?        @db.VarChar(255)
   invoiceValue             Float?         @db.Float
   ewayBillNumber           String?        @db.VarChar(255)
- 
+
   ratePerKg                Float?         @db.Float
   rollupVolume             Float?         @db.Float
   rollupWeight             Float?         @db.Float
   rollupArticleCnt         Int?
- 
+
   rollupChargedWtInKgs     Float?         @db.Float
   chargedWeightWithCeiling Float?         @db.Float
   grandTotal               Float?         @db.Float
- 
+
   subTotal                 Float?         @db.Float
   AWBStatus                AWBStatus      @default(PickUp)
   articleGenFlag           Boolean        @default(false)
@@ -195,9 +196,9 @@ model AirWayBill {
   AWBIdTripLineItems       TripLineItem[] @relation("AWBIdTripLineItem")
   hlfLineAWBIds            HLFLineItem[]  @relation("hlfLineAWBId")
   depsAWBIds               DEPS[]         @relation("depsAWBId")
-   
 
-   
+
+
   weightKgs                Float?         @db.Float
   rollupArticleWeightKg    Float?         @db.Float
   rollupCwWeight           Float?         @db.Float
@@ -462,12 +463,19 @@ enum FilesType {
   TripCheckin
 }
 
+enum SourceType {
+    Local
+    S3Bucket
+}
+
 model FileUpload {
   id                              Int           @id @default(autoincrement())
   type                            FilesType?
   path                            String        @db.VarChar(255)
-  sourceId                        String?       @db.VarChar(255)
+  sourceType                      SourceType?
   isDeleted                       Boolean       @default(false)
+  uri                             String        @db.VarChar(500)
+  expiresOn                       DateTime?
   createdOn                       DateTime?     @default(now())
   modifiedOn                      DateTime?     @updatedAt
   odometerImageTripCheckInRecords TripCheckIn[] @relation("odometerImageTripCheckInRecord")
@@ -699,3 +707,28 @@ model DriverMaster {
   modifiedOn    DateTime?       @updatedAt
   tripDriverIds TripDetails[]   @relation("tripDriverId")
 }
+
+
+
+
+
+
+
+//View Tables
+
+view ViewHubLoadFactor {
+    id                  Int         @id @unique
+    nscsAwb             String
+    numOfArticles       Int?
+    actualWeight        Float?
+    CDM                 Float?
+    chargedWeight       Float?
+    currentHub          String?
+    finalDestination    String?
+    status              String?
+    inwardedDate        DateTime?
+    awbDate             DateTime?
+    depsCount           Int?
+}
+
+

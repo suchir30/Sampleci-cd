@@ -2,6 +2,9 @@ import pdfMake, { fonts } from 'pdfmake/build/pdfmake.js';
 import vfsFonts from 'pdfmake/build/vfs_fonts.js';
 import fs from 'fs';
 import path from 'path';
+import * as url from 'url';
+
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 // Set the virtual file system for pdfmake
 (pdfMake as any).vfs = vfsFonts.pdfMake.vfs;

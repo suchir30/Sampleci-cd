@@ -1,0 +1,38 @@
+import { buildFeature, FeatureType, ComponentLoader } from 'adminjs';
+
+import { postActionHandler } from './utils.js';
+import { exportHandler } from './export.handler.js';
+import { importHandler } from './import.handler.js';
+import { bundleComponent } from './bundle-component.js';
+
+type ImportExportFeatureOptions = {
+  /**
+   * Your ComponentLoader instance. It is required for the feature to add it's components.
+   */
+  componentLoader: ComponentLoader;
+};
+
+const importExportFeature = (
+  options: ImportExportFeatureOptions
+): FeatureType => {
+  const { componentLoader } = options;
+  const importComponent1 = bundleComponent(componentLoader, 'ImportComponent');
+  const exportComponent1 = bundleComponent(componentLoader, 'ExportComponent');
+
+  return buildFeature({
+    actions: {
+      export: {
+        handler: postActionHandler(exportHandler),
+        component: exportComponent1,
+        actionType: 'resource',
+      },
+      import: {
+        handler: postActionHandler(importHandler),
+        component: importComponent1,
+        actionType: 'resource',
+      },
+    },
+  });
+};
+
+export default importExportFeature;

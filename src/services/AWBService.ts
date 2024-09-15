@@ -326,8 +326,10 @@ export const addAWBArticles = async (AWBId: number, numArticlesToAdd: number):Pr
         const count = await prisma.awbArticle.count({
             where: {
               AWBId: AWBId,
-              status: 'Created',
+              status: {
+                in: ['Created', 'Printed'], // Include only 'created' and 'printed' statuses
             },
+        },
           });
         if (numArticlesToAdd <= 0) {
             throw Error(`Article count should be positive. Got ${numArticlesToAdd}`);
@@ -437,6 +439,8 @@ export const getUpdateAWB = async (AWBId: number) => {
           consigneeId:true,
           AWBStatus:true,
           articleGenFlag:true,
+          fromBranchId:true,
+          toBranchId:true,
           CDM:true,
           AWBLineItems: {
             select: {

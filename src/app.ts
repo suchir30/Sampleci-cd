@@ -1,11 +1,14 @@
 import express from 'express';
 import path from 'path';
+import * as url from 'url';
 import authRoutes from './routes/authRoutes';
 import apiRoutes from './routes/apiRoutes';
 import { tokenAuth } from './middleware/auth';
 import {logResponses} from './middleware/loggerMiddleware'; // Import middleware
 import { handleErrors } from './middleware/errorHandler';
 import logger from './scripts/logger'; // Ensure logger import
+
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 const app = express();
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads'))); // Serve static files
