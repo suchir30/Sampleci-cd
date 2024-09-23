@@ -62,6 +62,7 @@ router.post('/generateTripsPDF', apiController.pdfGenerateTrips)
 router.post('/generateTripHirePDF', apiController.pdfGenerateTripHire)
 router.post('/insertConnectivityPlan', apiController.insertConnectivityPlan)
 router.post('/updateTripLineItem', apiController.updateTripLineItem)
+router.post('/deliverAWBCheck', apiController.deliverAWBCheck)
 
 
 export default router;

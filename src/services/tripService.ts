@@ -1052,3 +1052,18 @@ export const updateTripLineItem=async(tripLineItemId:number,unloadLocationId:num
     }
   });
 }
+
+export const deliverAWBCheck=async(AWBCode:string)=>{
+  let AWBRes=await prisma.airWayBill.findFirst({
+   where :{
+     AWBCode:AWBCode,
+     AWBStatus:"outForDelivery"
+   }
+  })
+  if(AWBRes){
+   return true
+  }
+  else{
+   return false
+  }
+ }

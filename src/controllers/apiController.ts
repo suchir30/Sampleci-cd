@@ -442,34 +442,38 @@ export const getUpdateAWB = async (req: Request, res: Response, next: NextFuncti
 
 export const updateAWB = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const AWBId: number = req.body.AWBId
-    const consigneeId: number = req.body.consigneeId
+    const AWBId: number = req.body.AWBId;
+    const consigneeId: number = req.body.consigneeId;
     const invoiceNumber: string = req.body.invoiceNumber;
     const invoiceValue: number = req.body.invoiceValue;
     const ewayBillNumber: string = req.body.ewayBillNumber;
-    const appointmentDate = new Date(req.body.appointmentDate);
-    const CDM:number=req.body.CDM
+    const CDM: number = req.body.CDM;
 
-    if (isNaN(appointmentDate.getTime())) {
-      throwValidationError([{ message: "Invalid appointment date(YYYY/MM/DD)" }]);
+    let appointmentDate: Date | null = null;
+    if (req.body.appointmentDate) {
+      appointmentDate = new Date(req.body.appointmentDate);
+      if (isNaN(appointmentDate.getTime())) {
+        throwValidationError([{ message: "Invalid appointment date (YYYY/MM/DD)" }]);
+      }
     }
 
     if (!AWBId) {
       throwValidationError([{ message: "AWB ID is required" }]);
     }
-    const updateAWBRes = await AWBService.updateAWB(AWBId, consigneeId, appointmentDate, invoiceNumber, invoiceValue, ewayBillNumber,CDM);
-    if (updateAWBRes == "NotExists") {
+
+    const updateAWBRes = await AWBService.updateAWB(AWBId, consigneeId, appointmentDate ? appointmentDate : undefined, invoiceNumber, invoiceValue, ewayBillNumber, CDM);
+    if (updateAWBRes === "NotExists") {
       throwValidationError([{ message: "Invalid AWB ID" }]);
-    }
-    else {
+    } else {
       res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWB Updated Successfully"));
     }
-
   } catch (err) {
     console.error('Error updateAWB', err);
-    next(err)
+    next(err);
   }
-}
+};
+
+
 
 export const updateAWBLineItem = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -1069,6 +1073,20 @@ export const updateTripLineItem = async (req: Request, res: Response, next: Next
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(connectedDataRes));
   } catch (err) {
     console.error('Error updateTripLineItem', err);
+    next(err);
+  }
+};
+
+export const deliverAWBCheck = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const AWBCode:string= req.body.AWBCode;
+    if (!AWBCode) {
+      throwValidationError([{ message: "AWBCode is mandatory" }]);
+    }
+    const connectedDataRes = await tripService.deliverAWBCheck(AWBCode);
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(connectedDataRes));
+  } catch (err) {
+    console.error('Error deliverAWBCheck', err);
     next(err);
   }
 };

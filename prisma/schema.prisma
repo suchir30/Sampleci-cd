@@ -53,7 +53,7 @@ model Branch {
   phone2                   String?              @db.VarChar(255)
   isHub                    Boolean?             @default(false)
   isConsignorPickupPoint   Boolean?
-  isActive                 Boolean              @default(true)
+  isActive                 Boolean?             @default(false)
   createdOn                DateTime             @default(now())
   consignors               Consignor[]          @relation("consignorBranch")
   consignees               Consignee[]          @relation("consigneeBranch")
@@ -264,7 +264,7 @@ model ConsignorRateTable {
   branch      Branch?             @relation("consignorRateBranch", fields: [branchId], references: [id])
   ratePerKg   Float?
   ratePerBox  Float?
-  boxType     BoxType?
+  boxType     String?
   status      RateConsignorStatus @default(PendingApproval)
   createdOn   DateTime?           @default(now())
   modifiedOn  DateTime?           @updatedAt
@@ -287,12 +287,12 @@ model TripDetails {
   route                 String?              @db.VarChar(255)
   costPerKg             String?              @db.VarChar(255)
   localTripNumber       String?              @db.VarChar(255)
-  vendorId              Int?
-  vendor                VendorMaster?        @relation("tripVendorCode", fields: [vendorId], references: [id])
-  vehicleId             Int?
-  vehicle               VehicleMaster?       @relation("tripVehicleId", fields: [vehicleId], references: [id])
-  driverId              Int?
-  driver                DriverMaster?        @relation("tripDriverId", fields: [driverId], references: [id])
+  vendorId              Int
+  vendor                VendorMaster         @relation("tripVendorCode", fields: [vendorId], references: [id])
+  vehicleId             Int 
+  vehicle               VehicleMaster        @relation("tripVehicleId", fields: [vehicleId], references: [id])
+  driverId              Int
+  driver                DriverMaster         @relation("tripDriverId", fields: [driverId], references: [id])
   FTLLocalNumber        String?              @db.VarChar(255)
   originBranchId        Int?
   originBranch          Branch?              @relation("tripBranchId", fields: [originBranchId], references: [id])
