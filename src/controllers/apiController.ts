@@ -28,6 +28,7 @@ import {
   GetObjectCommand
 } from "@aws-sdk/client-s3";
 import {UploadResult} from "../services/fileService.js";
+import {handleFileUpload, refreshSignedUrlIfNeeded} from "../services/fileService";
 
 export const getIndustryTypes = async (_req: Request, res: Response, next: NextFunction) => {
   try {
@@ -789,97 +790,31 @@ export const inwardAWBs = async (req: Request, res: Response, next: NextFunction
 }
 
 export const fileUpload = async (req: Request, res: Response, next: NextFunction) => {
-  const {files} = req as Request & { files?: { file: MulterFile[] } };
+  const { files } = req as Request & { files?: { file: MulterFile[] } };
+
   try {
     if (!files || !files.file || files.file.length === 0) {
-      throwValidationError([{ message: "No file uploaded" }]);
-      return
+      return throwValidationError([{ message: "No file uploaded" }]);
     }
 
     if (files.file.length > 6) {
-      throwValidationError([{ message: "Number of files exceeded. Maximum allowed: 6" }]);
-      return;
+      return throwValidationError([{ message: "Number of files exceeded. Maximum allowed: 6" }]);
     }
-    const type: string = req.body.type || 'defaultScreen';
-    const validType = ['DEPS', 'AWB', 'GST', 'ShippingLabel', 'TripCheckin'];
-    if (!validType.includes(type)) {
-      throwValidationError([{ message: "Invalid type provided", key: `Type Should be: ${validType}.` }]);
+
+    const type = req.body.type || 'defaultScreen';
+    const validTypes = ['DEPS', 'AWB', 'GST', 'ShippingLabel', 'TripCheckin'];
+    if (!validTypes.includes(type)) {
+      return throwValidationError([{ message: `Invalid type provided. Type should be one of: ${validTypes.join(', ')}` }]);
     }
-    const currentTimestamp: string = new Date().getTime().toString();
-    const fileUploadPromises: Promise<UploadResult>[] = [];
 
     const uploadDir = path.join(__dirname, '..', '..', process.env.UPLOAD_DIR || 'uploads', type);
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
+    fs.mkdirSync(uploadDir, { recursive: true });
 
-    if (process.env.FILE_SOURCE === 'S3Bucket') {
-      const s3Client = new S3Client({
-        credentials:{
-          accessKeyId: process.env.S3_ACCESS_KEY_ID || "na",
-          secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || "na",
-        },
-        region: process.env.S3_BUCKET_REGION || "na"
-      });
-      const expirationTime = eval(process.env.URL_EXPIRTAION_TIME || "");
-      const expirationDate = new Date(Date.now() + expirationTime * 1000);
+    const uploadResults = await fileService.handleFileUpload(files.file, type);
+    const fileUploadRes = await fileService.fileUploadRes(uploadResults, type);
 
-      for (const item of files.file) {
-        const fileName = `${currentTimestamp}_${item.originalname}`;
-        const fileKey = `${type}/${fileName}`;
-        let fileUrl ='';
 
-        const uploadParams = {
-          Bucket: process.env.S3_BUCKET_NAME,
-          Key: fileKey,
-          Body: item.buffer,
-          ContentType: item.mimetype,
-        };
-
-        try {
-          await s3Client.send(new PutObjectCommand(uploadParams))
-              .then((response) => {
-                fileUrl = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.S3_BUCKET_REGION}.amazonaws.com/${fileKey}`;
-                console.log(`File ${item.originalname} uploaded successfully to S3`);
-              })
-
-          const getObjectParams = {
-            Bucket: process.env.S3_BUCKET_NAME,
-            Key: fileKey,
-          };
-          const command = new GetObjectCommand(getObjectParams);
-          const signedUrl = await getSignedUrl(s3Client, command, {expiresIn: expirationTime});
-          fileUploadPromises.push(Promise.resolve({filePath: fileUrl, uri: signedUrl, expiresOn: expirationDate}));
-
-        } catch (err) {
-          fileUploadPromises.push(Promise.reject(err));
-        }
-      }
-    } else if (process.env.FILE_SOURCE == 'Local'){
-      files.file.forEach((item: MulterFile) => {
-        const filePath = path.join('uploads', type, `${currentTimestamp}_${item.originalname}`);
-        const uri = `${process.env.BASE_URL}/${filePath}`;
-
-        fileUploadPromises.push(
-            new Promise((resolve, reject) => {
-              fs.writeFile(filePath, item.buffer, (err) => {
-                if (err) {
-                  console.error('Error writing file:', err);
-                  reject(err);
-                } else {
-                  console.log(`File ${item.originalname} uploaded successfully`);
-                  resolve({filePath: filePath, uri:uri});
-                }
-              });
-            })
-        );
-      });
-    }
-
-    const results = await Promise.all(fileUploadPromises);
-    const fileUploadRes = await fileService.fileUploadRes(results, type);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(fileUploadRes));
-
   } catch (error) {
     console.error('Error in fileUpload:', error);
     next(error);
@@ -890,52 +825,28 @@ export const getFile = async (req: Request, res: Response, next: NextFunction) =
   try {
     const { fileId } = req.query;
     if (!fileId || isNaN(Number(fileId))) {
-      throwValidationError([{ message: "Invalid or missing File ID" }]);
+      return throwValidationError([{ message: "Invalid or missing File ID" }]);
     }
+
     const numFileId = parseInt(fileId as string, 10);
-
-    const baseURL = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.S3_BUCKET_REGION}.amazonaws.com/`;
     const fileDetails = await fileService.getFileDetails([numFileId]);
-
     if (!fileDetails || fileDetails.length === 0) {
-      throwValidationError([{ message: "File not found" }]);
+      return throwValidationError([{ message: "File not found" }]);
     }
 
     const file = fileDetails[0];
     let fileURI = file.uri;
 
     if (file.sourceType === 'S3Bucket') {
-      const expirationTime = eval(process.env.URL_EXPIRATION_TIME || "na");
-      const fileExpiresInSeconds = (new Date(file.expiresOn || "na").getTime() - Date.now()) / 1000;
-      const twoHoursInSeconds = 2 * 60 * 60;
-
-      if (fileExpiresInSeconds <= twoHoursInSeconds) {
-        const s3Client = new S3Client({
-          credentials: {
-            accessKeyId: process.env.S3_ACCESS_KEY_ID || "na",
-            secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || "na",
-          },
-          region: process.env.S3_BUCKET_REGION || "na"
-        });
-
-        const getObjectParams = {
-          Bucket: process.env.S3_BUCKET_NAME,
-          Key: file.path.replace(baseURL, ''),
-        };
-        const command = new GetObjectCommand(getObjectParams);
-        fileURI = await getSignedUrl(s3Client, command, { expiresIn: expirationTime });
-
-        const newExpirationTime = new Date(Date.now() + expirationTime * 1000);
-        await fileService.updateFileExpiration(file.id, newExpirationTime);
-      }
+      fileURI = await refreshSignedUrlIfNeeded(file);
     }
 
     res.redirect(fileURI);
   } catch (error) {
-    console.error('Error redirecting to file URI:', error);
+    console.error('Error in getFile:', error);
     next(error);
   }
-}
+};
 
 
 export const getDepsLists = async (req: Request, res: Response, next: NextFunction) => {
@@ -993,14 +904,15 @@ export const pdfGenerateAWB = async (req: Request, res: Response, next: NextFunc
     // }
 
     const pdfData = await AWBService.getAwbPdfData(AWBId);
-    const path = await AWBPdfGenerator(pdfData);
+    const generatorResponse = await AWBPdfGenerator(pdfData);
 
-    const fileUploadRes = await fileService.fileUploadRes([], 'AWB');
+    const fileUploadRes = await fileService.fileUploadRes(generatorResponse, 'AWB');
+    console.log(fileUploadRes);
     await AWBService.awbEntry(AWBId, fileUploadRes[0].fileId);
 
     let response = {
       "fileName": `${pdfData?.AWBCode}`,
-      "pdfPath": path
+      "pdfPath": fileUploadRes[0].fileUri,
     }
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(response));
   } catch (err) {

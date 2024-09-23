@@ -2,6 +2,10 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import vfsFonts from 'pdfmake/build/vfs_fonts';
 import fs from 'fs';
 import path from 'path';
+import {handleFileUpload, UploadResult} from "./fileService";
+import {MulterFile} from "../types/multerTypes";
+
+import QRCode from 'qrcode';
 
 type VfsFonts = {
     pdfMake: {
@@ -11,13 +15,36 @@ type VfsFonts = {
 
 (pdfMake as any).vfs = vfsFonts.pdfMake.vfs;
 
-export const AWBPdfGenerator = async (pdfData: any): Promise<string> => {
+ const generateQRCode = async (data: string) => {
+    try {
+        const qrCodeDataUrl = await QRCode.toDataURL(data, {
+            errorCorrectionLevel: 'H',
+            margin: 0,
+        }); // generate base64 QR code
+        console.log('QR Code (Base64):', qrCodeDataUrl);
+        return qrCodeDataUrl;
+    } catch (error) {
+        console.error('Error generating QR Code:', error);
+    }
+}
+
+export const AWBPdfGenerator = async (pdfData: any): Promise<UploadResult[]> => {
     const logoPath = path.join(__dirname, '../assests/logo.jpg');
     const logoBase64 = fs.readFileSync(logoPath, { encoding: 'base64' });
 
     const docDefinition = {
         content: [
             {
+
+                image: await generateQRCode(pdfData.AWBCode),
+                width: 70,
+                absolutePosition: { x: 475, y: 30 },
+                border: [true, true, true, true],
+                borderColor: 'black',
+                borderWidth: 1,
+            },
+            {
+
                 table: {
                     widths: ['*', '*', '*'],
                     body: [
@@ -29,17 +56,20 @@ export const AWBPdfGenerator = async (pdfData: any): Promise<string> => {
                             {
                                 margin: [0, 0, 20, 0],
                                 stack: [
-                                    {text: `\n\nDate: ${pdfData.createdOn.toISOString().split('T')[0]}`, style: 'textSmall' },
+                                    {
+                                        text: [
+                                            {text: `Date: ${pdfData.createdOn.toISOString().split('T')[0]}`, style: 'textSmall' },
+                                            {text: '\n\nDocket No.: ', style: 'textSmall'},
+                                            {text: `${pdfData.AWBCode}\n`, style: 'subHeader'},
+                                        ],
+                                    }
                                 ],
                             },
                             {
                                 stack: [
                                     {
-                                        text: [
-                                            { text: '\n\nDocket No.: ', style: 'textSmall' },
-                                            { text: `${pdfData.AWBCode}\n`, style: 'subHeader' },
-                                        ],
-                                    },
+
+                                    }
                                 ],
                             },
                         ],
@@ -315,10 +345,34 @@ export const AWBPdfGenerator = async (pdfData: any): Promise<string> => {
 
     };
 
-    return new Promise<string>((resolve, reject) => {
+    return new Promise<UploadResult[]>((resolve, reject) => {
         const pdfDoc = (pdfMake as any).createPdf(docDefinition);
-        pdfDoc.getBuffer((buffer: Uint8Array) => {
-            const relativePath = path.join(process.env.UPLOAD_DIR || 'uploads', 'AWB', `${pdfData.AWBCode}.pdf`);
+        pdfDoc.getBuffer(async (buffer: Uint8Array) => {
+            try {
+                const fileName = `${pdfData.AWBCode}.pdf`;
+                const file: MulterFile = {
+                    originalname: fileName,
+                    buffer: Buffer.from(buffer),
+                    mimetype: 'application/pdf',
+                    fieldname: 'file',
+                    encoding: '7bit',
+                    size: buffer.length,
+                    destination: '',
+                    filename: '',
+                    path: '',
+                };
+
+                const uploadResults = await handleFileUpload([file], 'AWB', false);
+                if (uploadResults && uploadResults.length > 0) {
+                    resolve(uploadResults);
+                } else {
+                    reject(new Error('File upload failed'));
+                }
+            } catch (error) {
+                console.error('Error uploading PDF:', error);
+                reject(error);
+            }
+            /*const relativePath = path.join(process.env.UPLOAD_DIR || 'uploads', 'AWB', `${pdfData.AWBCode}.pdf`);
             const filePath = path.join(__dirname, '..','..', relativePath);
             fs.mkdirSync(path.dirname(filePath), { recursive: true })
             console.log(filePath);
@@ -328,7 +382,7 @@ export const AWBPdfGenerator = async (pdfData: any): Promise<string> => {
                 }
 
                 resolve(relativePath);
-            });
+            });*/
         });
     });
 };
