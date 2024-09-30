@@ -508,6 +508,10 @@ enum FilesType {
   GST
   ShippingLabel
   TripCheckin
+  LoadingSheet
+  UnloadingSheet
+  HireLetter
+  POD
 }
 
 enum SourceType {

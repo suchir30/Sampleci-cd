@@ -5,6 +5,7 @@ import {getSignedUrl} from "@aws-sdk/s3-request-presigner";
 import path from "path";
 import fs from "fs";
 import {error} from "winston";
+import {throwValidationError} from "../utils/apiUtils";
 
 export interface UploadResult {
     filePath?: string;
@@ -109,6 +110,11 @@ export const s3Client = new S3Client({
 
 
 export const handleFileUpload = async (files: MulterFile[], type: string, useTimestamp = true): Promise<UploadResult[]> => {
+    const validTypes = ['DEPS', 'AWB', 'GST', 'ShippingLabel', 'TripCheckin', 'LoadingSheet', 'UnloadingSheet', 'HireLetter', 'POD'];
+
+    if (!validTypes.includes(type)) {
+        throw throwValidationError([{ message: `Invalid type provided. Type should be one of: ${validTypes.join(', ')}` }]);
+    }
     const currentTimestamp = useTimestamp? Date.now().toString(): '';
     switch (process.env.FILE_SOURCE){
         case 'S3Bucket':
@@ -151,8 +157,11 @@ const uploadToS3 = async (files: MulterFile[], type: string, currentTimestamp: s
 };
 
 const uploadToLocal = (files: MulterFile[], type: string, currentTimestamp: string): Promise<UploadResult[]> => {
+    const uploadDir = path.join(__dirname, '..', '..', process.env.UPLOAD_DIR || 'uploads', type);
+    fs.mkdirSync(uploadDir, { recursive: true });
 
     const uploadPromises = files.map(async (file) => {
+
         const filePath = path.join('uploads', type, `${currentTimestamp}_${file.originalname}`);
         const uri = `${process.env.BASE_URL}/${filePath}`;
 
@@ -200,6 +209,34 @@ export const refreshSignedUrlIfNeeded = async (file: any): Promise<string> => {
 
     return file.uri;
 };
+
+export const uploadPDF = async (buffer: Buffer, filename: string, type: string, useTimeStamp = true): Promise<UploadResult[]> => {
+    try {
+        const fileName = `${filename}.pdf`;
+        const file: MulterFile = {
+            originalname: fileName,
+            buffer: buffer,
+            mimetype: 'application/pdf',
+            fieldname: 'file',
+            encoding: '7bit',
+            size: buffer.length,
+            destination: '',
+            filename: '',
+            path: '',
+        };
+
+        const uploadResults = await handleFileUpload([file], type, useTimeStamp);
+        if (uploadResults && uploadResults.length > 0) {
+            return uploadResults;
+        } else {
+            throw new Error('File upload failed');
+        }
+    } catch (error) {
+        console.error('Error uploading PDF:', error);
+        throw error;
+    }
+}
+
 
 
 

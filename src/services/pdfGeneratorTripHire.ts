@@ -6,7 +6,7 @@ import path from 'path';
 // Set the virtual file system for pdfmake
 (pdfMake as any).vfs = vfsFonts.pdfMake.vfs;
 
-export const tripHirePdfGenerator = async (pdfData: any): Promise<string> => {
+export const tripHirePdfGenerator = async (pdfData: any): Promise<Buffer> => {
     const tripHireDetails = pdfData[0];
     const docDefinition = {
         content: [
@@ -188,19 +188,17 @@ export const tripHirePdfGenerator = async (pdfData: any): Promise<string> => {
         }
     };
 
-    return new Promise<string>((resolve, reject) => {
+    try {
         const pdfDoc = (pdfMake as any).createPdf(docDefinition);
-        pdfDoc.getBuffer((buffer: Uint8Array) => {
-            const relativePath = path.join(process.env.UPLOAD_DIR || 'uploads', 'TripHireLetter', `Trip Hire Letter.pdf`);
-            const filePath = path.join(__dirname, '..', '..', relativePath);
-            fs.mkdirSync(path.dirname(filePath), { recursive: true });
-            fs.writeFile(filePath, Buffer.from(buffer), (err) => {
-                if (err) {
-                    return reject(err);
-                }
-
-                resolve(relativePath);
+        const buffer: Uint8Array = await new Promise((resolve, reject) => {
+            pdfDoc.getBuffer((buf: Uint8Array) => {
+                resolve(buf);
             });
         });
-    });
+        console.log("PDF generated");
+        return Buffer.from(buffer);
+    } catch (error) {
+        console.error("Error generating or uploading PDF:", error);
+        throw error;
+    }
 };

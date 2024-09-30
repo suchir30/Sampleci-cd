@@ -28,7 +28,7 @@ import {
   GetObjectCommand
 } from "@aws-sdk/client-s3";
 import {UploadResult} from "../services/fileService.js";
-import {handleFileUpload, refreshSignedUrlIfNeeded} from "../services/fileService";
+import {handleFileUpload, refreshSignedUrlIfNeeded, uploadPDF} from "../services/fileService";
 
 export const getIndustryTypes = async (_req: Request, res: Response, next: NextFunction) => {
   try {
@@ -806,14 +806,6 @@ export const fileUpload = async (req: Request, res: Response, next: NextFunction
     }
 
     const type = req.body.type || 'defaultScreen';
-    const validTypes = ['DEPS', 'AWB', 'GST', 'ShippingLabel', 'TripCheckin'];
-    if (!validTypes.includes(type)) {
-      return throwValidationError([{ message: `Invalid type provided. Type should be one of: ${validTypes.join(', ')}` }]);
-    }
-
-    const uploadDir = path.join(__dirname, '..', '..', process.env.UPLOAD_DIR || 'uploads', type);
-    fs.mkdirSync(uploadDir, { recursive: true });
-
     const uploadResults = await fileService.handleFileUpload(files.file, type);
     const fileUploadRes = await fileService.fileUploadRes(uploadResults, type);
 
@@ -908,9 +900,12 @@ export const pdfGenerateAWB = async (req: Request, res: Response, next: NextFunc
     // }
 
     const pdfData = await AWBService.getAwbPdfData(AWBId);
-    const generatorResponse = await AWBPdfGenerator(pdfData);
-
-    const fileUploadRes = await fileService.fileUploadRes(generatorResponse, 'AWB');
+    if(!pdfData) {
+      return throwValidationError([{ message: "Invalid AWB ID" }]);
+    }
+    const buffer = await AWBPdfGenerator(pdfData);
+    const uploadRes = await uploadPDF(buffer, pdfData!.AWBCode, 'AWB', false);
+    const fileUploadRes = await fileService.fileUploadRes(uploadRes, 'AWB');
     console.log(fileUploadRes);
     await AWBService.awbEntry(AWBId, fileUploadRes[0].fileId);
 
@@ -956,6 +951,7 @@ export const getBoxTypes = async (req: Request, res: Response, next: NextFunctio
 export const pdfGenerateTrips = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { tripId, tripLineItemStatus, locationId } = req.body;
+    let type = '';
     if (!tripId || tripId.length == 0) {
       throwValidationError([{ message: "Trip ID is mandatory" }]);
     }
@@ -973,9 +969,11 @@ export const pdfGenerateTrips = async (req: Request, res: Response, next: NextFu
       let tripLineItems
 
       if (tripLineItemStatus === "Assigned") {
+        type = 'LoadingSheet';
         const loadLocationId = locationId;
         tripLineItems = await tripService.getTripLineItems(tripId, tripLineItemStatus, loadLocationId, null);
       } else if (tripLineItemStatus === "Open") {
+        type = 'UnloadingSheet';
         const unloadLocationId = locationId;
         tripLineItems = await tripService.getTripLineItems(tripId, tripLineItemStatus, null, unloadLocationId);
       }
@@ -987,12 +985,15 @@ export const pdfGenerateTrips = async (req: Request, res: Response, next: NextFu
       tripsPdfData.push(tripData);
     }
 
+    const buffer =  await tripsPdfGenerator(tripsPdfData);
+    const uploadRes = await uploadPDF(buffer, tripsPdfData[0]?.tripDetails.tripCode, type, false);
+    const fileUploadRes = await fileService.fileUploadRes(uploadRes, type);
+    console.log(fileUploadRes);
 
-    const path = await tripsPdfGenerator(tripsPdfData);
 
     let response = {
       "fileName": tripsPdfData.length > 0 ? `${tripsPdfData[0]?.tripDetails?.tripCode}` : 'trips_report.pdf',
-      "pdfPath": path,
+      "pdfPath": fileUploadRes[0].fileUri,
     };
 
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(response));
@@ -1011,11 +1012,14 @@ export const pdfGenerateTripHire = async (req: Request, res: Response, next: Nex
     }
 
     const tripsData = await tripService.getTripDetails(tripId);
-    const path = await tripHirePdfGenerator(tripsData);
+    const buffer =  await tripHirePdfGenerator(tripsData);
+    const uploadRes = await uploadPDF(buffer, tripId, 'HireLetter', true);
+    const fileUploadRes = await fileService.fileUploadRes(uploadRes, 'HireLetter');
+    console.log(fileUploadRes);
 
     let response = {
       "fileName": 'trip_hire.pdf',
-      "pdfPath": path,
+      "pdfPath": fileUploadRes[0].fileUri,
     };
 
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(response));

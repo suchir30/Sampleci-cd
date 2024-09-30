@@ -2,7 +2,7 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import vfsFonts from 'pdfmake/build/vfs_fonts';
 import fs from 'fs';
 import path from 'path';
-import {handleFileUpload, UploadResult} from "./fileService";
+import {handleFileUpload, uploadPDF, UploadResult} from "./fileService";
 import {MulterFile} from "../types/multerTypes";
 
 import QRCode from 'qrcode';
@@ -21,14 +21,13 @@ type VfsFonts = {
             errorCorrectionLevel: 'H',
             margin: 0,
         }); // generate base64 QR code
-        console.log('QR Code (Base64):', qrCodeDataUrl);
         return qrCodeDataUrl;
     } catch (error) {
         console.error('Error generating QR Code:', error);
     }
 }
 
-export const AWBPdfGenerator = async (pdfData: any): Promise<UploadResult[]> => {
+export const AWBPdfGenerator = async (pdfData: any): Promise<Buffer> => {
     const logoPath = path.join(__dirname, '../assests/logo.jpg');
     const logoBase64 = fs.readFileSync(logoPath, { encoding: 'base64' });
 
@@ -345,44 +344,17 @@ export const AWBPdfGenerator = async (pdfData: any): Promise<UploadResult[]> => 
 
     };
 
-    return new Promise<UploadResult[]>((resolve, reject) => {
+    try {
         const pdfDoc = (pdfMake as any).createPdf(docDefinition);
-        pdfDoc.getBuffer(async (buffer: Uint8Array) => {
-            try {
-                const fileName = `${pdfData.AWBCode}.pdf`;
-                const file: MulterFile = {
-                    originalname: fileName,
-                    buffer: Buffer.from(buffer),
-                    mimetype: 'application/pdf',
-                    fieldname: 'file',
-                    encoding: '7bit',
-                    size: buffer.length,
-                    destination: '',
-                    filename: '',
-                    path: '',
-                };
-
-                const uploadResults = await handleFileUpload([file], 'AWB', false);
-                if (uploadResults && uploadResults.length > 0) {
-                    resolve(uploadResults);
-                } else {
-                    reject(new Error('File upload failed'));
-                }
-            } catch (error) {
-                console.error('Error uploading PDF:', error);
-                reject(error);
-            }
-            /*const relativePath = path.join(process.env.UPLOAD_DIR || 'uploads', 'AWB', `${pdfData.AWBCode}.pdf`);
-            const filePath = path.join(__dirname, '..','..', relativePath);
-            fs.mkdirSync(path.dirname(filePath), { recursive: true })
-            console.log(filePath);
-            fs.writeFile(filePath, Buffer.from(buffer), (err) => {
-                if (err) {
-                    return reject(err);
-                }
-
-                resolve(relativePath);
-            });*/
+        const buffer: Uint8Array = await new Promise((resolve, reject) => {
+            pdfDoc.getBuffer((buf: Uint8Array) => {
+                resolve(buf);
+            });
         });
-    });
+        console.log("PDF generated");
+        return Buffer.from(buffer);
+    } catch (error) {
+        console.error("Error generating or uploading PDF:", error);
+        throw error;
+    }
 };
