@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import * as userService from '../services/userService';
 import { buildNoContentResponse, buildObjectFetchResponse, throwValidationError } from '../utils/apiUtils';
 import { HttpStatusCode } from '../types/apiTypes';
+import { AuthUserDetails } from '../types/authTypes';
 
 export const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -22,21 +23,15 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       throw new Error('JWT_SECRET is not set in the environment');
     }
     
-    const token = jwt.sign({ 
-      employeeId: user?.employeeId,
-      firstName: user?.firstName || '', 
-      lastName: user?.lastName || ''    
-    }, process.env.JWT_SECRET, { expiresIn: '2d' });
+    const token = jwt.sign({
+      userId: user?.userId, roleId: user?.roleId} as AuthUserDetails,
+      process.env.JWT_SECRET, { expiresIn: '2d' });
     const expirationTime = Date.now() + (2*24*60*60*1000); // 2 days in milliseconds
 
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse({ 
       token, 
       expirationTime,
-      user: {
-        employeeId: user?.employeeId,
-        firstName: user?.firstName,
-        lastName: user?.lastName
-      }
+      user: user || null,
     }));
   } catch (err) {
     console.log("Error login", err);

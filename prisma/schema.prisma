@@ -2,8 +2,12 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["views"]
+}
+
+generator typegraphql {
+  provider = "typegraphql-prisma"
 }
 
 datasource db {
@@ -21,8 +25,8 @@ model User {
   phone1               String?         @db.VarChar(255)
   phone2               String?         @db.VarChar(255)
   title                String?         @db.VarChar(255)
-  role                 String?         @db.VarChar(255)
-  profile              String?         @db.VarChar(255)
+  roleId               Int?
+  role                 Role?           @relation("userRole", fields: [roleId], references: [id])
   isActiveUser         Boolean         @default(true)
   address1             String?         @db.VarChar(255)
   address2             String?         @db.VarChar(255)
@@ -35,6 +39,51 @@ model User {
   createdOn            DateTime        @default(now())
   depsLoadingUserIds   DEPS[]          @relation("depsLoadingUserId")
   depsUnloadingUserIds DEPS[]          @relation("depsUnloadingUserId")
+}
+
+model Role {
+  id                   Int                   @id @default(autoincrement())
+  name                 String
+  users                User[]                @relation("userRole")
+  CRMTablePermissions  CRMTablePermission[]  @relation("CRMTablePermissionRole")
+  CRMColumnPermissions CRMColumnPermission[] @relation("CRMColumnPermissionRole")
+}
+
+model CRMTable {
+  id                  Int                  @id @default(autoincrement())
+  name                String
+  CRMColumns          CRMColumn[]          @relation("CRMColumnTable")
+  CRMTablePermissions CRMTablePermission[] @relation("CRMTablePermissionCRMTable")
+}
+
+model CRMColumn {
+  id                   Int                   @id @default(autoincrement())
+  name                 String
+  CRMTableId           Int
+  CRMTable             CRMTable              @relation("CRMColumnTable", fields: [CRMTableId], references: [id])
+  CRMColumnPermissions CRMColumnPermission[] @relation("CRMColumnPermissionCRMColumn")
+}
+
+model CRMTablePermission {
+  id         Int      @id @default(autoincrement())
+  roleId     Int
+  CRMTableId Int
+  can_read   Boolean  @default(false)
+  can_edit   Boolean  @default(false)
+  can_add    Boolean  @default(false)
+  can_delete Boolean  @default(false)
+  role       Role     @relation("CRMTablePermissionRole", fields: [roleId], references: [id])
+  CRMTable   CRMTable @relation("CRMTablePermissionCRMTable", fields: [CRMTableId], references: [id])
+}
+
+model CRMColumnPermission {
+  id          Int       @id @default(autoincrement())
+  roleId      Int
+  CRMColumnId Int
+  can_read    Boolean   @default(false)
+  can_edit    Boolean   @default(false)
+  role        Role      @relation("CRMColumnPermissionRole", fields: [roleId], references: [id])
+  CRMColumn   CRMColumn @relation("CRMColumnPermissionCRMColumn", fields: [CRMColumnId], references: [id])
 }
 
 model Branch {
@@ -155,54 +204,52 @@ enum AWBStatus {
 }
 
 model AirWayBill {
-  id                       Int            @id @default(autoincrement())
-  AWBCode                  String         @db.VarChar(255)
-  consignorId              Int
-  consignor                Consignor      @relation("AWBConsignor", fields: [consignorId], references: [consignorId])
-  consigneeId              Int?
-  consignee                Consignee?     @relation("AWBConsignee", fields: [consigneeId], references: [consigneeId])
-  fromBranchId             Int
-  toBranchId               Int
-  fromBranch               Branch         @relation("AWBFromBranch", fields: [fromBranchId], references: [id])
-  toBranch                 Branch         @relation("AWBToBranch", fields: [toBranchId], references: [id])
-  numOfArticles            Int
-  invoiceNumber            String?        @db.VarChar(255)
-  invoiceValue             Float?         @db.Float
-  ewayBillNumber           String?        @db.VarChar(255)
+  id             Int        @id @default(autoincrement())
+  AWBCode        String     @db.VarChar(255)
+  consignorId    Int
+  consignor      Consignor  @relation("AWBConsignor", fields: [consignorId], references: [consignorId])
+  consigneeId    Int?
+  consignee      Consignee? @relation("AWBConsignee", fields: [consigneeId], references: [consigneeId])
+  fromBranchId   Int
+  toBranchId     Int
+  fromBranch     Branch     @relation("AWBFromBranch", fields: [fromBranchId], references: [id])
+  toBranch       Branch     @relation("AWBToBranch", fields: [toBranchId], references: [id])
+  numOfArticles  Int
+  invoiceNumber  String?    @db.VarChar(255)
+  invoiceValue   Float?     @db.Float
+  ewayBillNumber String?    @db.VarChar(255)
 
-  ratePerKg                Float?         @db.Float
-  rollupVolume             Float?         @db.Float
-  rollupWeight             Float?         @db.Float
-  rollupArticleCnt         Int?
+  ratePerKg        Float? @db.Float
+  rollupVolume     Float? @db.Float
+  rollupWeight     Float? @db.Float
+  rollupArticleCnt Int?
 
-  rollupChargedWtInKgs     Float?         @db.Float
-  chargedWeightWithCeiling Float?         @db.Float
-  grandTotal               Float?         @db.Float
+  rollupChargedWtInKgs     Float? @db.Float
+  chargedWeightWithCeiling Float? @db.Float
+  grandTotal               Float? @db.Float
 
-  subTotal                 Float?         @db.Float
-  AWBStatus                AWBStatus      @default(PickUp)
-  articleGenFlag           Boolean        @default(false)
-  contractTypeId           Int?
-  contract                 Contract?      @relation("AWBContractType", fields: [contractTypeId], references: [id])
-  appointmentDate          DateTime?
-  AWBPdf                   Int?
-  FileUpload               FileUpload?    @relation("AWBFileAirWayBill", fields: [AWBPdf], references: [id])
-  CDM                      Float?         @db.Float
-  completeFlag             Boolean        @default(false)
-  createdOn                DateTime?      @default(now())
-  modifiedOn               DateTime?      @updatedAt
-  AWBLineItems             AwbLineItem[]
-  AWBArticles              AwbArticle[]
-  AWBIdTripLineItems       TripLineItem[] @relation("AWBIdTripLineItem")
-  hlfLineAWBIds            HLFLineItem[]  @relation("hlfLineAWBId")
-  depsAWBIds               DEPS[]         @relation("depsAWBId")
+  subTotal           Float?         @db.Float
+  AWBStatus          AWBStatus      @default(PickUp)
+  articleGenFlag     Boolean        @default(false)
+  contractTypeId     Int?
+  contract           Contract?      @relation("AWBContractType", fields: [contractTypeId], references: [id])
+  appointmentDate    DateTime?
+  AWBPdf             Int?
+  FileUpload         FileUpload?    @relation("AWBFileAirWayBill", fields: [AWBPdf], references: [id])
+  CDM                Float?         @db.Float
+  completeFlag       Boolean        @default(false)
+  createdOn          DateTime?      @default(now())
+  modifiedOn         DateTime?      @updatedAt
+  AWBLineItems       AwbLineItem[]
+  AWBArticles        AwbArticle[]
+  AWBIdTripLineItems TripLineItem[] @relation("AWBIdTripLineItem")
+  hlfLineAWBIds      HLFLineItem[]  @relation("hlfLineAWBId")
+  depsAWBIds         DEPS[]         @relation("depsAWBId")
 
-
-
-  weightKgs                Float?         @db.Float
-  rollupArticleWeightKg    Float?         @db.Float
-  rollupCwWeight           Float?         @db.Float
-  rollupSKU                Float?         @db.Float
+  weightKgs             Float? @db.Float
+  rollupArticleWeightKg Float? @db.Float
+  rollupCwWeight        Float? @db.Float
+  rollupSKU             Float? @db.Float
 }
 
 model AwbLineItem {
@@ -313,7 +360,7 @@ model TripDetails {
   paymentReqDate        DateTime?
   UTRDetails            String?              @db.VarChar(255)
   ePODsCleared          Boolean?
-  originalPODsReceived   Boolean?
+  originalPODsReceived  Boolean?
   createdOn             DateTime?            @default(now())
   modifiedOn            DateTime?            @updatedAt
   tripIdCheckins        TripCheckIn[]        @relation("tripIdCheckin")
@@ -395,11 +442,11 @@ enum HLFLineItemStatus {
 model HLFLineItem {
   id               Int               @id @default(autoincrement())
   HLFLineItemAWBId Int
-  AWB       AirWayBill        @relation("hlfLineAWBId", fields: [HLFLineItemAWBId], references: [id])
+  AWB              AirWayBill        @relation("hlfLineAWBId", fields: [HLFLineItemAWBId], references: [id])
   HLFLineStatus    HLFLineItemStatus
   branchId         Int?
   branch           Branch?           @relation("hlfLineBranchId", fields: [branchId], references: [id])
-  AWBWeightInKgs  Float?            @db.Float
+  AWBWeightInKgs   Float?            @db.Float
   AWBVolumeInKgs   Float?            @db.Float
   createdOn        DateTime?         @default(now())
   modifiedOn       DateTime?         @updatedAt
@@ -452,7 +499,7 @@ model DEPSImages {
   DEPS       DEPS       @relation("depsImage", fields: [depsId], references: [id])
   fileId     Int
   FileUpload FileUpload @relation("DEPSFiles", fields: [fileId], references: [id])
-  createdOn            DateTime?      @default(now())
+  createdOn  DateTime?  @default(now())
 }
 
 enum FilesType {
@@ -464,8 +511,8 @@ enum FilesType {
 }
 
 enum SourceType {
-    Local
-    S3Bucket
+  Local
+  S3Bucket
 }
 
 model FileUpload {
@@ -667,7 +714,7 @@ model VendorMaster {
 
 model VehicleMaster {
   id                   Int           @id @default(autoincrement())
-  vehicleNum        String           @unique @db.VarChar(255)
+  vehicleNum           String        @unique @db.VarChar(255)
   vehicleType          String?       @db.VarChar(255)
   vehicleCapacity      String?       @db.VarChar(255)
   vehiclePermit        String?       @db.VarChar(255)
@@ -686,49 +733,41 @@ model VehicleMaster {
 }
 
 model DriverMaster {
-  id            Int             @id @default(autoincrement())
-  driverName    String          @db.VarChar(255)
-  phone1        String?         @db.VarChar(255)
-  licenseNumber String?         @db.VarChar(255)
+  id                Int             @id @default(autoincrement())
+  driverName        String          @db.VarChar(255)
+  phone1            String?         @db.VarChar(255)
+  licenseNumber     String?         @db.VarChar(255)
   licenseExpiryDate DateTime?
-  placeOfIssueRTA      String?
-  PANNumber     String?         @db.VarChar(255)
-  aadharNumber  String?         @db.VarChar(255)
-  address1      String?         @db.VarChar(255)
-  cityId        Int?
-  city          CityMaster?     @relation("driverCity", fields: [cityId], references: [id])
-  stateId       Int?
-  state         StateMaster?    @relation("driverState", fields: [stateId], references: [id])
-  districtId    Int?
-  district      DistrictMaster? @relation("driverDistrict", fields: [districtId], references: [id])
-  Pincode       Int?
-  phone2        Int?
-  createdOn     DateTime?       @default(now())
-  modifiedOn    DateTime?       @updatedAt
-  tripDriverIds TripDetails[]   @relation("tripDriverId")
+  placeOfIssueRTA   String?
+  PANNumber         String?         @db.VarChar(255)
+  aadharNumber      String?         @db.VarChar(255)
+  address1          String?         @db.VarChar(255)
+  cityId            Int?
+  city              CityMaster?     @relation("driverCity", fields: [cityId], references: [id])
+  stateId           Int?
+  state             StateMaster?    @relation("driverState", fields: [stateId], references: [id])
+  districtId        Int?
+  district          DistrictMaster? @relation("driverDistrict", fields: [districtId], references: [id])
+  Pincode           Int?
+  phone2            Int?
+  createdOn         DateTime?       @default(now())
+  modifiedOn        DateTime?       @updatedAt
+  tripDriverIds     TripDetails[]   @relation("tripDriverId")
 }
-
-
-
-
-
-
 
 //View Tables
 
 view ViewHubLoadFactor {
-    id                  Int         @id @unique
-    nscsAwb             String
-    numOfArticles       Int?
-    actualWeight        Float?
-    CDM                 Float?
-    chargedWeight       Float?
-    currentHub          String?
-    finalDestination    String?
-    status              String?
-    inwardedDate        DateTime?
-    awbDate             DateTime?
-    depsCount           Int?
+  id               Int       @id @unique
+  nscsAwb          String
+  numOfArticles    Int?
+  actualWeight     Float?
+  CDM              Float?
+  chargedWeight    Float?
+  currentHub       String?
+  finalDestination String?
+  status           String?
+  inwardedDate     DateTime?
+  awbDate          DateTime?
+  depsCount        Int?
 }
-
-
