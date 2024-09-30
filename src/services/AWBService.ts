@@ -101,6 +101,7 @@ export const getGeneratedAWB = async (consignorId: number, AWBStatus: any) => {
             articleGenFlag:true,
             rollupArticleCnt:true,
             completeFlag:true,
+            createdOn:true,
             consignor: {
                 select: {
                     consignorCode: true,
@@ -181,6 +182,9 @@ export const getGeneratedAWB = async (consignorId: number, AWBStatus: any) => {
             consignorId: consignorId !== null ? consignorId : undefined,
             AWBStatus: AWBStatus,
         },
+        orderBy: {
+            createdOn: 'desc', // Order by createdDate in descending order
+        }
     });
     return getGeneratedAWBQuery;
 };
