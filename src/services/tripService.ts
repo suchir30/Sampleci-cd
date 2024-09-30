@@ -501,14 +501,13 @@ if (unloadLocationId) {
     return finalResult;
 };
 
-export const addAWBArticleLogs = async (AWBArticleCode: any, scanType: any, tripId: number, tripLineItemId: number): Promise<string | void> => {
+export const addAWBArticleLogs = async (AWBArticleCode: any, scanType: any, tripId: number): Promise<string | void> => {
   const today = moment().toISOString();
-
   const result = await prisma.$transaction(async prisma => {
     const AWBArticleRes = await prisma.awbArticle.findFirst({
       where: { articleCode: AWBArticleCode }
     });
-
+    
     if (AWBArticleRes) {
       const checkDuplicateRes = await prisma.awbArticleTripLogs.findMany({
         where: {
@@ -517,42 +516,39 @@ export const addAWBArticleLogs = async (AWBArticleCode: any, scanType: any, trip
           scanType: scanType
         }
       });
-
       if (checkDuplicateRes.length > 0) {
         console.log("duplicate");
         return "Duplicate";
       }
-
+      const tripLineItemRes = await prisma.tripLineItem.findFirst({
+        where: { AWBId: AWBArticleRes?.AWBId,
+          tripId:tripId }
+      });
       const AWBArticleTripLogsRes = await prisma.awbArticleTripLogs.create({
         data: {
           AWBArticleId: AWBArticleRes?.id,
           tripId: tripId,
           scanType: scanType,
-          tripLineItemId: tripLineItemId
+          tripLineItemId: tripLineItemRes?.id
         }
       });
-
       console.log(AWBArticleTripLogsRes.id);
-
       const countQuery = await prisma.awbArticleTripLogs.findMany({
         where: {
-          tripLineItemId: tripLineItemId,
+          tripLineItemId: tripLineItemRes?.id,
           scanType: scanType
         }
       });
-
       console.log(countQuery.length);
-
       await prisma.tripLineItem.update({
         where: {
-          id: tripLineItemId,
+          id: tripLineItemRes?.id,
         },
         data: {
           rollupScanCount: countQuery.length,
           latestArticleScanTime: today
         }
       });
-
 
       return "Success";
     }
@@ -561,9 +557,9 @@ export const addAWBArticleLogs = async (AWBArticleCode: any, scanType: any, trip
     }
     return;
   });
-
   return result;
 };
+
 
 export const getDepsLists = async (AWBId: number) => {
     const result = await prisma.dEPS.findMany({

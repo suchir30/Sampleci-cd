@@ -706,15 +706,11 @@ export const addAWBArticleLogs = async (
     if (!AWBArticleCode) {
       throwValidationError([{ message: "AWBArticleCode is mandatory" }]);
     }
-    if (!tripLineItemId) {
-      throwValidationError([{ message: "tripLineItemId is mandatory" }]);
-    }
-
-    const addAWBArticleLogsRes = await tripService.addAWBArticleLogs(AWBArticleCode, scanType, tripId, tripLineItemId);
+    const addAWBArticleLogsRes = await tripService.addAWBArticleLogs(AWBArticleCode, scanType, tripId);
     console.log(addAWBArticleLogsRes, "Service Response");
 
     if (addAWBArticleLogsRes === 'Duplicate') {
-      res.status(HttpStatusCode.OK).json(buildNoContentResponse(`Invalid Article`));
+      res.status(HttpStatusCode.OK).json(buildNoContentResponse(`Article Already Exists`));
     } else {
       res.status(HttpStatusCode.OK).json(buildNoContentResponse("Success"));
     }
