@@ -604,22 +604,17 @@ export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem
             const AWBConsignorId = await prisma.airWayBill.findUnique({
                 where: { id: AWBId }
             });
-
             if (!AWBConsignorId) {
                 console.log("AWB not found");
                 return "Invalid AWB";
             }
-
             const factorRes = await prisma.contract.findFirst({
                 where: { consignorId: AWBConsignorId.consignorId }
             });
-
         
-
             await prisma.awbLineItem.deleteMany({
                 where: { AWBId: AWBId }
             });
-
             if (factorRes?.consignorContractType == "BoxRate") {
                 console.log("boxrate")
                 const createPromises = awbLineItems.map(item => {
@@ -639,8 +634,7 @@ export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem
             await Promise.all(createPromises);
             }
             else{
-
-                if (factorRes?.actualWeightFactor == null || factorRes?.volumetricWeightFactor == null) {
+                if (factorRes?.actualWeightFactor == null || factorRes?.volumetricWeightFactor == null || factorRes?.cwCeiling==null) {
                     console.log("Invalid factors", factorRes);
                     return "Invalid factors";
                 } 
@@ -664,7 +658,6 @@ export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem
                         }
                     });
                 });
-
                 
             await Promise.all(createPromises);
             }
@@ -680,7 +673,7 @@ export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem
                     AWBId: AWBId
                 }
             });
-
+            
             const { numOfArticles,articleWeightKg,volume,weightKgs} = aggregateResults._sum;
 
             const awbLineItemsList = await prisma.awbLineItem.findMany({
@@ -691,10 +684,25 @@ export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem
                 }
             });
 
-            const rollupChargedWtInKgs = awbLineItemsList.reduce((acc, item) => {
-                const maxWeight = Math.max(item.actualFactorWeight ?? 0, item.volumetricFactorWeight ?? 0);
-                return acc + maxWeight;
+            // const rollupChargedWtInKgs = awbLineItemsList.reduce((acc, item) => {
+            //     const maxWeight = Math.max(item.actualFactorWeight ?? 0, item.volumetricFactorWeight ?? 0);
+            //     return acc + maxWeight;
+            // }, 0);
+
+               // Sum of all actualFactorWeight values
+            const totalActualFactorWeight = awbLineItemsList.reduce((acc, item) => {
+                return acc + (item.actualFactorWeight ?? 0);
             }, 0);
+            // Sum of all volumetricFactorWeight values
+            const totalVolumetricFactorWeight = awbLineItemsList.reduce((acc, item) => {
+                return acc + (item.volumetricFactorWeight ?? 0);
+            }, 0);
+            // Determine rollupChargedWtInKgs as the maximum of the two sums
+            const rollupChargedWtInKgs = Math.max(totalActualFactorWeight, totalVolumetricFactorWeight);
+
+            // rollupChargedWtCeiling logic
+            const rollupChargedWtCeiling = Math.ceil(rollupChargedWtInKgs / (factorRes?.cwCeiling??0)) * (factorRes?.cwCeiling??0);
+            console.log(`rollupChargedWtInKgs: ${rollupChargedWtInKgs}, rollupChargedWtCeiling: ${rollupChargedWtCeiling}`);
 
             const updatedAirWayBill = await prisma.airWayBill.update({
                 where: {
@@ -705,10 +713,10 @@ export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem
                     rollupArticleWeightKg:articleWeightKg||0,
                     rollupWeight: weightKgs|| 0,
                     rollupVolume: volume || 0,
-                    rollupChargedWtInKgs: rollupChargedWtInKgs || 0
+                    rollupChargedWtInKgs: rollupChargedWtInKgs || 0,
+                    chargedWeightWithCeiling: rollupChargedWtCeiling || 0 
                 }
             });
-
 
           
             return updatedAirWayBill;
