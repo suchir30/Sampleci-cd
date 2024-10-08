@@ -6,7 +6,7 @@ import * as consignorService from '../services/consignorService';
 import * as consigneeService from '../services/consigneeService';
 import * as AWBService from '../services/AWBService';
 import * as tripService from '../services/tripService';
-
+import * as invoiceAWB from '../services/invoiceAWB';
 // import * as pricingServices from '../services/pricingServices';
 import { AWBCreateData } from '../types/awbTypes';
 import { HttpStatusCode } from '../types/apiTypes';
@@ -1090,3 +1090,40 @@ export const deliverAWBCheck = async (req: Request, res: Response, next: NextFun
     next(err);
   }
 };
+
+export const calculateShippingCosts = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const AWBId:number= req.body.AWBId;
+   
+    if (!AWBId) {
+      throwValidationError([{ message: "consignorId is mandatory" }]);
+    }
+    const Result = await invoiceAWB.calculateShippingCosts(AWBId);
+    console.log(Result,"%%controller6")
+    if (Result=="NoAWB") {
+      res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWB doesn't exists"));
+    }
+    else if (Result=="NoContract") {
+      res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWB doesn't have required contract details"));
+    }
+    else if (Result=="boxTypeWithChargeNoExists") {
+      res.status(HttpStatusCode.OK).json(buildNoContentResponse("chargeType should never be withChargedWeightRange for BoxRate ContractType"));
+    }
+    else if (Result=="noAWBLineItem") {
+      res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWB has BoxType contract but doesn't have AWBLineItems"));
+    }
+    else if (Result=="AWBInvalidConsigneeId") {
+      res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWB has Invalid ConsigneeID"));
+    }
+    else if (Result=="AWBInvalidCeilingCW") {
+      res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWB has Invalid ChargeWeightWithCeiling"));
+    }
+    else{
+      res.status(HttpStatusCode.OK).json(buildNoContentResponse("success"));
+    }
+  } catch (err) {
+    console.error('Error updateTripLineItem', err);
+    next(err);
+  }
+};
+

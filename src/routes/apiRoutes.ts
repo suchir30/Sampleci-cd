@@ -63,6 +63,6 @@ router.post('/generateTripHirePDF', apiController.pdfGenerateTripHire)
 router.post('/insertConnectivityPlan', apiController.insertConnectivityPlan)
 router.post('/updateTripLineItem', apiController.updateTripLineItem)
 router.post('/deliverAWBCheck', apiController.deliverAWBCheck)
-
+router.post('/calculateShippingCosts', apiController.calculateShippingCosts)
 
 export default router;
