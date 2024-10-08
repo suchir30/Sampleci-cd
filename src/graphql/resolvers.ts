@@ -66,6 +66,7 @@ import {
 } from "@generated/type-graphql";
 import { Authorized, NonEmptyArray } from "type-graphql";
 import { ResolversEnhanceMap, ModelsEnhanceMap, applyResolversEnhanceMap, applyModelsEnhanceMap } from "@generated/type-graphql";
+import {CreateManyGeneral} from "./components/customResolvers/CreateManyGeneral";
 
 const resolversEnhanceMap: ResolversEnhanceMap = {
     User: { _all: [Authorized()] },
@@ -206,3 +207,7 @@ export const generatedRelationResolvers: NonEmptyArray<Function> = [
     CRMColumnPermissionRelationsResolver,
     IndustryTypeMasterRelationsResolver,
 ];
+
+export const customResolvers: NonEmptyArray<Function> = [
+    CreateManyGeneral
+]

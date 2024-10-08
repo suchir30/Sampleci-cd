@@ -4,11 +4,11 @@ import { buildSchema } from "type-graphql";
 import { ApolloServer } from "@apollo/server";
 import { GraphQLContext } from "./context";
 import { customAuthChecker } from "./auth";
-import { generatedCrudResolvers, generatedRelationResolvers } from "./resolvers";
+import {customResolvers, generatedCrudResolvers, generatedRelationResolvers} from "./resolvers";
 
 export async function buildGraphQLServer() {
   const schema = await buildSchema({
-    resolvers: [...generatedCrudResolvers, ...generatedRelationResolvers],
+    resolvers: [...generatedCrudResolvers, ...generatedRelationResolvers, ...customResolvers],
     validate: false,
     authChecker: customAuthChecker,
     authMode: "error"

@@ -5,7 +5,7 @@ import { table } from "console";
 
 type MutationType = "create" | "delete" | "update" | "upsert";
 
-function authorizeTableMutation(tableName: string, mutationType: MutationType, permissions: RolePermissions | null) {
+export function authorizeTableMutation(tableName: string, mutationType: MutationType, permissions: RolePermissions | null) {
   if (!permissions) {
     throw Error("Permissions have not been initialized.");
   }
@@ -27,7 +27,7 @@ function authorizeTableMutation(tableName: string, mutationType: MutationType, p
   }
 }
 
-function authorizeTableMutationData(tableName: string, data: any[], permissions: RolePermissions | null) {
+export function authorizeTableMutationData(tableName: string, data: any[], permissions: RolePermissions | null) {
   if (!permissions) {
     throw Error("Permissions have not been initialized.");
   }
