@@ -201,6 +201,7 @@ enum AWBStatus {
   atHub
   outForDelivery
   Delivered
+  Deleted
 }
 
 model AirWayBill {
@@ -582,6 +583,7 @@ model Contract {
 enum ArticleLogsScanType {
   Load
   Unload
+  Deleted
 }
 
 model AwbArticleTripLogs {
