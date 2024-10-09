@@ -80,7 +80,7 @@ export const getFileDetails = async (fileIds: number[]) => {
     }
 }
 
-export const updateFileExpiration = async (fileId: number, newExpirationDate: Date): Promise<void> => {
+export const updateFileExpiration = async (fileId: number, newExpirationDate: Date,signedUrl:string): Promise<void> => {
     try {
         await prisma.fileUpload.update({
             where: {
@@ -88,6 +88,7 @@ export const updateFileExpiration = async (fileId: number, newExpirationDate: Da
             },
             data: {
                 expiresOn: newExpirationDate,
+                uri:signedUrl
             },
         });
         console.log(`Expiration date updated successfully for file ID: ${fileId}`);
@@ -202,7 +203,7 @@ export const refreshSignedUrlIfNeeded = async (file: any): Promise<string> => {
         const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: expirationTime });
 
         const newExpirationDate = new Date(Date.now() + expirationTime * 1000);
-        await updateFileExpiration(file.id, newExpirationDate);
+        await updateFileExpiration(file.id, newExpirationDate,signedUrl);
 
         return signedUrl;
     }
