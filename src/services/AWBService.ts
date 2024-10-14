@@ -1,4 +1,4 @@
-import { ArticleStatus,AwbLineItem} from '@prisma/client';
+import { ArticleStatus,AwbLineItem,ArticleLogsScanType} from '@prisma/client';
 import moment from 'moment';
 import prisma from '../client';
 import { AWBCreateData } from '../types/awbTypes';
@@ -367,13 +367,23 @@ export const markAWBArticlesAsPrinted = async (AWBId: number) => {
     return true;
 };
 export const markAWBArticleAsDeleted = async (articleId: number, AWBId: number) => {
+   
+    let checkstatus= await prisma.awbArticle.findFirst({
+        where: {
+            id:articleId
+        },
+    });
+    if(checkstatus?.status=="Deleted"){
+        console.log("no action status is already deleted")
+        return
+    }
     await prisma.awbArticle.update({
-        where: { id: articleId, AWBId },
+        where: { id: articleId},
         data: {
             status: ArticleStatus.Deleted,
         }
     });
-
+   
     const deletedArticle = await prisma.awbArticle.findMany({
         where: {
             AWBId: AWBId,
@@ -389,6 +399,29 @@ export const markAWBArticleAsDeleted = async (articleId: number, AWBId: number) 
             numOfArticles: deletedArticle.length,
         }
     });
+    let awbarticletriplogsRes=await prisma.awbArticleTripLogs.findFirst({
+        where: { AWBArticleId:articleId }
+    });
+    console.log("awbarticletriplogsRes",awbarticletriplogsRes)
+    if(awbarticletriplogsRes?.id && awbarticletriplogsRes.tripLineItemId){
+        await prisma.awbArticleTripLogs.update({
+            where: { id: awbarticletriplogsRes.id},
+            data: {
+                scanType: ArticleLogsScanType.Deleted,
+            }
+        });
+        await prisma.tripLineItem.update({
+            where: { id: awbarticletriplogsRes.tripLineItemId},
+            data: {
+                rollupScanCount: {
+                    decrement: 1, // Decrement rollupScanCount by 1
+                }
+            }
+        });
+    }
+    else{
+        console.log("in else")
+    }
     return deletedArticle;
 };
 
