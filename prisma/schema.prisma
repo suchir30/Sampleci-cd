@@ -164,7 +164,8 @@ model Consignor {
   consignorRate         ConsignorRateTable[] @relation("rateTableConsignor")
   odaConsignorIds       ODA[]                @relation("odaConsignorId")
   contractConsignorIds  Contract[]           @relation("contractConsignorId")
-  SKUConsignorIds       SKU[]                @relation("SKUConsignorId")
+  SKUConsignorIds       SKU[]                @relation("SKUConsignorId")  
+  internalInvocieConsignors       InternalInvoice[]                @relation("internalInvocieConsignor")
 }
 
 model Consignee {
@@ -193,6 +194,7 @@ model Consignee {
   createdOn           DateTime?       @default(now())
   modifiedOn          DateTime?       @updatedAt
   AWBs                AirWayBill[]    @relation("AWBConsignee")
+  internalInvocieConsignees                InternalInvoice[]    @relation("internalInvocieConsignee")
 }
 
 enum AWBStatus {
@@ -246,7 +248,7 @@ model AirWayBill {
   AWBIdTripLineItems TripLineItem[] @relation("AWBIdTripLineItem")
   hlfLineAWBIds      HLFLineItem[]  @relation("hlfLineAWBId")
   depsAWBIds         DEPS[]         @relation("depsAWBId")
-
+  internalInvocieAWBs      InternalInvoice[]         @relation("internalInvocieAWB")
   weightKgs             Float? @db.Float
   rollupArticleWeightKg Float? @db.Float
   rollupCwWeight        Float? @db.Float
@@ -273,6 +275,7 @@ model AwbLineItem {
   ratePerBox             Float?     @db.Float
   createdOn              DateTime?  @default(now())
   modifiedOn             DateTime?  @updatedAt
+  internalInvocieLIAWBs  InternalInvoiceLineItems[]         @relation("internalInvocieLIAWB")
 }
 
 enum ArticleStatus {
@@ -312,6 +315,8 @@ model ConsignorRateTable {
   branch      Branch?             @relation("consignorRateBranch", fields: [branchId], references: [id])
   ratePerKg   Float?
   ratePerBox  Float?
+  chargedWeightLower    Float?    @db.Float
+  chargedWeightHigher   Float?    @db.Float
   boxType     String?
   status      RateConsignorStatus @default(PendingApproval)
   createdOn   DateTime?           @default(now())
@@ -421,17 +426,19 @@ model TripLineItem {
 }
 
 model ODA {
-  id               Int       @id @default(autoincrement())
-  consignorId      Int
-  consignor        Consignor @relation("odaConsignorId", fields: [consignorId], references: [consignorId])
-  odaType          String    @db.VarChar(255)
-  odaKmLowerLimit  Float?    @db.Float
-  odaKmUpperLimit  Float?    @db.Float
-  weightLowerLimit Float?    @db.Float
-  weightUpperLimit Float?    @db.Float
-  charges          Float?    @db.Float
-  createdOn        DateTime? @default(now())
-  modifiedOn       DateTime? @updatedAt
+  id                    Int       @id @default(autoincrement())
+  consignorId           Int
+  consignor             Consignor @relation("odaConsignorId", fields: [consignorId], references: [consignorId])
+  kmStartingRange       Int?    
+  kmEndingRange         Int?   
+  chargedWeightLower    Float?    @db.Float
+  chargedWeightHigher   Float?    @db.Float
+  ODARatePerKg          Float?    @db.Float
+  ODABoxType            String?   @db.VarChar(255) 
+  ODARatePerBox         Float?    @db.Float
+  minimumCharge         Float?    @db.Float
+  createdOn             DateTime? @default(now())
+  modifiedOn            DateTime? @updatedAt
 }
 
 enum HLFLineItemStatus {
@@ -554,6 +561,11 @@ enum PTlRateType {
   RatePerBox
 }
 
+enum chargeType {
+  withChargedWeightRange
+  withoutChargedWeightRange
+}
+
 model Contract {
   id                          Int                   @id @default(autoincrement())
   consignorId                 Int
@@ -574,11 +586,15 @@ model Contract {
   articleChargeMaxAmount      Float?                @db.Float
   actualWeightFactor          Float?                @db.Float
   volumetricWeightFactor      Float?                @db.Float
-  cwCeiling                   Int?
+  cwCeiling                   Int?         
+  odaChargeType               chargeType?
+  baseChargeType              chargeType?
   createdOn                   DateTime              @default(now())
   modifiedOn                  DateTime?             @updatedAt
   AWBContractTypes            AirWayBill[]          @relation("AWBContractType")
+  internalInvocieContracts    InternalInvoice[]          @relation("internalInvocieContract")
 }
+
 
 enum ArticleLogsScanType {
   Load
@@ -613,6 +629,36 @@ model SKU {
   createdOn     DateTime   @default(now())
   modifiedOn    DateTime?  @updatedAt
 }
+
+model InternalInvoice{
+   id            Int        @id @default(autoincrement())
+   AWBId         Int
+   AirWayBill    AirWayBill     @relation("internalInvocieAWB", fields: [AWBId], references: [id])
+   consignorId   Int
+   consignor     Consignor     @relation("internalInvocieConsignor",fields:[consignorId],references:[consignorId])
+   consigneeId   Int
+   consignee     Consignee      @relation("internalInvocieConsignee",fields:[consigneeId],references:[consigneeId])
+   contractId    Int
+   contract      Contract       @relation("internalInvocieContract",fields:[contractId],references:[id])
+   ODACharge     Float          @db.Float
+   baseCharge    Float          @db.Float
+   createdOn     DateTime       @default(now())
+   modifiedOn    DateTime?      @updatedAt
+   internalInvocieLIInternalInvoices InternalInvoiceLineItems[]  @relation("internalInvocieLIInternalInvoice")
+}
+
+model InternalInvoiceLineItems{
+   id            Int           @id @default(autoincrement())
+   internalInvoiceId  Int
+   internalInvoice   InternalInvoice  @relation("internalInvocieLIInternalInvoice",fields:[internalInvoiceId],references:[id])
+   AWBLineItemId         Int
+   AwbLineItem    AwbLineItem  @relation("internalInvocieLIAWB", fields: [AWBLineItemId], references: [id])
+   ODACharge     Float          @db.Float
+   baseCharge    Float          @db.Float
+   createdOn     DateTime       @default(now())
+   modifiedOn    DateTime?      @updatedAt
+}
+
 
 //MASTER TABLES
 
