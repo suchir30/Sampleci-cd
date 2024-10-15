@@ -42,7 +42,6 @@ CREATE TABLE `CRMObject` (
     `viewIndex` INTEGER NULL,
     `CRMObjectGroupId` INTEGER NOT NULL,
 
-    UNIQUE INDEX `CRMObject_viewIndex_key`(`viewIndex`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -51,7 +50,7 @@ CREATE TABLE `CRMField` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(191) NOT NULL,
     `viewName` VARCHAR(191) NULL,
-    `ViewIndex` INTEGER NULL,
+    `viewIndex` INTEGER NULL,
     `isRelation` BOOLEAN NOT NULL DEFAULT false,
     `idFieldName` VARCHAR(191) NULL,
     `labelFieldName` VARCHAR(191) NULL,
@@ -64,7 +63,6 @@ CREATE TABLE `CRMField` (
     `filterView` BOOLEAN NOT NULL DEFAULT false,
     `CRMObjectId` INTEGER NOT NULL,
 
-    UNIQUE INDEX `CRMField_ViewIndex_key`(`ViewIndex`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -74,7 +72,6 @@ CREATE TABLE `CRMObjectGroup` (
     `viewName` VARCHAR(191) NOT NULL,
     `viewIndex` INTEGER NOT NULL,
 
-    UNIQUE INDEX `CRMObjectGroup_viewIndex_key`(`viewIndex`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -86,7 +83,6 @@ CREATE TABLE `CRMObjectRelations` (
     `viewIndex` INTEGER NULL,
     `isInRelatedListView` BOOLEAN NOT NULL DEFAULT false,
 
-    UNIQUE INDEX `CRMObjectRelations_viewIndex_key`(`viewIndex`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

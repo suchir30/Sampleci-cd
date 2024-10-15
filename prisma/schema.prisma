@@ -53,7 +53,7 @@ model CRMObject {
   id                   Int                   @id @default(autoincrement())
   name                 String
   viewName             String?
-  viewIndex            Int?                  @unique
+  viewIndex            Int?
   CRMObjectGroupId     Int
   CRMFields            CRMField[]            @relation("CRMFieldTable")
   CRMObjectGroup       CRMObjectGroup        @relation("CRMObjectGroupCRMObject", fields: [CRMObjectGroupId], references: [id])
@@ -66,7 +66,7 @@ model CRMField {
   id                  Int                  @id @default(autoincrement())
   name                String
   viewName            String?
-  ViewIndex           Int?                 @unique
+  viewIndex           Int?
   isRelation          Boolean              @default(false)
   idFieldName         String?
   labelFieldName      String?
@@ -85,7 +85,7 @@ model CRMField {
 model CRMObjectGroup {
   id         Int         @id @default(autoincrement())
   viewName   String
-  viewIndex  Int         @unique
+  viewIndex  Int
   CRMObjects CRMObject[] @relation("CRMObjectGroupCRMObject")
 }
 
@@ -93,7 +93,7 @@ model CRMObjectRelations {
   id                  Int       @id @default(autoincrement())
   primaryObjectId     Int
   relatedObjectId     Int
-  viewIndex           Int?      @unique
+  viewIndex           Int?
   isInRelatedListView Boolean   @default(false)
   PrimaryObject       CRMObject @relation("PrimaryObject", fields: [primaryObjectId], references: [id])
   RelatedObject       CRMObject @relation("RelatedObject", fields: [relatedObjectId], references: [id])
