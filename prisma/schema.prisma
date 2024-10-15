@@ -45,45 +45,80 @@ model Role {
   id                   Int                   @id @default(autoincrement())
   name                 String
   users                User[]                @relation("userRole")
-  CRMTablePermissions  CRMTablePermission[]  @relation("CRMTablePermissionRole")
-  CRMColumnPermissions CRMColumnPermission[] @relation("CRMColumnPermissionRole")
+  CRMObjectPermissions CRMObjectPermission[] @relation("CRMObjectPermissionRole")
+  CRMFieldPermissions  CRMFieldPermission[]  @relation("CRMFieldPermissionRole")
 }
 
-model CRMTable {
-  id                  Int                  @id @default(autoincrement())
-  name                String
-  CRMColumns          CRMColumn[]          @relation("CRMColumnTable")
-  CRMTablePermissions CRMTablePermission[] @relation("CRMTablePermissionCRMTable")
-}
-
-model CRMColumn {
+model CRMObject {
   id                   Int                   @id @default(autoincrement())
   name                 String
-  CRMTableId           Int
-  CRMTable             CRMTable              @relation("CRMColumnTable", fields: [CRMTableId], references: [id])
-  CRMColumnPermissions CRMColumnPermission[] @relation("CRMColumnPermissionCRMColumn")
+  viewName             String?
+  viewIndex            Int?                  @unique
+  CRMObjectGroupId     Int
+  CRMFields            CRMField[]            @relation("CRMFieldTable")
+  CRMObjectGroup       CRMObjectGroup        @relation("CRMObjectGroupCRMObject", fields: [CRMObjectGroupId], references: [id])
+  CRMObjectRelations   CRMObjectRelations[]  @relation("PrimaryObject")
+  CRMObjectRelated     CRMObjectRelations[]  @relation("RelatedObject")
+  CRMObjectPermissions CRMObjectPermission[] @relation("CRMObjectPermissionCRMObject")
 }
 
-model CRMTablePermission {
-  id         Int      @id @default(autoincrement())
-  roleId     Int
-  CRMTableId Int
-  can_read   Boolean  @default(false)
-  can_edit   Boolean  @default(false)
-  can_add    Boolean  @default(false)
-  can_delete Boolean  @default(false)
-  role       Role     @relation("CRMTablePermissionRole", fields: [roleId], references: [id])
-  CRMTable   CRMTable @relation("CRMTablePermissionCRMTable", fields: [CRMTableId], references: [id])
+model CRMField {
+  id                  Int                  @id @default(autoincrement())
+  name                String
+  viewName            String?
+  ViewIndex           Int?                 @unique
+  isRelation          Boolean              @default(false)
+  idFieldName         String?
+  labelFieldName      String?
+  isInCreateView      Boolean              @default(false)
+  isInListView        Boolean              @default(false)
+  isInEditView        Boolean              @default(false)
+  isInDetailView      Boolean              @default(false)
+  isInRelatedList     Boolean              @default(false)
+  isSearchableField   Boolean              @default(false)
+  filterView          Boolean              @default(false)
+  CRMObjectId         Int
+  CRMObject           CRMObject            @relation("CRMFieldTable", fields: [CRMObjectId], references: [id])
+  CRMFieldPermissions CRMFieldPermission[] @relation("CRMFieldPermissionCRMField")
 }
 
-model CRMColumnPermission {
+model CRMObjectGroup {
+  id         Int         @id @default(autoincrement())
+  viewName   String
+  viewIndex  Int         @unique
+  CRMObjects CRMObject[] @relation("CRMObjectGroupCRMObject")
+}
+
+model CRMObjectRelations {
+  id                  Int       @id @default(autoincrement())
+  primaryObjectId     Int
+  relatedObjectId     Int
+  viewIndex           Int?      @unique
+  isInRelatedListView Boolean   @default(false)
+  PrimaryObject       CRMObject @relation("PrimaryObject", fields: [primaryObjectId], references: [id])
+  RelatedObject       CRMObject @relation("RelatedObject", fields: [relatedObjectId], references: [id])
+}
+
+model CRMObjectPermission {
   id          Int       @id @default(autoincrement())
   roleId      Int
-  CRMColumnId Int
+  CRMObjectId Int
   can_read    Boolean   @default(false)
   can_edit    Boolean   @default(false)
-  role        Role      @relation("CRMColumnPermissionRole", fields: [roleId], references: [id])
-  CRMColumn   CRMColumn @relation("CRMColumnPermissionCRMColumn", fields: [CRMColumnId], references: [id])
+  can_add     Boolean   @default(false)
+  can_delete  Boolean   @default(false)
+  role        Role      @relation("CRMObjectPermissionRole", fields: [roleId], references: [id])
+  CRMObject   CRMObject @relation("CRMObjectPermissionCRMObject", fields: [CRMObjectId], references: [id])
+}
+
+model CRMFieldPermission {
+  id         Int      @id @default(autoincrement())
+  roleId     Int
+  CRMFieldId Int
+  can_read   Boolean  @default(false)
+  can_edit   Boolean  @default(false)
+  role       Role     @relation("CRMFieldPermissionRole", fields: [roleId], references: [id])
+  CRMField   CRMField @relation("CRMFieldPermissionCRMField", fields: [CRMFieldId], references: [id])
 }
 
 model Branch {
@@ -121,80 +156,80 @@ model Branch {
 }
 
 model Consignor {
-  consignorId           Int                  @id @default(autoincrement())
-  consignorCode         String?              @db.VarChar(255)
-  publicName            String               @db.VarChar(255)
-  legalName             String               @db.VarChar(255)
-  industryTypeId        Int?
-  industryType          IndustryTypeMaster?  @relation("consignorIndustryType", fields: [industryTypeId], references: [id])
-  commodityId           Int?
-  commodity             CommodityMaster?     @relation("ConsignoreCommodity", fields: [commodityId], references: [id])
-  address1              String?              @db.VarChar(255)
-  address2              String?              @db.VarChar(255)
-  cityId                Int?
-  city                  CityMaster?          @relation("consignorCity", fields: [cityId], references: [id])
-  districtId            Int?
-  disstrict             DistrictMaster?      @relation("consignorDistrict", fields: [districtId], references: [id])
-  stateId               Int?
-  state                 StateMaster?         @relation("consignorState", fields: [stateId], references: [id])
-  gstNumber             String?              @db.VarChar(255)
-  panNumber             String?              @db.VarChar(255)
-  tanNumber             String?              @db.VarChar(255)
-  cinNumber             String?              @db.VarChar(255)
-  gstId                 Int?
-  gst                   GstMaster?           @relation("ConsignorGstId", fields: [gstId], references: [id])
-  gstExemptFileId       Int?
-  FileUpload            FileUpload?          @relation("consignorGstFile", fields: [gstExemptFileId], references: [id])
-  taxCategory           String?              @db.VarChar(255)
-  parentConsignorId     Int?
-  parentConsignor       Consignor?           @relation("parentConsignor", fields: [parentConsignorId], references: [consignorId])
-  childConsignors       Consignor[]          @relation("parentConsignor")
-  branchId              Int?
-  branch                Branch?              @relation("consignorBranch", fields: [branchId], references: [id])
-  wareHouseId           Int?
-  wareHouse             Branch?              @relation("consignorwareHouseId", fields: [wareHouseId], references: [id])
-  keyContactName        String?              @db.VarChar(255)
-  keyContactDesignation String?              @db.VarChar(255)
-  keyContactAddress     String?              @db.VarChar(255)
-  distanceFromBranchKms Int?
-  createdOn             DateTime?            @default(now())
-  modifiedOn            DateTime?            @updatedAt
-  consignees            Consignee[]          @relation("consigneeConsignor")
-  AWBs                  AirWayBill[]         @relation("AWBConsignor")
-  consignorRate         ConsignorRateTable[] @relation("rateTableConsignor")
-  odaConsignorIds       ODA[]                @relation("odaConsignorId")
-  contractConsignorIds  Contract[]           @relation("contractConsignorId")
-  SKUConsignorIds       SKU[]                @relation("SKUConsignorId")  
-  internalInvocieConsignors       InternalInvoice[]                @relation("internalInvocieConsignor")
+  consignorId               Int                  @id @default(autoincrement())
+  consignorCode             String?              @db.VarChar(255)
+  publicName                String               @db.VarChar(255)
+  legalName                 String               @db.VarChar(255)
+  industryTypeId            Int?
+  industryType              IndustryTypeMaster?  @relation("consignorIndustryType", fields: [industryTypeId], references: [id])
+  commodityId               Int?
+  commodity                 CommodityMaster?     @relation("ConsignoreCommodity", fields: [commodityId], references: [id])
+  address1                  String?              @db.VarChar(255)
+  address2                  String?              @db.VarChar(255)
+  cityId                    Int?
+  city                      CityMaster?          @relation("consignorCity", fields: [cityId], references: [id])
+  districtId                Int?
+  disstrict                 DistrictMaster?      @relation("consignorDistrict", fields: [districtId], references: [id])
+  stateId                   Int?
+  state                     StateMaster?         @relation("consignorState", fields: [stateId], references: [id])
+  gstNumber                 String?              @db.VarChar(255)
+  panNumber                 String?              @db.VarChar(255)
+  tanNumber                 String?              @db.VarChar(255)
+  cinNumber                 String?              @db.VarChar(255)
+  gstId                     Int?
+  gst                       GstMaster?           @relation("ConsignorGstId", fields: [gstId], references: [id])
+  gstExemptFileId           Int?
+  FileUpload                FileUpload?          @relation("consignorGstFile", fields: [gstExemptFileId], references: [id])
+  taxCategory               String?              @db.VarChar(255)
+  parentConsignorId         Int?
+  parentConsignor           Consignor?           @relation("parentConsignor", fields: [parentConsignorId], references: [consignorId])
+  childConsignors           Consignor[]          @relation("parentConsignor")
+  branchId                  Int?
+  branch                    Branch?              @relation("consignorBranch", fields: [branchId], references: [id])
+  wareHouseId               Int?
+  wareHouse                 Branch?              @relation("consignorwareHouseId", fields: [wareHouseId], references: [id])
+  keyContactName            String?              @db.VarChar(255)
+  keyContactDesignation     String?              @db.VarChar(255)
+  keyContactAddress         String?              @db.VarChar(255)
+  distanceFromBranchKms     Int?
+  createdOn                 DateTime?            @default(now())
+  modifiedOn                DateTime?            @updatedAt
+  consignees                Consignee[]          @relation("consigneeConsignor")
+  AWBs                      AirWayBill[]         @relation("AWBConsignor")
+  consignorRate             ConsignorRateTable[] @relation("rateTableConsignor")
+  odaConsignorIds           ODA[]                @relation("odaConsignorId")
+  contractConsignorIds      Contract[]           @relation("contractConsignorId")
+  SKUConsignorIds           SKU[]                @relation("SKUConsignorId")
+  internalInvocieConsignors InternalInvoice[]    @relation("internalInvocieConsignor")
 }
 
 model Consignee {
-  consigneeId         Int             @id @default(autoincrement())
-  consignorId         Int
-  consignor           Consignor       @relation("consigneeConsignor", fields: [consignorId], references: [consignorId])
-  consigneeCode       String?         @db.VarChar(255)
-  consigneeName       String          @db.VarChar(255)
-  phone1              String?         @db.VarChar(255)
-  phone2              String?         @db.VarChar(255)
-  email               String?         @db.VarChar(255)
-  address1            String?         @db.VarChar(255)
-  address2            String?         @db.VarChar(255)
-  cityId              Int?
-  city                CityMaster?     @relation("consigneeCity", fields: [cityId], references: [id])
-  districtId          Int?
-  district            DistrictMaster? @relation("consigneeDistrict", fields: [districtId], references: [id])
-  stateId             Int?
-  state               StateMaster?    @relation("consigneeState", fields: [stateId], references: [id])
-  branchId            Int?
-  branch              Branch?         @relation("consigneeBranch", fields: [branchId], references: [id])
-  distanceToBranchKms Int?
-  odaType             String?         @db.VarChar(255)
-  tatNumber           Int?
-  PINCodeId           Int?
-  createdOn           DateTime?       @default(now())
-  modifiedOn          DateTime?       @updatedAt
-  AWBs                AirWayBill[]    @relation("AWBConsignee")
-  internalInvocieConsignees                InternalInvoice[]    @relation("internalInvocieConsignee")
+  consigneeId               Int               @id @default(autoincrement())
+  consignorId               Int
+  consignor                 Consignor         @relation("consigneeConsignor", fields: [consignorId], references: [consignorId])
+  consigneeCode             String?           @db.VarChar(255)
+  consigneeName             String            @db.VarChar(255)
+  phone1                    String?           @db.VarChar(255)
+  phone2                    String?           @db.VarChar(255)
+  email                     String?           @db.VarChar(255)
+  address1                  String?           @db.VarChar(255)
+  address2                  String?           @db.VarChar(255)
+  cityId                    Int?
+  city                      CityMaster?       @relation("consigneeCity", fields: [cityId], references: [id])
+  districtId                Int?
+  district                  DistrictMaster?   @relation("consigneeDistrict", fields: [districtId], references: [id])
+  stateId                   Int?
+  state                     StateMaster?      @relation("consigneeState", fields: [stateId], references: [id])
+  branchId                  Int?
+  branch                    Branch?           @relation("consigneeBranch", fields: [branchId], references: [id])
+  distanceToBranchKms       Int?
+  odaType                   String?           @db.VarChar(255)
+  tatNumber                 Int?
+  PINCodeId                 Int?
+  createdOn                 DateTime?         @default(now())
+  modifiedOn                DateTime?         @updatedAt
+  AWBs                      AirWayBill[]      @relation("AWBConsignee")
+  internalInvocieConsignees InternalInvoice[] @relation("internalInvocieConsignee")
 }
 
 enum AWBStatus {
@@ -231,51 +266,51 @@ model AirWayBill {
   chargedWeightWithCeiling Float? @db.Float
   grandTotal               Float? @db.Float
 
-  subTotal           Float?         @db.Float
-  AWBStatus          AWBStatus      @default(PickUp)
-  articleGenFlag     Boolean        @default(false)
-  contractTypeId     Int?
-  contract           Contract?      @relation("AWBContractType", fields: [contractTypeId], references: [id])
-  appointmentDate    DateTime?
-  AWBPdf             Int?
-  FileUpload         FileUpload?    @relation("AWBFileAirWayBill", fields: [AWBPdf], references: [id])
-  CDM                Float?         @db.Float
-  completeFlag       Boolean        @default(false)
-  createdOn          DateTime?      @default(now())
-  modifiedOn         DateTime?      @updatedAt
-  AWBLineItems       AwbLineItem[]
-  AWBArticles        AwbArticle[]
-  AWBIdTripLineItems TripLineItem[] @relation("AWBIdTripLineItem")
-  hlfLineAWBIds      HLFLineItem[]  @relation("hlfLineAWBId")
-  depsAWBIds         DEPS[]         @relation("depsAWBId")
-  internalInvocieAWBs      InternalInvoice[]         @relation("internalInvocieAWB")
-  weightKgs             Float? @db.Float
-  rollupArticleWeightKg Float? @db.Float
-  rollupCwWeight        Float? @db.Float
-  rollupSKU             Float? @db.Float
+  subTotal              Float?            @db.Float
+  AWBStatus             AWBStatus         @default(PickUp)
+  articleGenFlag        Boolean           @default(false)
+  contractTypeId        Int?
+  contract              Contract?         @relation("AWBContractType", fields: [contractTypeId], references: [id])
+  appointmentDate       DateTime?
+  AWBPdf                Int?
+  FileUpload            FileUpload?       @relation("AWBFileAirWayBill", fields: [AWBPdf], references: [id])
+  CDM                   Float?            @db.Float
+  completeFlag          Boolean           @default(false)
+  createdOn             DateTime?         @default(now())
+  modifiedOn            DateTime?         @updatedAt
+  AWBLineItems          AwbLineItem[]
+  AWBArticles           AwbArticle[]
+  AWBIdTripLineItems    TripLineItem[]    @relation("AWBIdTripLineItem")
+  hlfLineAWBIds         HLFLineItem[]     @relation("hlfLineAWBId")
+  depsAWBIds            DEPS[]            @relation("depsAWBId")
+  internalInvocieAWBs   InternalInvoice[] @relation("internalInvocieAWB")
+  weightKgs             Float?            @db.Float
+  rollupArticleWeightKg Float?            @db.Float
+  rollupCwWeight        Float?            @db.Float
+  rollupSKU             Float?            @db.Float
 }
 
 model AwbLineItem {
-  id                     Int        @id @default(autoincrement())
+  id                     Int                        @id @default(autoincrement())
   AWBId                  Int
-  AWB                    AirWayBill @relation(fields: [AWBId], references: [id])
-  lineItemDescription    String?    @db.VarChar(255)
+  AWB                    AirWayBill                 @relation(fields: [AWBId], references: [id])
+  lineItemDescription    String?                    @db.VarChar(255)
   numOfArticles          Int
-  articleWeightKg        Float?     @db.Float
-  weightKgs              Float?     @db.Float
-  actualFactorWeight     Float?     @db.Float
-  volumetricFactorWeight Float?     @db.Float
-  lengthCms              Float?     @db.Float
-  breadthCms             Float?     @db.Float
-  heightCms              Float?     @db.Float
-  volume                 Float?     @db.Float
+  articleWeightKg        Float?                     @db.Float
+  weightKgs              Float?                     @db.Float
+  actualFactorWeight     Float?                     @db.Float
+  volumetricFactorWeight Float?                     @db.Float
+  lengthCms              Float?                     @db.Float
+  breadthCms             Float?                     @db.Float
+  heightCms              Float?                     @db.Float
+  volume                 Float?                     @db.Float
   SKUId                  Int?
   SKUCode                String?
   boxType                String?
-  ratePerBox             Float?     @db.Float
-  createdOn              DateTime?  @default(now())
-  modifiedOn             DateTime?  @updatedAt
-  internalInvocieLIAWBs  InternalInvoiceLineItems[]         @relation("internalInvocieLIAWB")
+  ratePerBox             Float?                     @db.Float
+  createdOn              DateTime?                  @default(now())
+  modifiedOn             DateTime?                  @updatedAt
+  internalInvocieLIAWBs  InternalInvoiceLineItems[] @relation("internalInvocieLIAWB")
 }
 
 enum ArticleStatus {
@@ -308,19 +343,19 @@ enum BoxType {
 }
 
 model ConsignorRateTable {
-  id          Int                 @id @default(autoincrement())
-  consignorId Int?
-  consignor   Consignor?          @relation("rateTableConsignor", fields: [consignorId], references: [consignorId])
-  branchId    Int?
-  branch      Branch?             @relation("consignorRateBranch", fields: [branchId], references: [id])
-  ratePerKg   Float?
-  ratePerBox  Float?
-  chargedWeightLower    Float?    @db.Float
-  chargedWeightHigher   Float?    @db.Float
-  boxType     String?
-  status      RateConsignorStatus @default(PendingApproval)
-  createdOn   DateTime?           @default(now())
-  modifiedOn  DateTime?           @updatedAt
+  id                  Int                 @id @default(autoincrement())
+  consignorId         Int?
+  consignor           Consignor?          @relation("rateTableConsignor", fields: [consignorId], references: [consignorId])
+  branchId            Int?
+  branch              Branch?             @relation("consignorRateBranch", fields: [branchId], references: [id])
+  ratePerKg           Float?
+  ratePerBox          Float?
+  chargedWeightLower  Float?              @db.Float
+  chargedWeightHigher Float?              @db.Float
+  boxType             String?
+  status              RateConsignorStatus @default(PendingApproval)
+  createdOn           DateTime?           @default(now())
+  modifiedOn          DateTime?           @updatedAt
 }
 
 enum TripStatus {
@@ -342,7 +377,7 @@ model TripDetails {
   localTripNumber       String?              @db.VarChar(255)
   vendorId              Int
   vendor                VendorMaster         @relation("tripVendorCode", fields: [vendorId], references: [id])
-  vehicleId             Int 
+  vehicleId             Int
   vehicle               VehicleMaster        @relation("tripVehicleId", fields: [vehicleId], references: [id])
   driverId              Int
   driver                DriverMaster         @relation("tripDriverId", fields: [driverId], references: [id])
@@ -426,19 +461,19 @@ model TripLineItem {
 }
 
 model ODA {
-  id                    Int       @id @default(autoincrement())
-  consignorId           Int
-  consignor             Consignor @relation("odaConsignorId", fields: [consignorId], references: [consignorId])
-  kmStartingRange       Int?    
-  kmEndingRange         Int?   
-  chargedWeightLower    Float?    @db.Float
-  chargedWeightHigher   Float?    @db.Float
-  ODARatePerKg          Float?    @db.Float
-  ODABoxType            String?   @db.VarChar(255) 
-  ODARatePerBox         Float?    @db.Float
-  minimumCharge         Float?    @db.Float
-  createdOn             DateTime? @default(now())
-  modifiedOn            DateTime? @updatedAt
+  id                  Int       @id @default(autoincrement())
+  consignorId         Int
+  consignor           Consignor @relation("odaConsignorId", fields: [consignorId], references: [consignorId])
+  kmStartingRange     Int?
+  kmEndingRange       Int?
+  chargedWeightLower  Float?    @db.Float
+  chargedWeightHigher Float?    @db.Float
+  ODARatePerKg        Float?    @db.Float
+  ODABoxType          String?   @db.VarChar(255)
+  ODARatePerBox       Float?    @db.Float
+  minimumCharge       Float?    @db.Float
+  createdOn           DateTime? @default(now())
+  modifiedOn          DateTime? @updatedAt
 }
 
 enum HLFLineItemStatus {
@@ -586,15 +621,14 @@ model Contract {
   articleChargeMaxAmount      Float?                @db.Float
   actualWeightFactor          Float?                @db.Float
   volumetricWeightFactor      Float?                @db.Float
-  cwCeiling                   Int?         
+  cwCeiling                   Int?
   odaChargeType               chargeType?
   baseChargeType              chargeType?
   createdOn                   DateTime              @default(now())
   modifiedOn                  DateTime?             @updatedAt
   AWBContractTypes            AirWayBill[]          @relation("AWBContractType")
-  internalInvocieContracts    InternalInvoice[]          @relation("internalInvocieContract")
+  internalInvocieContracts    InternalInvoice[]     @relation("internalInvocieContract")
 }
-
 
 enum ArticleLogsScanType {
   Load
@@ -630,35 +664,34 @@ model SKU {
   modifiedOn    DateTime?  @updatedAt
 }
 
-model InternalInvoice{
-   id            Int        @id @default(autoincrement())
-   AWBId         Int
-   AirWayBill    AirWayBill     @relation("internalInvocieAWB", fields: [AWBId], references: [id])
-   consignorId   Int
-   consignor     Consignor     @relation("internalInvocieConsignor",fields:[consignorId],references:[consignorId])
-   consigneeId   Int
-   consignee     Consignee      @relation("internalInvocieConsignee",fields:[consigneeId],references:[consigneeId])
-   contractId    Int
-   contract      Contract       @relation("internalInvocieContract",fields:[contractId],references:[id])
-   ODACharge     Float          @db.Float
-   baseCharge    Float          @db.Float
-   createdOn     DateTime       @default(now())
-   modifiedOn    DateTime?      @updatedAt
-   internalInvocieLIInternalInvoices InternalInvoiceLineItems[]  @relation("internalInvocieLIInternalInvoice")
+model InternalInvoice {
+  id                                Int                        @id @default(autoincrement())
+  AWBId                             Int
+  AirWayBill                        AirWayBill                 @relation("internalInvocieAWB", fields: [AWBId], references: [id])
+  consignorId                       Int
+  consignor                         Consignor                  @relation("internalInvocieConsignor", fields: [consignorId], references: [consignorId])
+  consigneeId                       Int
+  consignee                         Consignee                  @relation("internalInvocieConsignee", fields: [consigneeId], references: [consigneeId])
+  contractId                        Int
+  contract                          Contract                   @relation("internalInvocieContract", fields: [contractId], references: [id])
+  ODACharge                         Float                      @db.Float
+  baseCharge                        Float                      @db.Float
+  createdOn                         DateTime                   @default(now())
+  modifiedOn                        DateTime?                  @updatedAt
+  internalInvocieLIInternalInvoices InternalInvoiceLineItems[] @relation("internalInvocieLIInternalInvoice")
 }
 
-model InternalInvoiceLineItems{
-   id            Int           @id @default(autoincrement())
-   internalInvoiceId  Int
-   internalInvoice   InternalInvoice  @relation("internalInvocieLIInternalInvoice",fields:[internalInvoiceId],references:[id])
-   AWBLineItemId         Int
-   AwbLineItem    AwbLineItem  @relation("internalInvocieLIAWB", fields: [AWBLineItemId], references: [id])
-   ODACharge     Float          @db.Float
-   baseCharge    Float          @db.Float
-   createdOn     DateTime       @default(now())
-   modifiedOn    DateTime?      @updatedAt
+model InternalInvoiceLineItems {
+  id                Int             @id @default(autoincrement())
+  internalInvoiceId Int
+  internalInvoice   InternalInvoice @relation("internalInvocieLIInternalInvoice", fields: [internalInvoiceId], references: [id])
+  AWBLineItemId     Int
+  AwbLineItem       AwbLineItem     @relation("internalInvocieLIAWB", fields: [AWBLineItemId], references: [id])
+  ODACharge         Float           @db.Float
+  baseCharge        Float           @db.Float
+  createdOn         DateTime        @default(now())
+  modifiedOn        DateTime?       @updatedAt
 }
-
 
 //MASTER TABLES
 
