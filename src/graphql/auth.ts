@@ -9,8 +9,8 @@ export function authorizeTableMutation(tableName: string, mutationType: Mutation
   if (!permissions) {
     throw Error("Permissions have not been initialized.");
   }
-  const tablePermission = permissions.CRMTablePermissions.find(
-    tablePermission => tablePermission.CRMTable.name === tableName);
+  const tablePermission = permissions.CRMObjectPermissions.find(
+    tablePermission => tablePermission.CRMObject.name === tableName);
   if (!tablePermission) {
     throw Error(`No permissions are registered for table: ${tableName}`);
   }
@@ -40,9 +40,9 @@ export function authorizeTableMutationData(tableName: string, data: any[], permi
   console.log({data});
   console.log(columnFields);
   for (let columnName of columnFields) {
-    const columnPermission = permissions.CRMColumnPermissions.find(
-      columnPermission => columnPermission.CRMColumn.name === columnName &&
-        columnPermission.CRMColumn.CRMTable.name === tableName);
+    const columnPermission = permissions.CRMFieldPermissions.find(
+      columnPermission => columnPermission.CRMField.name === columnName &&
+        columnPermission.CRMField.CRMObject.name === tableName);
     if (!columnPermission) {
       throw Error(`No permissions are registered for column ${columnName} of table: ${tableName} `);
     }
@@ -57,9 +57,9 @@ function authorizeColumnQuery(tableName: string, columnName: string, permissions
   if (!permissions) {
     throw Error("Permissions have not been initialized.");
   }
-  const columnPermission = permissions.CRMColumnPermissions.find(
-    columnPermission => columnPermission.CRMColumn.name === columnName &&
-      columnPermission.CRMColumn.CRMTable.name === tableName);
+  const columnPermission = permissions.CRMFieldPermissions.find(
+    columnPermission => columnPermission.CRMField.name === columnName &&
+      columnPermission.CRMField.CRMObject.name === tableName);
   if (!columnPermission) {
     throw Error(`No permissions are registered for column ${columnName} of table: ${tableName} `);
   }
