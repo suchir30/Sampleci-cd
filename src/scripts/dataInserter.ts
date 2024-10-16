@@ -18,6 +18,9 @@ const prisma = new PrismaClient();
         console.error('Error fetching DMMF:', error);
     }
 }*/
+function unCapitalizeFirstLetter(str: string): string {
+    return str.charAt(0).toLowerCase() + str.slice(1);
+}
 
 async function getDefaultGroupId() {
     const defalutGroupName = 'others'
@@ -56,9 +59,10 @@ async function insertSchemaData(models:any) {
     const othersGroupId = await getDefaultGroupId();
 
     for (const model of models) {
+        const modelName = unCapitalizeFirstLetter(model.name);
         const existingCrmObject = await prisma.cRMObject.findFirst({
             where: {
-                name: model.name,
+                name: modelName,
             },
         });
 
@@ -67,8 +71,8 @@ async function insertSchemaData(models:any) {
         if (!existingCrmObject) {
             crmObject = await prisma.cRMObject.create({
                 data: {
-                    name: model.name,
-                    viewName: model.name,
+                    name: modelName,
+                    viewName: modelName,
                     viewIndex: models.indexOf(model) + 1,
                     CRMObjectGroupId: othersGroupId
                 }
@@ -109,14 +113,15 @@ async function insertSchemaData(models:any) {
 
 async function insertRelations(models:any) {
     for (const model of models) {
+        const modelName = unCapitalizeFirstLetter(model.name);
         const crmObject = await prisma.cRMObject.findFirst({
             where: {
-                name: model.name,
+                name: modelName,
             },
         });
 
         if (!crmObject) {
-            console.warn(`CRMObject for model ${model.name} not found. Skipping relations.`);
+            console.warn(`CRMObject for model ${modelName} not found. Skipping relations.`);
             continue;
         }
 
@@ -152,23 +157,18 @@ async function insertRelations(models:any) {
 }
 
 async function cleanUpDeletedEnteries(models:any) {
-    // Create a Set of model names for quick lookup
-    const modelNamesSet = new Set(models.map((model: { name: any; }) => model.name));
+    const modelNamesSet = new Set(models.map((model: { name: any; }) => unCapitalizeFirstLetter(model.name)));
 
-    // Fetch all CRMObjects
     const existingCrmObjects = await prisma.cRMObject.findMany();
 
-    // Iterate over existing CRMObjects and delete those not in models
     for (const crmObject of existingCrmObjects) {
         if (!modelNamesSet.has(crmObject.name)) {
-            // Delete associated CRMField entries first
             await prisma.cRMField.deleteMany({
                 where: {
                     CRMObjectId: crmObject.id,
                 },
             });
 
-            // Delete associated CRMObjectRelations
             await prisma.cRMObjectRelations.deleteMany({
                 where: {
                     OR: [
@@ -178,7 +178,6 @@ async function cleanUpDeletedEnteries(models:any) {
                 },
             });
 
-            // Delete the CRMObject
             await prisma.cRMObject.delete({
                 where: {
                     id: crmObject.id,
@@ -186,16 +185,13 @@ async function cleanUpDeletedEnteries(models:any) {
             });
             console.log(`Deleted CRMObject: ${crmObject.name}`);
         } else {
-            // If the object exists in models, we also need to clean up its fields
-            const modelFieldsSet = new Set(models.find((model: { name: string; }) => model.name === crmObject.name).fields.map((field: { name: any; }) => field.name));
+            const modelFieldsSet = new Set(models.find((model: { name: string; }) => unCapitalizeFirstLetter(model.name) === crmObject.name).fields.map((field: { name: any; }) => field.name));
 
             const existingCrmFields = await prisma.cRMField.findMany({
                 where: {
                     CRMObjectId: crmObject.id,
                 },
             });
-
-            // Iterate over existing CRMFields and delete those not in modelFields
             for (const crmField of existingCrmFields) {
                 if (!modelFieldsSet.has(crmField.name)) {
                     await prisma.cRMField.delete({
