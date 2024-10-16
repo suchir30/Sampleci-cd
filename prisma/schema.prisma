@@ -10,9 +10,9 @@ generator typegraphql {
   provider = "typegraphql-prisma"
 }
 
-generator dataSeedGenerator {
-  provider = "ts-node ./prisma/configSeedingGenerator/generator.ts"
-}
+//generator dataSeedGenerator {
+//  provider = "ts-node ./prisma/configSeedingGenerator/generator.ts"
+//}
 
 datasource db {
   provider = "mysql"
