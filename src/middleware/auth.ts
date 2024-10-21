@@ -7,7 +7,13 @@ const tokenAuth = (req: AuthRequest, res: Response, next: NextFunction): void =>
         next();
         return;
     }
-    const bearerHeader = req.headers['authorization'];
+    let bearerHeader = req.headers['authorization'];
+    if (req.url.includes('/getFile')) {
+        const queryBearerHeader = req.query.token;
+        if (typeof queryBearerHeader === 'string') {
+            bearerHeader = queryBearerHeader;
+        }
+    }
     if (typeof bearerHeader !== 'undefined') {
         const [_, token] = bearerHeader.split(' ');
         jwt.verify(token, process.env.JWT_SECRET as string, (err: any, user: any) => {
