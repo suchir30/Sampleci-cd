@@ -1,0 +1,284 @@
+import { PrismaClient } from '@prisma/client';
+import {getDMMF} from '@prisma/internals';
+import path from 'path';
+
+const prisma = new PrismaClient();
+
+
+async function getDmmf() {
+    try {
+        const schemaPath = path.join(__dirname, '../../prisma/schema.prisma');
+        const dmmf = await getDMMF({
+            datamodelPath: schemaPath,
+            retry: 3,
+        });
+        console.log(dmmf.datamodel.models[0].name);
+        return dmmf;
+    } catch (error) {
+        console.error('Error fetching DMMF:', error);
+    }
+}
+function unCapitalizeFirstLetter(str: string): string {
+    return str.charAt(0).toLowerCase() + str.slice(1);
+}
+
+async function getDefaultGroupId() {
+    const defalutGroupName = 'others';
+    try {
+        const othersGroup = await prisma.cRMObjectGroup.findFirst({
+            where: {
+                viewName: {
+                    equals: defalutGroupName,
+                },
+            },
+        });
+
+        if (othersGroup) {
+            return othersGroup.id;
+        }
+
+        const maxViewIndex = await prisma.cRMObjectGroup.aggregate({
+            _max: {
+                viewIndex: true,
+            },
+        });
+
+        const newViewIndex = (maxViewIndex._max.viewIndex || 0) + 1;
+
+        const newGroup = await prisma.cRMObjectGroup.create({
+            data: {
+                viewName: defalutGroupName,
+                viewIndex: newViewIndex,
+            },
+        });
+
+        return newGroup.id;
+    } catch (error) {
+        console.error('Error in getDefaultGroupId:', error);
+        return null;
+    }
+}
+
+async function insertSchemaData(models: any) {
+    const othersGroupId = await getDefaultGroupId();
+
+    for (const model of models) {
+        const modelName = unCapitalizeFirstLetter(model.name);
+
+        try {
+            const existingCrmObject = await prisma.cRMObject.findFirst({
+                where: {
+                    name: modelName,
+                },
+            });
+
+            let crmObject;
+
+            if (!existingCrmObject) {
+                crmObject = await prisma.cRMObject.create({
+                    data: {
+                        name: modelName,
+                        viewName: modelName,
+                        viewIndex: models.indexOf(model) + 1,
+                        CRMObjectGroupId: othersGroupId ?? -1,
+                    },
+                });
+            } else {
+                crmObject = existingCrmObject;
+            }
+
+            for (const field of model.fields) {
+                try {
+                    const existingCrmField = await prisma.cRMField.findFirst({
+                        where: {
+                            name: field.name,
+                            CRMObjectId: crmObject.id,
+                        },
+                    });
+
+                    if (!existingCrmField) {
+                        await prisma.cRMField.create({
+                            data: {
+                                name: field.name,
+                                viewName: field.name,
+                                isRelation: field.kind === 'object',
+                                idFieldName: field.kind === 'object' ? field.relationFromFields[0] : null,
+                                labelFieldName: field.kind === 'object' ? field.name : null,
+                                isInCreateView: false,
+                                isInListView: false,
+                                isInEditView: false,
+                                isInDetailView: false,
+                                isInRelatedList: field.kind === 'object',
+                                isSearchableField: field.kind !== 'object',
+                                CRMObjectId: crmObject.id,
+                            },
+                        });
+                    }
+                } catch (error) {
+                    console.error(`Error processing field ${field.name} for CRMObject ${modelName}:`, error);
+                }
+            }
+        } catch (error) {
+            console.error(`Error processing CRMObject ${modelName}:`, error);
+        }
+    }
+}
+
+async function insertRelations(models: any) {
+    for (const model of models) {
+        const modelName = unCapitalizeFirstLetter(model.name);
+
+        try {
+            const crmObject = await prisma.cRMObject.findFirst({
+                where: {
+                    name: modelName,
+                },
+            });
+
+            if (!crmObject) {
+                console.warn(`CRMObject for model ${modelName} not found. Skipping relations.`);
+                continue;
+            }
+
+            for (const field of model.fields) {
+                if (field.kind === 'object') {
+                    try {
+                        const relatedObjectName = field.type;
+                        const relatedCrmObject = await prisma.cRMObject.findFirst({
+                            where: {
+                                name: relatedObjectName,
+                            },
+                        });
+
+                        if (relatedCrmObject) {
+                            const existingRelation = await prisma.cRMObjectRelations.findFirst({
+                                where: {
+                                    primaryObjectId: crmObject.id,
+                                    relatedObjectId: relatedCrmObject.id,
+                                },
+                            });
+
+                            if (!existingRelation) {
+                                await prisma.cRMObjectRelations.create({
+                                    data: {
+                                        primaryObjectId: crmObject.id,
+                                        relatedObjectId: relatedCrmObject.id,
+                                    },
+                                });
+                            }
+                        }
+                    } catch (error) {
+                        console.error(`Error processing relation for CRMObject ${modelName} and field ${field.name}:`, error);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error(`Error processing relations for CRMObject ${modelName}:`, error);
+        }
+    }
+}
+
+async function cleanUpDeletedEnteries(models: any) {
+    try {
+        const modelNamesSet = new Set(models.map((model: { name: any; }) => unCapitalizeFirstLetter(model.name)));
+
+        const existingCrmObjects = await prisma.cRMObject.findMany();
+
+        for (const crmObject of existingCrmObjects) {
+            if (!modelNamesSet.has(crmObject.name)) {
+                await prisma.cRMField.deleteMany({
+                    where: {
+                        CRMObjectId: crmObject.id,
+                    },
+                });
+
+                await prisma.cRMObjectRelations.deleteMany({
+                    where: {
+                        OR: [
+                            { primaryObjectId: crmObject.id },
+                            { relatedObjectId: crmObject.id },
+                        ],
+                    },
+                });
+
+                await prisma.cRMObject.delete({
+                    where: {
+                        id: crmObject.id,
+                    },
+                });
+                console.log(`Deleted CRMObject: ${crmObject.name}`);
+            } else {
+                const modelFieldsSet = new Set(
+                    models.find((model: { name: string }) => unCapitalizeFirstLetter(model.name) === crmObject.name).fields.map(
+                        (field: { name: any }) => field.name
+                    )
+                );
+
+                const existingCrmFields = await prisma.cRMField.findMany({
+                    where: {
+                        CRMObjectId: crmObject.id,
+                    },
+                });
+
+                for (const crmField of existingCrmFields) {
+                    if (!modelFieldsSet.has(crmField.name)) {
+                        await prisma.cRMField.delete({
+                            where: {
+                                id: crmField.id,
+                            },
+                        });
+                        console.log(`Deleted CRMField: ${crmField.name} from CRMObject: ${crmObject.name}`);
+                    }
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Error cleaning up entries:', error);
+    }
+}
+
+
+export async function insertData(models:any) {
+
+    if(!models){
+        const dmmf = await getDmmf();
+        models = dmmf!.datamodel.models;
+    }
+
+    await insertSchemaData(models)
+        .then(() => {
+            console.log('Objects and Fields Inserted Successfully');
+        })
+        .catch((error) => {
+            console.error('Error inserting data:', error);
+        })
+
+    await insertRelations(models)
+        .then(() => {
+            console.log('Object Relations Inserted Successfully');
+        })
+        .catch((error) => {
+            console.error('Error inserting Relations:', error);
+        })
+
+    await cleanUpDeletedEnteries(models)
+        .then(() => {
+            console.log('CleanUp  Successful');
+        })
+        .catch((error) => {
+            console.error('Error Cleaning Up:', error);
+        })
+}
+
+insertData(null);
+
+/*
+insertData()
+    .catch((error) => {
+        console.error('Error inserting data or relations:', error);
+    })
+    .finally(async () => {
+        await prisma.$disconnect();
+        return;
+    });
+*/

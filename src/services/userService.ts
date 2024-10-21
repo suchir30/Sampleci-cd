@@ -94,9 +94,9 @@ const rolePermissionsSelect = {
   {
     id: true,
     name: true,
-    CRMTablePermissions: {
+    CRMObjectPermissions: {
       select: {
-        CRMTable: {
+        CRMObject: {
           select: {
             id: true,
             name: true,
@@ -108,13 +108,13 @@ const rolePermissionsSelect = {
         can_edit: true,
       }
     },
-    CRMColumnPermissions: {
+    CRMFieldPermissions: {
       select: {
-        CRMColumn: {
+        CRMField: {
           select: {
             id: true,
             name: true,
-            CRMTable: {
+            CRMObject: {
               select: {
                 id: true,
                 name: true,
