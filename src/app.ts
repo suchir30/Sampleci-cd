@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import path from 'path';
 import { expressMiddleware } from '@apollo/server/express4';
 
@@ -12,6 +13,14 @@ import { buildGraphQLServer } from './graphql/server';
 import { GraphQLContext, buildGraphQLContext } from './graphql/context';
 
 const app = express();
+
+const corsOptions = {
+  origin: 'http://localhost:5173',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], 
+  credentials: true, // Allow credentials (cookies, authorization headers)
+};
+
+app.use(cors(corsOptions)); 
 
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads'))); // Serve static files
 app.use(express.json({ limit: '10mb' })); // JSON body parser
