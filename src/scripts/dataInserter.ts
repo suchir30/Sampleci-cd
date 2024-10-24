@@ -1,9 +1,18 @@
 import { PrismaClient } from '@prisma/client';
-import {getDMMF} from '@prisma/internals';
+import { getDMMF } from '@prisma/internals';
 import path from 'path';
 
 const prisma = new PrismaClient();
 
+const groupMappings = {
+    'AirWayBill': ['AirWayBill', 'AWBLineItem', 'AWBArticle', 'AWBArticleTripLogs'],
+    'Trips': ['TripDetails', 'TripLineItem', 'TripCheckin', 'VendorMaster', 'DriverMaster', 'vehicleMaster'],
+    'HubLoadFactor': ['HLFLineItem'],
+    'DEPS': ['DEPS', 'DEPSImages'],
+    'Customers': ['Consignor', 'Consignee', 'Contract', 'ConsignorRateTable', 'SKU', 'ODA', 'InternalInvoice', 'InternalInvoiceLineItems'],
+    'User': ['User'],
+    'Masters': ['CityMaster', 'StateMaster', 'DistrictMaster', 'PincodesMaster', 'GSTMaster', 'commodityMaster', 'industryTypeMaster']
+};
 
 async function getDmmf() {
     try {
@@ -12,29 +21,26 @@ async function getDmmf() {
             datamodelPath: schemaPath,
             retry: 3,
         });
-        console.log(dmmf.datamodel.models[0].name);
         return dmmf;
     } catch (error) {
         console.error('Error fetching DMMF:', error);
     }
 }
+
 function unCapitalizeFirstLetter(str: string): string {
     return str.charAt(0).toLowerCase() + str.slice(1);
 }
 
-async function getDefaultGroupId() {
-    const defalutGroupName = 'others';
+async function getGroupId(groupName: string): Promise<number> {
     try {
-        const othersGroup = await prisma.cRMObjectGroup.findFirst({
+        const existingGroup = await prisma.cRMObjectGroup.findFirst({
             where: {
-                viewName: {
-                    equals: defalutGroupName,
-                },
+                viewName: groupName,
             },
         });
 
-        if (othersGroup) {
-            return othersGroup.id;
+        if (existingGroup) {
+            return existingGroup.id;
         }
 
         const maxViewIndex = await prisma.cRMObjectGroup.aggregate({
@@ -47,23 +53,42 @@ async function getDefaultGroupId() {
 
         const newGroup = await prisma.cRMObjectGroup.create({
             data: {
-                viewName: defalutGroupName,
+                viewName: groupName,
                 viewIndex: newViewIndex,
             },
         });
 
         return newGroup.id;
     } catch (error) {
-        console.error('Error in getDefaultGroupId:', error);
-        return null;
+        console.error(`Error in getGroupId for ${groupName}:`, error);
+        throw error;
     }
 }
 
+function getObjectGroup(modelName: string): string {
+    for (const [group, objects] of Object.entries(groupMappings)) {
+        if (objects.some(obj => obj.toLowerCase() === modelName.toLowerCase())) {
+            return group;
+        }
+    }
+    return 'others'; // Default group for unmapped objects
+}
+
 async function insertSchemaData(models: any) {
-    const othersGroupId = await getDefaultGroupId();
+    // Create all groups first
+    const groupIds = new Map<string, number>();
+    for (const groupName of Object.keys(groupMappings)) {
+        const groupId = await getGroupId(groupName);
+        groupIds.set(groupName, groupId);
+    }
+    // Also create 'others' group for unmapped objects
+    const othersGroupId = await getGroupId('others');
+    groupIds.set('others', othersGroupId);
 
     for (const model of models) {
         const modelName = unCapitalizeFirstLetter(model.name);
+        const groupName = getObjectGroup(modelName);
+        const groupId = groupIds.get(groupName);
 
         try {
             const existingCrmObject = await prisma.cRMObject.findFirst({
@@ -80,11 +105,19 @@ async function insertSchemaData(models: any) {
                         name: modelName,
                         viewName: modelName,
                         viewIndex: models.indexOf(model) + 1,
-                        CRMObjectGroupId: othersGroupId ?? -1,
+                        CRMObjectGroupId: groupId ?? -1,
                     },
                 });
             } else {
-                crmObject = existingCrmObject;
+                // Update group if different
+                if (existingCrmObject.CRMObjectGroupId !== groupId) {
+                    crmObject = await prisma.cRMObject.update({
+                        where: { id: existingCrmObject.id },
+                        data: { CRMObjectGroupId: groupId ?? -1 },
+                    });
+                } else {
+                    crmObject = existingCrmObject;
+                }
             }
 
             for (const field of model.fields) {
@@ -237,10 +270,8 @@ async function cleanUpDeletedEnteries(models: any) {
     }
 }
 
-
-export async function insertData(models:any) {
-
-    if(!models){
+export async function insertData(models: any) {
+    if (!models) {
         const dmmf = await getDmmf();
         models = dmmf!.datamodel.models;
     }
@@ -251,7 +282,7 @@ export async function insertData(models:any) {
         })
         .catch((error) => {
             console.error('Error inserting data:', error);
-        })
+        });
 
     await insertRelations(models)
         .then(() => {
@@ -259,26 +290,15 @@ export async function insertData(models:any) {
         })
         .catch((error) => {
             console.error('Error inserting Relations:', error);
-        })
+        });
 
     await cleanUpDeletedEnteries(models)
         .then(() => {
-            console.log('CleanUp  Successful');
+            console.log('CleanUp Successful');
         })
         .catch((error) => {
             console.error('Error Cleaning Up:', error);
-        })
+        });
 }
 
 insertData(null);
-
-/*
-insertData()
-    .catch((error) => {
-        console.error('Error inserting data or relations:', error);
-    })
-    .finally(async () => {
-        await prisma.$disconnect();
-        return;
-    });
-*/
