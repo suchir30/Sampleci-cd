@@ -42,7 +42,6 @@ model User {
   state                StateMaster?    @relation("userState", fields: [stateId], references: [id])
   createdOn            DateTime        @default(now())
   depsLoadingUserIds   DEPS[]          @relation("depsLoadingUserId")
-  depsUnloadingUserIds DEPS[]          @relation("depsUnloadingUserId")
 }
 
 model Role {
@@ -153,10 +152,10 @@ model Branch {
   nextBranchTripLineItems  TripLineItem[]       @relation("nextBranchTripLineItem")
   finalBranchTripLineItems TripLineItem[]       @relation("finalBranchTripLineItem")
   hlfLineBranchIds         HLFLineItem[]        @relation("hlfLineBranchId")
-  depsBrnachIds            DEPS[]               @relation("depsBrnachId")
   tripLatestCheckinHubs    TripDetails[]        @relation("tripLatestCheckinHub")
   consignorwareHouseIds    Consignor[]          @relation("consignorwareHouseId")
   loadLocationCodes        TripLineItem[]       @relation("loadLocationCode")
+  depsLoadingHubIds        DEPS[]               @relation("depsLoadingHubId")
 }
 
 model Consignor {
@@ -280,6 +279,11 @@ model AirWayBill {
   FileUpload            FileUpload?       @relation("AWBFileAirWayBill", fields: [AWBPdf], references: [id])
   CDM                   Float?            @db.Float
   completeFlag          Boolean           @default(false)
+  rollupShortCount      Int?              @default(0)
+  rollupExcessCount     Int?              @default(0)
+  rollupDamageCount     Int?              @default(0)
+  rollupPilferageCount  Int?              @default(0)
+  rollupDepsCount       Int?
   createdOn             DateTime?         @default(now())
   modifiedOn            DateTime?         @updatedAt
   AWBLineItems          AwbLineItem[]
@@ -324,15 +328,16 @@ enum ArticleStatus {
 }
 
 model AwbArticle {
-  id           Int                  @id @default(autoincrement())
-  AWBId        Int
-  AWB          AirWayBill           @relation(fields: [AWBId], references: [id])
-  articleCode  String               @db.VarChar(255)
-  articleIndex Int
-  status       ArticleStatus        @default(Created)
-  createdOn    DateTime?            @default(now())
-  modifiedOn   DateTime?            @updatedAt
-  AWBArtIds    AwbArticleTripLogs[] @relation("AWBArtId")
+  id             Int                  @id @default(autoincrement())
+  AWBId          Int
+  AWB            AirWayBill           @relation(fields: [AWBId], references: [id])
+  articleCode    String               @db.VarChar(255)
+  articleIndex   Int
+  status         ArticleStatus        @default(Created)
+  createdOn      DateTime?            @default(now())
+  modifiedOn     DateTime?            @updatedAt
+  AWBArtIds      AwbArticleTripLogs[] @relation("AWBArtId")
+  depsArticleIds DEPS[]               @relation("depsArticleId")
 }
 
 enum RateConsignorStatus {
@@ -497,7 +502,6 @@ model HLFLineItem {
   AWBVolumeInKgs   Float?            @db.Float
   createdOn        DateTime?         @default(now())
   modifiedOn       DateTime?         @updatedAt
-  depsHLFLineIds   DEPS[]            @relation("depsHLFLineId")
 }
 
 enum DEPSTypeList {
@@ -509,35 +513,27 @@ enum DEPSTypeList {
 
 enum DEPSStatus {
   Open
-  Cleared
+  Closed
 }
 
 model DEPS {
-  id                   Int            @id @default(autoincrement())
+  id                   Int                 @id @default(autoincrement())
   DEPSType             DEPSTypeList
-  DEPSSubType          String         @db.VarChar(255)
   AWBId                Int
-  AirWayBill           AirWayBill     @relation("depsAWBId", fields: [AWBId], references: [id])
-  loadingHubId         Int?
-  HLFLineItem          HLFLineItem?   @relation("depsHLFLineId", fields: [loadingHubId], references: [id])
-  numberOfDepsArticles Int?
-  vehicleNumberId      Int?
-  vehicle              VehicleMaster? @relation("depsVehicleNumberId", fields: [vehicleNumberId], references: [id])
-  tripIdRoute          Int?
-  trip                 TripDetails?   @relation("depsTripRoute", fields: [tripIdRoute], references: [id])
-  connectedDate        DateTime?
-  TicketRaisedBranchId Int?
-  branch               Branch?        @relation("depsBrnachId", fields: [TicketRaisedBranchId], references: [id])
-  loadingUserId        Int?
-  loadUser             User?          @relation("depsLoadingUserId", fields: [loadingUserId], references: [id])
-  unloadingUserId      Int?
-  unloadUser           User?          @relation("depsUnloadingUserId", fields: [unloadingUserId], references: [id])
-  sealNumber           String?        @db.VarChar(255)
+  AirWayBill           AirWayBill          @relation("depsAWBId", fields: [AWBId], references: [id])
+  articleId            Int
+  AwbArticle           AwbArticle          @relation("depsArticleId", fields: [articleId], references: [id])
+  hubId                Int?
+  loadingHubBranch     Branch?             @relation("depsLoadingHubId", fields: [hubId], references: [id])
+  tripId               Int?
+  trip                 TripDetails?        @relation("depsTripRoute", fields: [tripId], references: [id])
+  userId               Int?
+  loadUser             User?               @relation("depsLoadingUserId", fields: [userId], references: [id])
   depsStatus           DEPSStatus?
-  caseComment          String         @db.VarChar(255)
-  createdOn            DateTime?      @default(now())
-  modifiedOn           DateTime?      @updatedAt
-  depsImages           DEPSImages[]   @relation("depsImage")
+  scanType             ArticleLogsScanType
+  createdOn            DateTime?           @default(now())
+  modifiedOn           DateTime?           @updatedAt
+  depsImages           DEPSImages[]        @relation("depsImage")
 }
 
 model DEPSImages {
@@ -802,23 +798,22 @@ model VendorMaster {
 }
 
 model VehicleMaster {
-  id                   Int           @id @default(autoincrement())
-  vehicleNum           String        @unique @db.VarChar(255)
-  vehicleType          String?       @db.VarChar(255)
-  vehicleCapacity      String?       @db.VarChar(255)
-  vehiclePermit        String?       @db.VarChar(255)
-  engineNumber         String?
-  chassisNumber        String?
-  insuranceValidDate   DateTime?
-  ownerName            String?
-  ownerPANCardNumber   String?
-  ownerAddress         String?
-  createdOn            DateTime      @default(now())
-  modifiedOn           DateTime?     @updatedAt
-  vendorId             Int?
-  vendor               VendorMaster? @relation("vendorID", fields: vendorId, references: [id])
-  tripVehicleIds       TripDetails[] @relation("tripVehicleId")
-  depsVehicleNumberIds DEPS[]        @relation("depsVehicleNumberId")
+  id                 Int           @id @default(autoincrement())
+  vehicleNum         String        @unique @db.VarChar(255)
+  vehicleType        String?       @db.VarChar(255)
+  vehicleCapacity    String?       @db.VarChar(255)
+  vehiclePermit      String?       @db.VarChar(255)
+  engineNumber       String?
+  chassisNumber      String?
+  insuranceValidDate DateTime?
+  ownerName          String?
+  ownerPANCardNumber String?
+  ownerAddress       String?
+  createdOn          DateTime      @default(now())
+  modifiedOn         DateTime?     @updatedAt
+  vendorId           Int?
+  vendor             VendorMaster? @relation("vendorID", fields: vendorId, references: [id])
+  tripVehicleIds     TripDetails[] @relation("tripVehicleId")
 }
 
 model DriverMaster {

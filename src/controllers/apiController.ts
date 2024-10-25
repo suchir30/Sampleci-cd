@@ -14,7 +14,7 @@ import { MulterFile } from '../types/multerTypes';
 import { connectivityPlanData } from '../types/connectivityDataType';
 import { Inwarded, Outwarded } from '../types/outwardInwardTypes';
 import { buildNoContentResponse, buildObjectFetchResponse, throwValidationError } from '../utils/apiUtils';
-import { Consignee, Consignor, AwbLineItem, DEPS } from '@prisma/client';
+import { Consignee, Consignor, AwbLineItem, DEPS,ArticleLogsScanType } from '@prisma/client';
 import { AWBPdfGenerator } from "../services/pdfGeneratorAWB";
 import { tripsPdfGenerator } from '../services/pdfGeneratorTrips';
 import { tripHirePdfGenerator } from '../services/pdfGeneratorTripHire';
@@ -562,101 +562,128 @@ export const getTripCheckin = async (req: Request, res: Response, next: NextFunc
     next(err)
   }
 }
+
 export const unloadArticlesValidate = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const AWBId: string = req.body.AWBCode
     const AWBArticleId: string = req.body.AWBArticleCode
     const tripId: number = req.body.tripId
+    const checkinHubId:number=req.body.checkinHubId
     if (!AWBId) {
       throwValidationError([{ message: "AWBCode is mandatoryq" }]);
     }
     if (!AWBArticleId) {
       throwValidationError([{ message: "AWBArticeCode is mandatory" }]);
     }
-    const unloadArticlesValidateResult = await tripService.unloadArticlesValidate(AWBId, AWBArticleId, tripId);
-
-    if (unloadArticlesValidateResult?.split('+')[0] === "Valid") {
+    if (!checkinHubId) {
+      throwValidationError([{ message: "checkinHubId is mandatory" }]);
+    }
+  
+    const unloadArticlesValidateResult = await tripService.unloadArticlesValidate(AWBId, AWBArticleId, tripId,checkinHubId);
+    if (typeof unloadArticlesValidateResult=="string" && unloadArticlesValidateResult?.split('+')[0] === "Valid") {
       res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(
-        { "TripLineItemId": parseInt(unloadArticlesValidateResult?.split('+')[1]) }, "Success"));
+        { validation:"Success",validationMessage:"Success","TripLineItemId": parseInt(unloadArticlesValidateResult?.split('+')[1]) }, "Success"));
       return
     }
-
-    else if (unloadArticlesValidateResult == 'AWBIDInvalid') {
-      res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWBID has no Trip Items,Please check the AWBID"));
+    else if (unloadArticlesValidateResult == 'AWBIDInvalid') {//excess 
+      res.status(HttpStatusCode.OK).json(buildObjectFetchResponse({validation:"Wrong Checkin",validationMessage:"AWBID has no Trip Line Items,Please check the AWBID"}));
       return
     }
     else if (unloadArticlesValidateResult == 'Duplicate') {
-      res.status(HttpStatusCode.OK).json(buildNoContentResponse(`Article ${AWBArticleId} Already Scanned`));
+      res.status(HttpStatusCode.OK).json(buildObjectFetchResponse({validation:"Wrong Checkin",validationMessage:`Article ${AWBArticleId} Already Scanned`}));
       return
     }
     else if (unloadArticlesValidateResult == 'InvalidAWB') {
-      res.status(HttpStatusCode.OK).json(buildNoContentResponse(`Invalid AirWayBill,Please check the AWB.`));
+      res.status(HttpStatusCode.OK).json(buildObjectFetchResponse({validation:"Wrong Checkin",validationMessage:`Invalid AirWayBill,Please check the AWB.`}));
       return
     }
     else if (unloadArticlesValidateResult == 'InvalidArticle') {
-      res.status(HttpStatusCode.OK).json(buildNoContentResponse(`Invalid AWB Article,Please check the Article.`));
+      res.status(HttpStatusCode.OK).json(buildObjectFetchResponse({validation:"Wrong Checkin",validationMessage:`Invalid AWB Article,Please check the Article.`}));
       return
+    }
+    else if (typeof unloadArticlesValidateResult === 'object' && unloadArticlesValidateResult?.type == 'Not As Per Plan') {
+      const { AWBUnlaodHub, currentUnlaodingHub,AWBArticleCode,AWBCode } = unloadArticlesValidateResult;
+      res.status(HttpStatusCode.OK).json(
+          buildObjectFetchResponse({validation:"Not As Per Plan",validationMessage:`${AWBArticleCode} of ${AWBCode} is unloaded at the wrong HUB . CREATING EXCESS DEPS. <br> ` +
+            `AWB unload HUB: ${AWBUnlaodHub} <br> ` + `Current unloading HUB: ${currentUnlaodingHub}`})
+      );
+      return;
     }
     else {
-      res.status(HttpStatusCode.OK).json(buildNoContentResponse(`AWBID next destination is ${unloadArticlesValidateResult}. Please do not unload.`));
+      res.status(HttpStatusCode.OK).json(buildObjectFetchResponse({validation:"Not As Per Plan",validationMessage:`AWBID next destination is ${unloadArticlesValidateResult}. Please do not unload.`}));
       return
     }
-
   } catch (err) {
     console.error('Error unloadArticlesValidate', err);
     next(err)
   }
 }
-
 export const loadArticlesValidate = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const AWBId: string = req.body.AWBCode
     const AWBArticleId: string = req.body.AWBArticleCode
     const tripId: number = req.body.tripId
+    const checkinHubId:number=req.body.checkinHubId
     if (!AWBId) {
       throwValidationError([{ message: "AWBCode is mandatory" }]);
     }
     if (!AWBArticleId) {
       throwValidationError([{ message: "AWBArticeCode is mandatory" }]);
     }
-    const loadArticlesValidateResult = await tripService.loadArticlesValidate(AWBId, AWBArticleId, tripId);
-    console.log(loadArticlesValidateResult, "res")
-    if (loadArticlesValidateResult?.split('+')[0] === "Valid") {
+    if (!tripId) {
+      throwValidationError([{ message: "tripId is mandatory" }]);
+    }
+    if (!checkinHubId) {
+      throwValidationError([{ message: "checkinHubID is mandatory" }]);
+    }
+    const loadArticlesValidateResult = await tripService.loadArticlesValidate(AWBId, AWBArticleId, tripId,checkinHubId);
+    console.log(loadArticlesValidateResult, "Controller Res")
+    if (typeof loadArticlesValidateResult === 'string' && loadArticlesValidateResult?.split('+')[0] === "Valid") {
       res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(
-        { "TripLineItemId": parseInt(loadArticlesValidateResult?.split('+')[1]) }, "Success"));
+        { validation:"Success",validationMessage:"Success","TripLineItemId": parseInt(loadArticlesValidateResult?.split('+')[1]) }, "Success"));
       return
     }
-    if (loadArticlesValidateResult == 'Valid') {
-      res.status(HttpStatusCode.OK).json(buildNoContentResponse("Success"));
-      return
-    }
-    else if (loadArticlesValidateResult == 'AWBIDInvalid') {
-      res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWBID has no Checkin Trips,Please check the AWBID and TripId"));
+
+
+    else if (loadArticlesValidateResult == 'AWBIDInvalid') { //excess case
+      res.status(HttpStatusCode.BadRequest).json(buildObjectFetchResponse({validation:"Wrong Checkin",validationMessage:"AWBID has no Checkin Trips,Please check the AWBID and TripId"}));
       return
     }
     else if (loadArticlesValidateResult == 'Duplicate') {
-      res.status(HttpStatusCode.OK).json(buildNoContentResponse(`Article ${AWBArticleId} Already Scanned`));
+      res.status(HttpStatusCode.OK).json(buildObjectFetchResponse({validation:"Wrong Checkin",validationMessage:`Article ${AWBArticleId} Already Scanned`}));
       return
     }
     else if (loadArticlesValidateResult == 'InvalidAWB') {
-      res.status(HttpStatusCode.OK).json(buildNoContentResponse(`Invalid AirWayBill,Please check the AWB.`));
+      res.status(HttpStatusCode.OK).json(buildObjectFetchResponse({validation:"Wrong Checkin",validationMessage:`Invalid AirWayBill,Please check the AWB.`}));
       return
     }
     else if (loadArticlesValidateResult == 'InvalidArticle') {
-      res.status(HttpStatusCode.OK).json(buildNoContentResponse(`Invalid AWB Article,Please check the Article.`));
+      res.status(HttpStatusCode.OK).json(buildObjectFetchResponse({validation:"Wrong Checkin",validationMessage:`Invalid AWB Article,Please check the Article.`}));
       return
     }
-    else {
-      res.status(HttpStatusCode.OK).json(buildNoContentResponse(`TripCode ${loadArticlesValidateResult} not in Assigned Status. Please do not load.`));
-      return
-
+    else if (typeof loadArticlesValidateResult === 'object' && loadArticlesValidateResult?.type === 'consignorPickUpPoint') {
+      const { consignorCode, branchCode } = loadArticlesValidateResult;
+      res.status(HttpStatusCode.OK).json(buildObjectFetchResponse
+        ({validation:"Wrong Checkin",validationMessage:`AWB is being picked up at Consignor Pickup point - ${consignorCode}. You have checked in at ${branchCode}. Please FIX CHECKIN`})
+      );
+      return;
     }
-
-  } catch (err) {
+    // Assuming loadArticlesValidateResult is the response from the service
+    else if (typeof loadArticlesValidateResult === 'object' && loadArticlesValidateResult.type === 'wrongTrip') {
+      const { AWBAssignedTripCode, AWBAssignedTripRoute, currentLoadingTripCode, currentLoadingTripRoute,AWBArticleCode,AWBCode } = loadArticlesValidateResult;
+      const message = `${AWBArticleCode} of ${AWBCode} is not being loaded into the correct trip. CREATING EXCESS DEPS. <br> ` +
+      `AWB assigned Trip: ${AWBAssignedTripCode} ${AWBAssignedTripRoute} <br> ` +
+      `Current loading Trip: ${currentLoadingTripCode} ${currentLoadingTripRoute}`;
+      res.status(HttpStatusCode.OK).json(buildObjectFetchResponse({validation:"Not As Per Plan",validationMessage:message}));
+      return;
+    }
+  }
+  catch (err) {
     console.error('Error loadArticlesValidate', err);
     next(err)
   }
 }
+
 
 export const getTripDetails = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -685,6 +712,7 @@ export const getTripLineItems = async (req: Request, res: Response, next: NextFu
     next(err)
   }
 }
+
 
 export const addAWBArticleLogs = async (
   req: Request,
@@ -854,24 +882,26 @@ export const getDepsLists = async (req: Request, res: Response, next: NextFuncti
     next(err)
   }
 }
-
 export const addDeps = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const DEPSData: DEPS[] = req.body.DEPSData
-    if (DEPSData.length > 1) {
-      throwValidationError([{ message: "Add only one DEPS" }]);
+    if (!req.body || Object.keys(req.body).length === 0) {
+      console.log("innnnn ");
+      return throwValidationError([{ message: "DEPSData is missing" }]);
     }
-    const fileIds: any = req.body.fileIds
+      const DEPSData: DEPS[] = req.body.DEPSData
+    // const fileIds: any = req.body.fileIds
     if (!DEPSData || DEPSData.length == 0) {
       throwValidationError([{ message: "DEPSData is mandatory" }]);
+      return
     }
-    const addDepsResult = await tripService.addDeps(DEPSData, fileIds);
+    const addDepsResult = await tripService.addDeps(DEPSData);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(addDepsResult));
   } catch (err) {
     console.error('Error getDepsLists', err);
     next(err)
   }
 }
+
 
 export const pdfGenerateAWB = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -1127,3 +1157,55 @@ export const calculateShippingCosts = async (req: Request, res: Response, next: 
   }
 };
 
+
+
+export const getExcessDeps = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const tripId:number= req.body.tripId;
+    const checkinHub:number= req.body.checkinHub;
+    const scanType:string= req.body.scanType;
+    if (!tripId) {
+      throwValidationError([{ message: "tripId is mandatory" }]);
+    }
+    if (!checkinHub) {
+      throwValidationError([{ message: "checkinHub is mandatory" }]);
+    }
+    if (!scanType) {
+      throwValidationError([{ message: "scanType is mandatory" }]);
+    }
+    const scanTypeEnum = ArticleLogsScanType[scanType as keyof typeof ArticleLogsScanType];
+    if (!scanTypeEnum) {
+      throwValidationError([{ message: `Invalid scanType: ${scanType}` }]);
+    }
+    const getExcessDepsResponse = await tripService.getExcessDeps(tripId,checkinHub,scanTypeEnum);
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getExcessDepsResponse));
+  } catch (err) {
+    console.error('Error deliverAWBCheck', err);
+    next(err);
+  }
+};
+export const getShortArticles = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const AWBId:number= req.body.AWBId;
+    const tripId:number= req.body.tripId;
+    const scanType:string= req.body.scanType;
+    if (!AWBId) {
+      throwValidationError([{ message: "AWBId is mandatory" }]);
+    }
+    if (!tripId) {
+      throwValidationError([{ message: "tripId is mandatory" }]);
+    }
+    if (!scanType) {
+      throwValidationError([{ message: "scanType is mandatory" }]);
+    }
+    const scanTypeEnum = ArticleLogsScanType[scanType as keyof typeof ArticleLogsScanType];
+    if (!scanTypeEnum) {
+      throwValidationError([{ message: `Invalid scanType: ${scanType}` }]);
+    }
+    const getExcessDepsResponse = await tripService.getShortArticles(AWBId,tripId,scanTypeEnum);
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getExcessDepsResponse));
+  } catch (err) {
+    console.error('Error deliverAWBCheck', err);
+    next(err);
+  }
+};
