@@ -1291,8 +1291,7 @@ export const getShortArticles = async (
       },
       depsArticleIds: {
         none: {
-          DEPSType: DEPSTypeList.Shorts,
-          depsStatus: 'Open'
+          DEPSType: DEPSTypeList.Shorts
         },
       },
     },
