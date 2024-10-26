@@ -695,96 +695,249 @@ export const getDepsLists = async (AWBId: number) => {
 };
 
 export const addDeps = async (DEPSData: any[]) => {
-try {
-  await prisma.$transaction(async (prisma) => {
-    for (const deps of DEPSData) {
-      const { fileIds, ...depsData } = deps;
+  try {
+    await prisma.$transaction(async (prisma) => {
+      for (const deps of DEPSData) {
+        const { fileIds, ...depsData } = deps;
 
-      const awbArticle = await prisma.awbArticle.findFirst({
+        // Retrieve the articleId from awbArticle
+        const awbArticle = await prisma.awbArticle.findFirst({
+          where: {
+            articleCode: deps.articleId, // Use the provided articleCode to get the ID
+          },
+          select: {
+            id: true,
+          },
+        });
+
+        // Retrieve the AWBId from airWayBill using the AWBCode
+        const airWayBill = await prisma.airWayBill.findFirst({
+          where: {
+            AWBCode: deps.AWBCode, // Use the provided AWBCode to get the AWBId
+          },
+          select: {
+            id: true,
+          },
+        });
+
+        // Update depsData with the retrieved articleId and AWBId
+        const updatedDepsData = {
+          ...depsData,
+          articleId: awbArticle?.id || 0,
+          AWBId: airWayBill?.id || 0,
+        };
+
+        // Create DEPS record
+        const createdDeps = await prisma.dEPS.create({
+          data: updatedDepsData,
+        });
+
+        // Associate each fileId with the DEPS record in dEPSImages
+        if (createdDeps && fileIds && fileIds.length > 0) {
+          for (const fileId of fileIds) {
+            await prisma.dEPSImages.create({
+              data: {
+                depsId: createdDeps.id,
+                fileId: fileId,
+              },
+            });
+          }
+        }
+      }
+
+      // Collect unique AWBCodes from DEPSData and filter out undefined values
+      const uniqueAWBCodes = [...new Set(DEPSData.map(deps => deps.AWBCode))].filter(Boolean);
+
+      // Map each AWBCode to its AWBId
+      const awbIdMap = await prisma.airWayBill.findMany({
         where: {
-          articleCode: deps.articleId, // Use the provided articleCode to get the ID
+          AWBCode: { in: uniqueAWBCodes },
         },
         select: {
           id: true,
+          AWBCode: true,
         },
-      });
+      }).then(results => results.reduce((acc, curr) => {
+        acc[curr.AWBCode] = curr.id;
+        return acc;
+      }, {} as Record<string, number>));
 
-           // Update depsData with the retrieved AwbArticle ID
-           const updatedDepsData = {
-            ...depsData,
-            articleId: awbArticle?.id||0,
-          };
-  
-          // Create DEPS record
-          const createdDeps = await prisma.dEPS.create({
-            data: updatedDepsData,
-          });
+      // Iterate over each AWBCode and count DEPS records by DEPSType
+      for (const awbCode of uniqueAWBCodes) {
+        const awbId = awbIdMap[awbCode];
 
-      // // Create DEPS record
-      // const createdDeps = await prisma.dEPS.create({
-      //   data: depsData
-      // });
-   
-      // Associate each fileId with the DEPS record in dEPSImages
-      if (createdDeps && fileIds && fileIds.length > 0) {
-        for (const fileId of fileIds) {
-          await prisma.dEPSImages.create({
-            data: {
-              depsId: createdDeps.id,
-              fileId: fileId
-            }
-          });
-        }
+        if (!awbId) continue; // Skip if AWBId is not found
+
+        // Count DEPS records for each DEPSType
+        const totalShortsCount = await prisma.dEPS.count({
+          where: {
+            AWBId: awbId,
+            DEPSType: "Shorts",
+          },
+        });
+        const totalExcessCount = await prisma.dEPS.count({
+          where: {
+            AWBId: awbId,
+            DEPSType: "Excess",
+          },
+        });
+        const totalDamagesCount = await prisma.dEPS.count({
+          where: {
+            AWBId: awbId,
+            DEPSType: "Damage",
+          },
+        });
+        const totalPilferagesCount = await prisma.dEPS.count({
+          where: {
+            AWBId: awbId,
+            DEPSType: "Pilferage",
+          },
+        });
+
+        // Update airWayBill with the counts for each DEPSType
+        await prisma.airWayBill.update({
+          where: {
+            id: awbId,
+          },
+          data: {
+            rollupShortCount: totalShortsCount || 0,
+            rollupExcessCount: totalExcessCount || 0,
+            rollupDamageCount: totalDamagesCount || 0,
+            rollupPilferageCount: totalPilferagesCount || 0,
+          },
+        });
       }
-    }
-          // Now, after creating all DEPS records, calculate the count of DEPS records where DEPSType is 'Shorts' for each AWBId
-          const awbIds = [...new Set(DEPSData.map(deps => deps.AWBId))]; // Collect all unique AWBIds from DEPSData
-          for (const awbId of awbIds) {
-            // Count the number of DEPS records where DEPSType is 'Shorts'
-            const totalShortsCount = await prisma.dEPS.count({
-              where: {
-                AWBId: awbId,
-                DEPSType:"Shorts" // Only consider 'Shorts' DEPSType
-              }
-            });
-            const totalExcessCount = await prisma.dEPS.count({
-              where: {
-                AWBId: awbId,
-                DEPSType:"Excess" // Only consider 'Shorts' DEPSType
-              }
-            });
-            const totalDamagesCount = await prisma.dEPS.count({
-              where: {
-                AWBId: awbId,
-                DEPSType:"Damage" // Only consider 'Shorts' DEPSType
-              }
-            });
-            const totalPilferagesCount = await prisma.dEPS.count({
-              where: {
-                AWBId: awbId,
-                DEPSType:"Pilferage" // Only consider 'Shorts' DEPSType
-              }
-            });
-    
-            // Update rollupDepsCount in airWayBill based on the count of Shorts
-            await prisma.airWayBill.update({
-              where: {
-                id: awbId
-              },
-              data: {
-                rollupShortCount: totalShortsCount || 0, // Update rollupDepsCount with the count of 'Shorts'
-                rollupExcessCount:totalExcessCount || 0,
-                rollupDamageCount:totalDamagesCount|| 0,
-                rollupPilferageCount:totalPilferagesCount || 0
-              }
-            });
-          }
-  });
-} catch (error) {
-  console.error("Error in addDeps function:", error); // Log the error to see the details
-  throw new Error("Internal Server Error"); // Optional: You can also throw a specific error
-}
+    });
+  } catch (error) {
+    console.error("Error in addDeps function:", error);
+    throw new Error("Internal Server Error");
+  }
 };
+
+// export const addDeps = async (DEPSData: any[]) => {
+// try {
+//   await prisma.$transaction(async (prisma) => {
+//     for (const deps of DEPSData) {
+//       const { fileIds, ...depsData } = deps;
+
+//       const awbArticle = await prisma.awbArticle.findFirst({
+//         where: {
+//           articleCode: deps.articleId, // Use the provided articleCode to get the ID
+//         },
+//         select: {
+//           id: true,
+//         },
+//       });
+
+
+//       // Retrieve the AWBId from airWayBill using the AWBCode      
+//       const airWayBill = await prisma.airWayBill.findFirst({
+//         where: {
+//           AWBCode: deps.AWBCode, // Use the provided AWBCode to get the AWBId
+//           },
+//           select: {
+//             id: true,
+//           },
+//         });
+//         const updatedDepsData = {
+//           ...depsData,
+//           articleId: awbArticle?.id || 0,
+//           AWBId: airWayBill?.id || 0,
+//         };
+//         const createdDeps = await prisma.dEPS.create({
+//           data: updatedDepsData,
+//         });
+
+//       // // Create DEPS record
+//       // const createdDeps = await prisma.dEPS.create({
+//       //   data: depsData
+//       // });
+   
+//       // Associate each fileId with the DEPS record in dEPSImages
+//       if (createdDeps && fileIds && fileIds.length > 0) {
+//         for (const fileId of fileIds) {
+//           await prisma.dEPSImages.create({
+//             data: {
+//               depsId: createdDeps.id,
+//               fileId: fileId
+//             }
+//           });
+//         }
+//       }
+//     }
+//           // Now, after creating all DEPS records, calculate the count of DEPS records where DEPSType is 'Shorts' for each AWBId
+         
+//           // const awbIds = [...new Set(DEPSData.map(deps => deps.AWBId))]; // Collect all unique AWBIds from DEPSData
+//           // for (const awbId of awbIds) {
+
+//           const uniqueAWBCodes = [...new Set(DEPSData.map(deps => deps.AWBCode))];
+
+//           // Map each AWBCode to its AWBId
+//           const awbIdMap = await prisma.airWayBill.findMany({
+//             where: {
+//               AWBCode: { in: uniqueAWBCodes },
+//             },
+//             select: {
+//               id: true,
+//               AWBCode: true,
+//             },
+//           }).then(results => results.reduce((acc, curr) => {
+//             acc[curr.AWBCode] = curr.id;
+//             return acc;
+//           }, {} as Record<string, number>));
+    
+//           // Iterate over each AWBCode and count DEPS records by DEPSType
+//           for (const awbCode of uniqueAWBCodes) {
+//             const awbId = awbIdMap[awbCode];
+    
+//             if (!awbId) continue; // Skip if AWBId is not found
+    
+
+//             // Count the number of DEPS records where DEPSType is 'Shorts'
+//             const totalShortsCount = await prisma.dEPS.count({
+//               where: {
+//                 AWBId: awbId,
+//                 DEPSType:"Shorts" // Only consider 'Shorts' DEPSType
+//               }
+//             });
+//             const totalExcessCount = await prisma.dEPS.count({
+//               where: {
+//                 AWBId: awbId,
+//                 DEPSType:"Excess" // Only consider 'Shorts' DEPSType
+//               }
+//             });
+//             const totalDamagesCount = await prisma.dEPS.count({
+//               where: {
+//                 AWBId: awbId,
+//                 DEPSType:"Damage" // Only consider 'Shorts' DEPSType
+//               }
+//             });
+//             const totalPilferagesCount = await prisma.dEPS.count({
+//               where: {
+//                 AWBId: awbId,
+//                 DEPSType:"Pilferage" // Only consider 'Shorts' DEPSType
+//               }
+//             });
+    
+//             // Update rollupDepsCount in airWayBill based on the count of Shorts
+//             await prisma.airWayBill.update({
+//               where: {
+//                 id: awbId
+//               },
+//               data: {
+//                 rollupShortCount: totalShortsCount || 0, // Update rollupDepsCount with the count of 'Shorts'
+//                 rollupExcessCount:totalExcessCount || 0,
+//                 rollupDamageCount:totalDamagesCount|| 0,
+//                 rollupPilferageCount:totalPilferagesCount || 0
+//               }
+//             });
+//           }
+//   });
+// } catch (error) {
+//   console.error("Error in addDeps function:", error); // Log the error to see the details
+//   throw new Error("Internal Server Error"); // Optional: You can also throw a specific error
+// }
+// };
 
 
 
