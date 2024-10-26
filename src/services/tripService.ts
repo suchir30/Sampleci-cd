@@ -1242,7 +1242,8 @@ export const getExcessDeps=async(tripId:number,checkinHub:number,scanTypeEnum:Ar
      tripId:tripId,
      hubId:checkinHub,
      scanType:scanTypeEnum,
-     DEPSType:"Excess"
+     DEPSType:"Excess",
+     depsStatus:"Open"
    },
    select:{
     id:true,
@@ -1279,13 +1280,14 @@ export const getExcessDeps=async(tripId:number,checkinHub:number,scanTypeEnum:Ar
 }
 
 export const getShortArticles = async (
-  AWBId: number,
+  AWBIds: number[],
   tripId: number,
   scanTypeEnum: ArticleLogsScanType
 ) => {
   const articlesWithoutLogsAndDeps = await prisma.awbArticle.findMany({
     where: {
-      AWBId: AWBId, // Filter by specific AWBId
+      // AWBId: AWBId, // Filter by specific AWBId
+      AWBId: { in: AWBIds }, 
       AWBArtIds: {
         none: {
           scanType: scanTypeEnum,

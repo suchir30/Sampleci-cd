@@ -1184,13 +1184,16 @@ export const getExcessDeps = async (req: Request, res: Response, next: NextFunct
     next(err);
   }
 };
+
 export const getShortArticles = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const AWBId:number= req.body.AWBId;
-    const tripId:number= req.body.tripId;
-    const scanType:string= req.body.scanType;
-    if (!AWBId) {
-      throwValidationError([{ message: "AWBId is mandatory" }]);
+    const AWBId: number[] = req.body.AWBId;
+    const tripId: number = req.body.tripId;
+    const scanType: string = req.body.scanType;
+
+    // Validation checks
+    if (!AWBId || !Array.isArray(AWBId)) {
+      throwValidationError([{ message: "AWBId is mandatory and must be an array" }]);
     }
     if (!tripId) {
       throwValidationError([{ message: "tripId is mandatory" }]);
@@ -1198,14 +1201,20 @@ export const getShortArticles = async (req: Request, res: Response, next: NextFu
     if (!scanType) {
       throwValidationError([{ message: "scanType is mandatory" }]);
     }
+
+    // Convert scanType to enum, with error handling for invalid values
     const scanTypeEnum = ArticleLogsScanType[scanType as keyof typeof ArticleLogsScanType];
     if (!scanTypeEnum) {
       throwValidationError([{ message: `Invalid scanType: ${scanType}` }]);
     }
-    const getExcessDepsResponse = await tripService.getShortArticles(AWBId,tripId,scanTypeEnum);
+
+    // Call the service function
+    const getExcessDepsResponse = await tripService.getShortArticles(AWBId, tripId, scanTypeEnum);
+
+    // Build and send the response
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getExcessDepsResponse));
   } catch (err) {
-    console.error('Error deliverAWBCheck', err);
+    console.error('Error in getShortArticles', err);
     next(err);
   }
 };
