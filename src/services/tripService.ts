@@ -697,19 +697,24 @@ export const getDepsLists = async (AWBId: number) => {
 
 export const addDeps = async (DEPSData: any[]) => {
   try {
+    console.log(DEPSData,"DEPSData")
+
     await prisma.$transaction(async (prisma) => {
       for (const deps of DEPSData) {
         const { fileIds, ...depsData } = deps;
+        console.log(deps,"deps")
 
         const awbArticle = await prisma.awbArticle.findFirst({
           where: { articleCode: deps.articleId },
           select: { id: true },
         });
-
+        // console.log("awbArticle",awbArticle)
         const airWayBill = await prisma.airWayBill.findFirst({
-          where: { AWBCode: deps.AWBCode },
+          where: { AWBCode: deps.AWBId },
           select: { id: true },
         });
+        
+// console.log("airwaybill",airWayBill)
 
         const updatedDepsData = {
           ...depsData,
@@ -754,16 +759,16 @@ export const addDeps = async (DEPSData: any[]) => {
         console.log(`Processing counts for AWBId: ${awbId}`); // Log current AWBId
 
         const totalShortsCount = await prisma.dEPS.count({
-          where: { AWBId: awbId, DEPSType: "Shorts" },
+          where: { AWBId: awbId, DEPSType: "Shorts",depsStatus:"Open"},
         });
         const totalExcessCount = await prisma.dEPS.count({
-          where: { AWBId: awbId, DEPSType: "Excess" },
+          where: { AWBId: awbId, DEPSType: "Excess",depsStatus:"Open"},
         });
         const totalDamagesCount = await prisma.dEPS.count({
-          where: { AWBId: awbId, DEPSType: "Damage" },
+          where: { AWBId: awbId, DEPSType: "Damage",depsStatus:"Open"},
         });
         const totalPilferagesCount = await prisma.dEPS.count({
-          where: { AWBId: awbId, DEPSType: "Pilferage" },
+          where: { AWBId: awbId, DEPSType: "Pilferage",depsStatus:"Open"},
         });
 
         console.log(`Updating counts for AWBId: ${awbId}`);
