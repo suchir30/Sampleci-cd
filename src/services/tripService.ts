@@ -1,6 +1,7 @@
-import { $Enums } from '@prisma/client';
+import { $Enums, DEPSStatus, } from '@prisma/client';
 import prisma from '../client';
 import moment from 'moment';
+import { ArticleLogsScanType,DEPSTypeList} from '@prisma/client'; // Importing enum from Prisma schema
 
 export const getTrips = async (tripStatus:any,latestCheckinHubId:number,latestCheckinType:string) => {
   const whereClause: any = { tripStatus: tripStatus, };
@@ -122,20 +123,17 @@ export const getTripCheckin = async (tripType:any) => {
     return openTrips;
 };
 
-export const unloadArticlesValidate = async (AWBId:string,AWBArticleId:string,tripId:number) => {
+export const unloadArticlesValidate = async (AWBId:string,AWBArticleId:string,tripId:number,checkinHubId:number) => {
   const result=await prisma.$transaction(async prisma => {
-    const AWBIdRes=await prisma.airWayBill.findFirst({
-      where :{AWBCode:AWBId}
-    })
+  
     const AWBArticleIdRes=await prisma.awbArticle.findFirst({
       where :{articleCode:AWBArticleId, status: {
         not: "Deleted"
       }}
     })
-
-    if(!AWBIdRes){
-      return "InvalidAWB"
-    }
+    // if(!AWBIdRes){
+    //   return "InvalidAWB"
+    // }
     if(!AWBArticleIdRes){
       return "InvalidArticle"
     }
@@ -149,8 +147,7 @@ export const unloadArticlesValidate = async (AWBId:string,AWBArticleId:string,tr
     if(checkDuplicateRes.length>0){
       return "Duplicate"
     }
-
-    console.log(AWBIdRes?.id,"$$$$",AWBArticleIdRes?.id,checkDuplicateRes.length)
+    // console.log(AWBIdRes?.id,"$$$$",AWBArticleIdRes?.id,checkDuplicateRes.length)
       const tripLineItemRes = await prisma.tripLineItem.findFirst({
           select:{
               id:true,
@@ -160,59 +157,109 @@ export const unloadArticlesValidate = async (AWBId:string,AWBArticleId:string,tr
               unloadLocation:{
                   select:{
                       id:true,
-                      branchName:true
+                      branchName:true,
+                      branchCode:true
                   }
               }
           },
           where: {
-            AWBId:AWBIdRes?.id,
-            tripId:tripId
+            AWBId:AWBArticleIdRes?.AWBId,
+            tripId:tripId,
+            unloadLocationId:checkinHubId,
+            status:"Open"
           },
           orderBy: {
               id: 'desc',
           },
         });
+       
         if(tripLineItemRes==null){
+          const AWBIdRes=await prisma.airWayBill.findFirst({
+            where :{AWBCode:AWBId}
+          })
+
+          let tripDetailsRes = await prisma.tripDetails.findFirst({
+            where: {
+              id: tripId
+            },
+            select:{
+              id:true,
+              latestCheckinHubId:true,
+              checkinBranch:{
+                select:{
+                  branchCode:true
+                }
+              }
+            },
+            orderBy: {
+                id: 'desc',
+            },
+          });
           console.log("AWBIDInvalid",tripLineItemRes,AWBIdRes?.id)
-          return 'AWBIDInvalid'
+          // return 'AWBIDInvalid'
+          return {
+            type:'Not As Per Plan',
+            AWBUnlaodHub:null,
+            currentUnlaodingHub:tripDetailsRes?.checkinBranch?.branchCode,
+            AWBCode:AWBIdRes?.AWBCode,
+            AWBArticleCode:AWBArticleIdRes?.articleCode
+          }
         }
-
-        const tripDetailsRes = await prisma.tripDetails.findFirst({
-          where: {
-            id: tripId
-          },
-          orderBy: {
-              id: 'desc',
-          },
-        });
-        console.log(tripDetailsRes?.latestCheckinHubId,"validConditionss",tripLineItemRes?.unloadLocationId)
-        if(tripDetailsRes?.latestCheckinHubId==tripLineItemRes?.unloadLocationId){
-
+       
+      //  console.log(tripDetailsRes?.latestCheckinHubId,"validConditionss",tripLineItemRes?.unloadLocationId)
+        //tripId
+        if(checkinHubId===tripLineItemRes?.unloadLocationId && tripLineItemRes.tripId===tripId){
           console.log("valid",tripLineItemRes?.id)
           return `Valid+${tripLineItemRes?.id}`
         }
         else{
           console.log("invalid")
-          return tripLineItemRes?.unloadLocation?.branchName
+          let tripDetailsRes = await prisma.tripDetails.findFirst({
+            where: {
+              id: tripId
+            },
+            select:{
+              id:true,
+              latestCheckinHubId:true,
+              checkinBranch:{
+                select:{
+                  branchCode:true
+                }
+              }
+            },
+            orderBy: {
+                id: 'desc',
+            },
+          });
+          const AWBIdRes=await prisma.airWayBill.findFirst({
+            where :{AWBCode:AWBId}
+          })
+          return {
+            type:'Not As Per Plan',
+            AWBUnlaodHub:tripLineItemRes?.unloadLocation?.branchCode,
+            currentUnlaodingHub:tripDetailsRes?.checkinBranch?.branchCode,
+            AWBCode:AWBIdRes?.AWBCode,
+            AWBArticleCode:AWBArticleIdRes?.articleCode
+          }
         }
       })
       return result
 };
 
-
-export const loadArticlesValidate = async (AWBId:string,AWBArticleId:string,tripId:number) => {
+export const loadArticlesValidate = async (AWBId:string,AWBArticleId:string,tripId:number,checkinHubId:number) => {
   const result=await prisma.$transaction(async prisma => {
-    const AWBIdRes=await prisma.airWayBill.findFirst({
-      where :{AWBCode:AWBId}
-    })
+    
     const AWBArticleIdRes=await prisma.awbArticle.findFirst({
       where :{articleCode:AWBArticleId, status: {
         not: "Deleted"
-      }}
+      }},
+      select:{
+        id:true,
+        articleCode:true,
+        AWBId:true
+      }
     })
-    if(!AWBIdRes){
-      return "InvalidAWB"
-    }
+  
     if(!AWBArticleIdRes){
       return "InvalidArticle"
     }
@@ -227,74 +274,119 @@ export const loadArticlesValidate = async (AWBId:string,AWBArticleId:string,trip
       return "Duplicate"
     }
 
-
       const tripLineItemRes = await prisma.tripLineItem.findFirst({
           select:{
               id:true,
-              AWBId:true,
               tripId:true,
               loadLocationId:true,
-              loadlocation:{
-                select:{
-                  branchCode:true,
-                  branchName:true
-                }
-              },
               status:true,
-              unloadLocation:{
-                  select:{
-                      id:true,
-                      branchName:true
-                  }
-              },
               trip:{
                 select:{
                   tripCode:true,
-                  route:true,
-                  latestCheckinHubId:true
+                  route:true
                 }
               }
-
           },
           where: {
-            AWBId: AWBIdRes?.id,
-            tripId:tripId
+            AWBId:AWBArticleIdRes?.AWBId,
+            tripId:tripId,
+            loadLocationId:checkinHubId,
+            status:"Assigned"
           },
           orderBy: {
               id: 'desc',
           },
         });
         if(tripLineItemRes==null){
-          return 'AWBIDInvalid'
+          // return 'AWBIDInvalid'
+          const AWBIdRes=await prisma.airWayBill.findFirst({
+            where :{AWBCode:AWBId},
+            select:{
+              id:true,
+              AWBCode:true
+            }
+          })
+          const tripDetailsRes = await prisma.tripDetails.findFirst({
+            where: {
+              id: tripId,
+              latestCheckinHubId:checkinHubId
+            },
+            select:{
+              tripCode:true,
+              route:true
+            },
+            orderBy: {
+                id: 'desc',
+            },
+          });
+          return {
+            type:'wrongTrip',
+            AWBAssignedTripCode:null,
+            AWBAssignedTripRoute:null,
+            currentLoadingTripCode:tripDetailsRes?.tripCode,
+            currentLoadingTripRoute:tripDetailsRes?.route,
+            AWBCode:AWBIdRes?.AWBCode,
+            AWBArticleCode:AWBArticleIdRes?.articleCode
+          }
         }
 
-        const tripDetailsRes = await prisma.tripDetails.findFirst({
-          where: {
-            id: tripId
-          },
-          orderBy: {
-              id: 'desc',
-          },
-        });
-
-        if(tripLineItemRes?.status=="Assigned" && tripLineItemRes?.loadLocationId==tripDetailsRes?.latestCheckinHubId){
+        if(tripLineItemRes?.status=="Assigned" && tripLineItemRes?.loadLocationId===checkinHubId && tripLineItemRes.tripId===tripId){
           console.log("valid")
           return `Valid+${tripLineItemRes?.id}`
         }
         else{
-          if(tripLineItemRes?.status!="Assigned"){
-          console.log("invalid")
-          return 'status'
+          const AWBIdRes=await prisma.airWayBill.findFirst({
+            where :{AWBCode:AWBId},
+            select:{
+              AWBCode:true,
+              consignorId:true,
+              AWBStatus:true,
+              consignor:{
+                select:{
+                  consignorCode:true
+                }
+              }
+            }
+          })
+          const tripDetailsRes = await prisma.tripDetails.findFirst({
+            where: {
+              id: tripId
+            },
+            select:{
+              tripCode:true,
+              route:true,
+              checkinBranch:{
+                select:{
+                  branchCode:true
+                }
+              }
+            },
+            orderBy: {
+                id: 'desc',
+            },
+          });
+          //tli:- trip,awb,assigned   checkinup!=loadinglocation.tli
+          if(AWBIdRes?.AWBStatus==="PickUp" &&  tripLineItemRes.loadLocationId!=checkinHubId){
+          console.log("invalid AWB==pickup")
+          return {type:'consignorPickUpPoint',consignorCode:AWBIdRes?.consignor?.consignorCode,branchCode:tripDetailsRes?.checkinBranch?.branchCode}
           }
           else{
-            console.log("invalid")
-            return tripLineItemRes?.loadlocation?.branchName
+            console.log("loaded at wrongtrip at pickuppoint/hub")
+            return {
+              type:'wrongTrip',
+              AWBAssignedTripCode:tripLineItemRes?.trip?.tripCode,
+              AWBAssignedTripRoute:tripLineItemRes?.trip?.route,
+              currentLoadingTripCode:tripDetailsRes?.tripCode,
+              currentLoadingTripRoute:tripDetailsRes?.route,
+              AWBCode:AWBIdRes?.AWBCode,
+              AWBArticleCode:AWBArticleIdRes?.articleCode
+            }
           }
-
         }
       })
       return result
 };
+
 
 export const getTripDetails = async (tripId: number) => {
   const tripDetails = await prisma.tripDetails.findMany({
@@ -390,15 +482,12 @@ export const getTripLineItems = async (tripId: number, tripLineItemStatus: any, 
     status: tripLineItemStatus,
     tripId: tripId
 };
-
 if (loadLocationId) {
     whereClause.loadLocationId = loadLocationId;
 }
-
 if (unloadLocationId) {
     whereClause.unloadLocationId = unloadLocationId;
 }
-
     const result = await prisma.tripLineItem.findMany({
       where: whereClause,
       orderBy:{
@@ -421,6 +510,10 @@ if (unloadLocationId) {
             numOfArticles:true,
             rollupWeight:true,
             rollupChargedWtInKgs:true,
+            rollupShortCount:true,
+            rollupExcessCount:true,
+            rollupDamageCount:true,
+            rollupPilferageCount:true,
             completeFlag:true,
             consignorId:true,
             consignor:{
@@ -450,7 +543,6 @@ if (unloadLocationId) {
                 branchCode:true
               }
             }
-
           }
         },
         unloadLocation:{
@@ -493,13 +585,18 @@ if (unloadLocationId) {
       completeFlag: item.AirWayBill.completeFlag,
       TripLineItemStatus: item.status,
       numOfScan:item.rollupScanCount,
-      rollupDepsCount:item.rollupDepsCount,
+      rollupShortCount:item.AirWayBill.rollupShortCount,
+      rollupExcessCount:item.AirWayBill.rollupExcessCount,
+      rollupPilferageCount:item.AirWayBill.rollupPilferageCount,
+      rollupDamageCount:item.AirWayBill.rollupDamageCount,
+      rollupDEPSCount:(item.AirWayBill.rollupShortCount?? 0)+(item.AirWayBill.rollupExcessCount??0)+(item.AirWayBill.rollupPilferageCount??0)+(item.AirWayBill.rollupDamageCount??0),
       unloadLocationId:item.unloadLocationId,
       numberOfArticles: item.AirWayBill.numOfArticles,
       latestScanTime:item.latestArticleScanTime
     }));
     return finalResult;
 };
+
 
 export const addAWBArticleLogs = async (AWBArticleCode: any, scanType: any, tripId: number): Promise<string | void> => {
   const today = moment().toISOString();
@@ -562,80 +659,135 @@ export const addAWBArticleLogs = async (AWBArticleCode: any, scanType: any, trip
 
 
 export const getDepsLists = async (AWBId: number) => {
-    const result = await prisma.dEPS.findMany({
-      where: {
-        AWBId: AWBId,
-      },
-      select:{
-        id:true,
-        AWBId:true,
-        DEPSType:true,
-        DEPSSubType:true,
-        loadingHubId:true,
-        numberOfDepsArticles:true,
-        connectedDate:true,
-        depsStatus:true,
-        caseComment:true,
-        TicketRaisedBranchId:true,
-        loadingUserId:true,
-        createdOn:true,
-        loadUser:{
-          select:{
-            firstName:true,
-            lastName:true
-          }
-        },
-        unloadUser:{
-          select:{
-            firstName:true,
-            lastName:true
-          }
-        },
-        AirWayBill:{select:{AWBCode:true}},
-        depsImages: {
-          select: {
-            id: true,
-            fileId: true,
-            depsId:true,
-            FileUpload: {
-              select: {
-                path: true,
-                type:true
-              }
-            }
-          }
+  const result = await prisma.dEPS.findMany({
+    where: {
+      AWBId: AWBId,
+    },
+    select:{
+      id:true,
+      AWBId:true,
+      DEPSType:true,
+      hubId:true,
+      depsStatus:true,
+      scanType:true,
+      articleId:true,
+      userId:true,
+      createdOn:true,
+      loadUser:{
+        select:{
+          firstName:true,
+          lastName:true
         }
-
-
+      },
+      AirWayBill:{select:{AWBCode:true}},
+      AwbArticle:{select:{articleCode:true}},
+      depsImages: {
+        select: {
+          id: true,
+          fileId: true,
+          depsId:true
+        }
       }
-    })
-    return result;
-};
 
-export const addDeps = async (DEPSData:any,fileIds:any) => {
-
-   const result=await prisma.$transaction(async prisma => {
-      const addDepsRes=await prisma.dEPS.createMany({
-          data:DEPSData
-      })
-      if (addDepsRes.count !== undefined && addDepsRes.count > 0) {
-        const firstRecordId = (await prisma.dEPS.findFirst({
-            where: { AWBId: DEPSData.AWBId },
-            orderBy: { id: 'desc' },select: { id: true },
-
-        }));
-        if (firstRecordId) {
-          for (const fileId of fileIds) {
-              await prisma.dEPSImages.create({
-                  data: {
-                      depsId: firstRecordId.id,
-                      fileId: fileId
-                  }
-              });
-          }
-      }
     }
   })
+  return result;
+};
+
+
+export const addDeps = async (DEPSData: any[]) => {
+  try {
+    console.log(DEPSData,"DEPSData")
+
+    await prisma.$transaction(async (prisma) => {
+      for (const deps of DEPSData) {
+        const { fileIds, ...depsData } = deps;
+        console.log(deps,"deps")
+
+        const awbArticle = await prisma.awbArticle.findFirst({
+          where: { articleCode: deps.articleId },
+          select: { id: true },
+        });
+        // console.log("awbArticle",awbArticle)
+        const airWayBill = await prisma.airWayBill.findFirst({
+          where: { AWBCode: deps.AWBId },
+          select: { id: true },
+        });
+        
+// console.log("airwaybill",airWayBill)
+
+        const updatedDepsData = {
+          ...depsData,
+          articleId: awbArticle?.id || 0,
+          AWBId: airWayBill?.id || 0,
+        };
+
+        const createdDeps = await prisma.dEPS.create({ data: updatedDepsData });
+
+        if (createdDeps && fileIds && fileIds.length > 0) {
+          for (const fileId of fileIds) {
+            await prisma.dEPSImages.create({
+              data: { depsId: createdDeps.id, fileId: fileId },
+            });
+          }
+        }
+      }
+
+      // const uniqueAWBCodes = [...new Set(DEPSData.map(deps => deps.AWBCode))].filter(Boolean);
+      const uniqueAWBCodes = [...new Set(DEPSData.map(deps => deps.AWBId))].filter(Boolean);
+
+      console.log("Unique AWBCodes:", uniqueAWBCodes); // Log unique AWBCodes to verify
+
+      const awbIdMap = await prisma.airWayBill.findMany({
+        where: { AWBCode: { in: uniqueAWBCodes } },
+        select: { id: true, AWBCode: true },
+      }).then(results => results.reduce((acc, curr) => {
+        acc[curr.AWBCode] = curr.id;
+        return acc;
+      }, {} as Record<string, number>));
+
+      console.log("AWBId Map:", awbIdMap); // Log awbIdMap to verify mappings
+
+      for (const awbCode of uniqueAWBCodes) {
+        const awbId = awbIdMap[awbCode];
+
+        if (!awbId) {
+          console.log(`AWBId not found for AWBCode: ${awbCode}`);
+          continue;
+        }
+
+        console.log(`Processing counts for AWBId: ${awbId}`); // Log current AWBId
+
+        const totalShortsCount = await prisma.dEPS.count({
+          where: { AWBId: awbId, DEPSType: "Shorts",depsStatus:"Open"},
+        });
+        const totalExcessCount = await prisma.dEPS.count({
+          where: { AWBId: awbId, DEPSType: "Excess",depsStatus:"Open"},
+        });
+        const totalDamagesCount = await prisma.dEPS.count({
+          where: { AWBId: awbId, DEPSType: "Damage",depsStatus:"Open"},
+        });
+        const totalPilferagesCount = await prisma.dEPS.count({
+          where: { AWBId: awbId, DEPSType: "Pilferage",depsStatus:"Open"},
+        });
+
+        console.log(`Updating counts for AWBId: ${awbId}`);
+        await prisma.airWayBill.update({
+          where: { id: awbId },
+          data: {
+            rollupShortCount: totalShortsCount || 0,
+            rollupExcessCount: totalExcessCount || 0,
+            rollupDamageCount: totalDamagesCount || 0,
+            rollupPilferageCount: totalPilferagesCount || 0,
+          },
+        });
+      }
+    });
+    console.log("DEPS processing completed successfully.");
+  } catch (error) {
+    console.error("Error in addDeps function:", error);
+    throw new Error("Internal Server Error");
+  }
 };
 
 
@@ -723,7 +875,27 @@ export const outwardAWBs = async (tripId: number, data: any, checkinHub: number)
           AWBStatus: "outForDelivery",
         },
       });
+      const recentHLFLineItem = await prisma.hLFLineItem.findFirst({
+        where: {
+          HLFLineItemAWBId: item.AWBId,
+        },
+        orderBy: {
+          id: 'desc',
+        },
+      });
+      
+      // Update it if found
+      if (recentHLFLineItem) {
+        await prisma.hLFLineItem.update({
+          where: {
+            id: recentHLFLineItem.id,
+          },
+          data: {
+            HLFLineStatus: "Outwarded",
+          },
+        });
     }
+  }
     else {// unloadLocationId is not "CONSIGNEE"
 
         await prisma.tripLineItem.updateMany({
@@ -1062,4 +1234,100 @@ export const deliverAWBCheck=async(AWBCode:string)=>{
   else{
    return false
   }
- }
+}
+
+export const getExcessDeps=async(tripId:number,checkinHub:number,scanTypeEnum:ArticleLogsScanType)=>{
+  let DEPSResponse=await prisma.dEPS.findMany({
+   where :{
+     tripId:tripId,
+     hubId:checkinHub,
+     scanType:scanTypeEnum,
+     DEPSType:"Excess",
+     depsStatus:"Open"
+   },
+   select:{
+    id:true,
+    DEPSType:true,
+    scanType:true,
+    AWBId:true,
+    AirWayBill:{
+      select:{
+        AWBCode:true,
+        consignor:{
+          select:{
+            consignorCode:true,
+            publicName:true,
+          }
+        },
+        consignee:{
+          select:{
+            consigneeCode:true,
+            consigneeName:true,
+          }
+        }
+      }
+     
+    },
+    AwbArticle:{
+      select:{
+        articleCode:true
+      }
+     
+    }
+   }
+  })
+ return DEPSResponse
+}
+
+export const getShortArticles = async (
+  AWBIds: number[],
+  tripId: number,
+  scanTypeEnum: ArticleLogsScanType
+) => {
+  const articlesWithoutLogsAndDeps = await prisma.awbArticle.findMany({
+    where: {
+      // AWBId: AWBId, // Filter by specific AWBId
+      AWBId: { in: AWBIds }, 
+      AWBArtIds: {
+        none: {
+          scanType: scanTypeEnum,
+          tripId:tripId
+        },
+      },
+      depsArticleIds: {
+        none: {
+          DEPSType: DEPSTypeList.Shorts
+        },
+      },
+    },
+    select: {
+      id: true,
+      articleCode: true,
+      status: true,
+      AWB: {
+        select: {
+          id: true,
+          AWBCode: true,
+          AWBStatus: true,
+          consignor: {
+            select: {
+              consignorId: true,
+              consignorCode: true,
+              publicName: true,
+            },
+          },
+          consignee: {
+            select: {
+              consigneeId: true,
+              consigneeCode: true,
+              consigneeName: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  console.log(articlesWithoutLogsAndDeps);
+  return articlesWithoutLogsAndDeps;
+};
