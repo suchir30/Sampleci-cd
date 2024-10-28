@@ -714,8 +714,18 @@ export const addDeps = async (DEPSData: any[]) => {
           select: { id: true },
         });
         
-// console.log("airwaybill",airWayBill)
-
+        if (deps.DEPSType === "Excess" && awbArticle?.id) {
+          await prisma.dEPS.updateMany({
+            where: {
+              articleId: awbArticle.id,
+              depsStatus: "Open" // Only update records that are currently "Open"
+            },
+            data: {
+              depsStatus: "Closed"
+            }
+          });
+        }
+        
         const updatedDepsData = {
           ...depsData,
           articleId: awbArticle?.id || 0,
