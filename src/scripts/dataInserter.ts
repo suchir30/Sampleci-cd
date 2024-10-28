@@ -130,7 +130,7 @@ async function insertSchemaData(models: any) {
                     });
 
                     if (!existingCrmField) {
-                        await prisma.cRMField.create({
+                        const crmField = await prisma.cRMField.create({
                             data: {
                                 name: field.name,
                                 viewName: field.name,
@@ -146,6 +146,13 @@ async function insertSchemaData(models: any) {
                                 CRMObjectId: crmObject.id,
                             },
                         });
+
+                        if (field.isId) {
+                            await prisma.cRMObject.update({
+                                where: { id: crmObject.id },
+                                data: { SortFieldId: crmField.id },
+                            });
+                        }
                     }
                 } catch (error) {
                     console.error(`Error processing field ${field.name} for CRMObject ${modelName}:`, error);
