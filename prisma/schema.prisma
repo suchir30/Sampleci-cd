@@ -52,17 +52,26 @@ model Role {
   CRMFieldPermissions  CRMFieldPermission[]  @relation("CRMFieldPermissionRole")
 }
 
+enum CRMFieldSortOrder {
+  asc
+  desc
+}
+
 model CRMObject {
   id                   Int                   @id @default(autoincrement())
   name                 String
   viewName             String?
   viewIndex            Int?
   CRMObjectGroupId     Int
+  SortFieldId          Int?                  @unique
+  SortField            CRMField?             @relation("SortField", fields: [SortFieldId], references: [id])
+  SortOrder            CRMFieldSortOrder     @default(desc)
   CRMFields            CRMField[]            @relation("CRMFieldTable")
   CRMObjectGroup       CRMObjectGroup        @relation("CRMObjectGroupCRMObject", fields: [CRMObjectGroupId], references: [id])
   CRMObjectRelations   CRMObjectRelations[]  @relation("PrimaryObject")
   CRMObjectRelated     CRMObjectRelations[]  @relation("RelatedObject")
   CRMObjectPermissions CRMObjectPermission[] @relation("CRMObjectPermissionCRMObject")
+  cRMFieldId           Int?
 }
 
 model CRMField {
@@ -83,6 +92,7 @@ model CRMField {
   CRMObjectId         Int
   CRMObject           CRMObject            @relation("CRMFieldTable", fields: [CRMObjectId], references: [id])
   CRMFieldPermissions CRMFieldPermission[] @relation("CRMFieldPermissionCRMField")
+  CRMObjectSort       CRMObject?           @relation("SortField")
 }
 
 model CRMObjectGroup {
