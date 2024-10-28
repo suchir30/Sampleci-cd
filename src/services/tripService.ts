@@ -673,8 +673,15 @@ export const getDepsLists = async (AWBId: number) => {
       articleId:true,
       userId:true,
       createdOn:true,
+      loadingHubBranch:{select:{
+        id:true,
+        branchCode:true,
+        branchName:true
+      }},
       loadUser:{
         select:{
+          id:true,
+          employeeId:true,
           firstName:true,
           lastName:true
         }
@@ -714,8 +721,18 @@ export const addDeps = async (DEPSData: any[]) => {
           select: { id: true },
         });
         
-// console.log("airwaybill",airWayBill)
-
+        if (deps.DEPSType === "Excess" && awbArticle?.id) {
+          await prisma.dEPS.updateMany({
+            where: {
+              articleId: awbArticle.id,
+              depsStatus: "Open" // Only update records that are currently "Open"
+            },
+            data: {
+              depsStatus: "Closed"
+            }
+          });
+        }
+        
         const updatedDepsData = {
           ...depsData,
           articleId: awbArticle?.id || 0,
@@ -1250,21 +1267,25 @@ export const getExcessDeps=async(tripId:number,checkinHub:number,scanTypeEnum:Ar
     DEPSType:true,
     scanType:true,
     AWBId:true,
+    depsStatus:true,
+    createdOn:true,
+    loadUser:{
+      select:{
+        id:true,
+        employeeId:true,
+        firstName:true,
+        lastName:true
+      }
+    },
+    loadingHubBranch:{
+      select:{
+        id:true,
+        branchCode:true
+      }
+    },
     AirWayBill:{
       select:{
         AWBCode:true,
-        consignor:{
-          select:{
-            consignorCode:true,
-            publicName:true,
-          }
-        },
-        consignee:{
-          select:{
-            consigneeCode:true,
-            consigneeName:true,
-          }
-        }
       }
      
     },
