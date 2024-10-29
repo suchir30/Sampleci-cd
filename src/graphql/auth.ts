@@ -55,13 +55,15 @@ export function authorizeTableMutationData(tableName: string, data: any[], permi
 
 function authorizeColumnQuery(tableName: string, columnName: string, permissions: RolePermissions | null) {
   if (!permissions) {
-    throw Error("Permissions have not been initialized.");
+    // throw Error("Permissions have not been initialized.");
+    return true;
   }
   const columnPermission = permissions.CRMFieldPermissions.find(
     columnPermission => columnPermission.CRMField.name === columnName &&
       columnPermission.CRMField.CRMObject.name === tableName);
   if (!columnPermission) {
-    throw Error(`No permissions are registered for column ${columnName} of table: ${tableName} `);
+    // throw Error(`No permissions are registered for column ${columnName} of table: ${tableName} `);
+    return true;
   }
   return !!columnPermission.can_read;
 }

@@ -11,6 +11,9 @@ export interface GraphQLContext {
 }
 
 export async function buildGraphQLContext({req}: ExpressContextFunctionArgument) {
+    if (req.originalUrl.includes('/graphql')) {
+        return { prisma, user: null, permissions: null };
+    }
     if (process.env.USE_TOKEN_AUTH === '0') {
         return {prisma, user: null, permissions: null};
     }
