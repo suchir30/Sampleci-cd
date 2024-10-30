@@ -297,57 +297,12 @@ export const loadArticlesValidate = async (AWBId:string,AWBArticleId:string,trip
               id: 'desc',
           },
         });
-        if(tripLineItemRes==null){
-          // return 'AWBIDInvalid'
-          const AWBIdRes=await prisma.airWayBill.findFirst({
-            where :{AWBCode:AWBId},
-            select:{
-              id:true,
-              AWBCode:true
-            }
-          })
-          const tripDetailsRes = await prisma.tripDetails.findFirst({
-            where: {
-              id: tripId,
-              latestCheckinHubId:checkinHubId
-            },
-            select:{
-              tripCode:true,
-              route:true
-            },
-            orderBy: {
-                id: 'desc',
-            },
-          });
-          return {
-            type:'wrongTrip',
-            AWBAssignedTripCode:null,
-            AWBAssignedTripRoute:null,
-            currentLoadingTripCode:tripDetailsRes?.tripCode,
-            currentLoadingTripRoute:tripDetailsRes?.route,
-            AWBCode:AWBIdRes?.AWBCode,
-            AWBArticleCode:AWBArticleIdRes?.articleCode
-          }
-        }
-
-        if(tripLineItemRes?.status=="Assigned" && tripLineItemRes?.loadLocationId===checkinHubId && tripLineItemRes.tripId===tripId){
+     
+        if(tripLineItemRes){
           console.log("valid")
           return `Valid+${tripLineItemRes?.id}`
         }
         else{
-          const AWBIdRes=await prisma.airWayBill.findFirst({
-            where :{AWBCode:AWBId},
-            select:{
-              AWBCode:true,
-              consignorId:true,
-              AWBStatus:true,
-              consignor:{
-                select:{
-                  consignorCode:true
-                }
-              }
-            }
-          })
           const tripDetailsRes = await prisma.tripDetails.findFirst({
             where: {
               id: tripId
@@ -365,22 +320,58 @@ export const loadArticlesValidate = async (AWBId:string,AWBArticleId:string,trip
                 id: 'desc',
             },
           });
-          //tli:- trip,awb,assigned   checkinup!=loadinglocation.tli
-          if(AWBIdRes?.AWBStatus==="PickUp" &&  tripLineItemRes.loadLocationId!=checkinHubId){
-          console.log("invalid AWB==pickup")
-          return {type:'consignorPickUpPoint',consignorCode:AWBIdRes?.consignor?.consignorCode,branchCode:tripDetailsRes?.checkinBranch?.branchCode}
+          const AWBIdRes=await prisma.airWayBill.findFirst({
+            where :{AWBCode:AWBId},
+            select:{
+              AWBCode:true,
+              consignorId:true,
+              AWBStatus:true,
+              consignor:{
+                select:{
+                  consignorCode:true
+                }
+              }
+            }
+          })
+          const tripLineItemRes1 = await prisma.tripLineItem.findFirst({
+            select:{
+                id:true,
+                tripId:true,
+                loadLocationId:true,
+                status:true,
+                trip:{
+                  select:{
+                    tripCode:true,
+                    route:true
+                  }
+                }
+            },
+            where: {
+              AWBId:AWBArticleIdRes?.AWBId,
+              tripId:tripId,
+              status:"Assigned"
+            },
+            orderBy: {
+                id: 'desc',
+            },
+          });
+          if(tripLineItemRes1 && AWBIdRes?.AWBStatus=="PickUp"){
+            console.log("invalid AWB==pickup")
+            return {type:'consignorPickUpPoint',consignorCode:AWBIdRes?.consignor?.consignorCode,branchCode:tripDetailsRes?.checkinBranch?.branchCode}
+          
           }
           else{
             console.log("loaded at wrongtrip at pickuppoint/hub")
             return {
               type:'wrongTrip',
-              AWBAssignedTripCode:tripLineItemRes?.trip?.tripCode,
-              AWBAssignedTripRoute:tripLineItemRes?.trip?.route,
+              AWBAssignedTripCode:tripLineItemRes1?.trip?.tripCode,
+              AWBAssignedTripRoute:tripLineItemRes1?.trip?.route,
               currentLoadingTripCode:tripDetailsRes?.tripCode,
               currentLoadingTripRoute:tripDetailsRes?.route,
               AWBCode:AWBIdRes?.AWBCode,
               AWBArticleCode:AWBArticleIdRes?.articleCode
             }
+           
           }
         }
       })
