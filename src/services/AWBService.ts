@@ -2,76 +2,90 @@ import { ArticleStatus,AwbLineItem,ArticleLogsScanType} from '@prisma/client';
 import moment from 'moment';
 import prisma from '../client';
 import { AWBCreateData } from '../types/awbTypes';
-export const generateBulkAWBForConsignor = async (consignorId: number, awbData: AWBCreateData[]):Promise<boolean> => {
 
-    const result=await prisma.$transaction(async prisma => {
-        if (!awbData?.length) {
-            throw Error("Create AWB list is empty.");
+
+// Helper function to increment alphanumeric code
+function incrementAlphanumericCode(code: string): string {
+    let chars = code.split('');
+    for (let i = chars.length - 1; i >= 0; i--) {
+        if (chars[i] === 'Z') {
+            chars[i] = 'A';
+        } else {
+            chars[i] = String.fromCharCode(chars[i].charCodeAt(0) + 1);
+            return chars.join('');
         }
-        // Retrive the consignor details
+    }
+    return chars.join('');
+}
+
+export const generateBulkAWBForConsignor = async (
+    consignorId: number,
+    awbData: AWBCreateData[]
+): Promise<boolean> => {
+    console.log("new service")
+    const result = await prisma.$transaction(async prisma => {
+        if (!awbData?.length) {
+            throw new Error("Create AWB list is empty.");
+        }
+
+        // Retrieve the consignor details
         const consignor = await prisma.consignor.findUniqueOrThrow({
             where: { consignorId },
             select: { consignorId: true, consignorCode: true, branchId: true }
         });
+        console.log(consignor,"consignorresponse")
         if (consignor.branchId == null) {
-            throw Error(`Consignor ${consignor.consignorCode} does not have a branch assigned.`);
+            throw new Error(`Consignor ${consignor.consignorCode} does not have a branch assigned.`);
         }
 
-        // Retrieve the latest AWBId in a single database query
-        const today = moment().format('YYYY-MM-DD');
-        const tomorrow = moment().add(1, 'day').format('YYYY-MM-DD');
+        // Retrieve the latest AWB
         const latestAWB = await prisma.airWayBill.findFirst({
-            where: {
-                consignorId: {
-                    equals: consignorId, // Assuming all consignorIds are the same
-                },
-                AND: [
-                    {
-                        createdOn: {
-                            gte: new Date(today),
-                        },
-                    },
-                    {
-                        createdOn: {
-                            lt: new Date(tomorrow),
-                        },
-                    },
-                ],
-            },
-            orderBy: {
-                id: 'desc',
-            },
-            select: {
-                AWBCode: true,
-            },
+            where: { consignorId },
+            orderBy: { id: 'desc' },
+            select: { AWBCode: true }
         });
+        console.log(latestAWB,"latestAWBREsponse")
+       
 
-        // Increment value
-        let increment = 1;
+        // Set initial alphanumeric and numeric parts
+        let alphanumericPart = 'AAA';
+        let numericPart = 1;
+
         if (latestAWB) {
-            const lastThreeChars = parseInt(latestAWB.AWBCode.slice(-3));
-            console.log(lastThreeChars,"LASTTHREE");
+            const lastAlphaCode = latestAWB.AWBCode.slice(-6, -3); // Get the 'AAA' part
+            const lastNumCode = parseInt(latestAWB.AWBCode.slice(-3)); // Get the '000' part
+            console.log(lastAlphaCode,"lastAlphaCode",lastNumCode,"lastAlphaCode")
+            alphanumericPart = lastAlphaCode;
+            numericPart = lastNumCode + 1;
 
-            increment = lastThreeChars + 1;
-        }
-
-        // Generate all AWBIds in the dataArray
-        const currentTimestamp = moment().format('DDMMYY');
-        for (const data of awbData) {
-            data.consignorId = consignor.consignorId;
-            data.fromBranchId = consignor.branchId;
-            data.AWBCode = `${consignor.consignorCode}${currentTimestamp}${String(increment).padStart(3, '0')}`;
-            increment++;
-
-            // Validations
-            if (data.numOfArticles <= 0) {
-                throw Error(`Found non-positive article count for: consigneeId=${data.consigneeId}, toBranchId=${data.toBranchId}.`);
+            // If numeric part reaches 1000, reset it and increment alphanumeric part
+            if (numericPart >= 1000) {
+                alphanumericPart = incrementAlphanumericCode(alphanumericPart);
+                numericPart = 1;
             }
         }
 
+        // Generate all AWBIds in the dataArray
+        for (const data of awbData) {
+            data.consignorId = consignor.consignorId;
+            data.fromBranchId = consignor.branchId;
+            data.AWBCode = `${consignor.consignorCode}${alphanumericPart}${String(numericPart).padStart(3, '0')}`;
 
+            numericPart++;
+            // If numeric part reaches 1000, reset and increment alphanumeric part
+            if (numericPart >= 1000) {
+                alphanumericPart = incrementAlphanumericCode(alphanumericPart);
+                numericPart = 0;
+            }
 
-        const createdAWBs = await prisma.airWayBill.createMany({
+            // Validations
+            if (data.numOfArticles <= 0) {
+                throw new Error(`Found non-positive article count for: consigneeId=${data.consigneeId}, toBranchId=${data.toBranchId}.`);
+            }
+        }
+
+        // Insert the AWBs in bulk
+        await prisma.airWayBill.createMany({
             data: awbData.map(data => ({
                 consignorId: data.consignorId,
                 consigneeId: data.consigneeId,
@@ -82,9 +96,10 @@ export const generateBulkAWBForConsignor = async (consignorId: number, awbData: 
             })),
         });
 
-        return createdAWBs;
+        return true;
     });
-    return true;
+
+    return result;
 };
 
 export const getGeneratedAWB = async (consignorId: number, AWBStatus: any) => {
