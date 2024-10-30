@@ -361,16 +361,52 @@ export const loadArticlesValidate = async (AWBId:string,AWBArticleId:string,trip
           
           }
           else{
+            const tripLineItemRes2 = await prisma.tripLineItem.findFirst({
+              select:{
+                  id:true,
+                  tripId:true,
+                  loadLocationId:true,
+                  status:true,
+                  trip:{
+                    select:{
+                      tripCode:true,
+                      route:true
+                    }
+                  }
+              },
+              where: {
+                AWBId:AWBArticleIdRes?.AWBId,
+                status:"Assigned"
+              },
+              orderBy: {
+                  id: 'desc',
+              },
+            });
             console.log("loaded at wrongtrip at pickuppoint/hub")
-            return {
-              type:'wrongTrip',
-              AWBAssignedTripCode:tripLineItemRes1?.trip?.tripCode,
-              AWBAssignedTripRoute:tripLineItemRes1?.trip?.route,
-              currentLoadingTripCode:tripDetailsRes?.tripCode,
-              currentLoadingTripRoute:tripDetailsRes?.route,
-              AWBCode:AWBIdRes?.AWBCode,
-              AWBArticleCode:AWBArticleIdRes?.articleCode
+            if(tripLineItemRes2){
+              return {
+                type:'wrongTrip',
+                AWBAssignedTripCode:tripLineItemRes2?.trip?.tripCode,
+                AWBAssignedTripRoute:tripLineItemRes2?.trip?.route,
+                currentLoadingTripCode:tripDetailsRes?.tripCode,
+                currentLoadingTripRoute:tripDetailsRes?.route,
+                AWBCode:AWBIdRes?.AWBCode,
+                AWBArticleCode:AWBArticleIdRes?.articleCode
+              }
+
             }
+            else{
+              return {
+                type:'wrongTrip',
+                AWBAssignedTripCode:null,
+                AWBAssignedTripRoute:null,
+                currentLoadingTripCode:tripDetailsRes?.tripCode,
+                currentLoadingTripRoute:tripDetailsRes?.route,
+                AWBCode:AWBIdRes?.AWBCode,
+                AWBArticleCode:AWBArticleIdRes?.articleCode
+              }
+            }
+        
            
           }
         }
