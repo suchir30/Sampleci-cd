@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { AuthRequest } from '../types/authTypes';
 
 const tokenAuth = (req: AuthRequest, res: Response, next: NextFunction): void => {
-    if (process.env.USE_TOKEN_AUTH === '0') {
+    if (process.env.USE_TOKEN_AUTH === '0' || req.originalUrl.includes('/graphql')) {
         next();
         return;
     }
