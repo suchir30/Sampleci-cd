@@ -137,7 +137,7 @@ export const tripsPdfGenerator = async (pdfData: any): Promise<Buffer> => {
                             { text: item.awbToLocationCOde || '', style: 'textSmall' },
                             { text: item.numberOfArticles || '', style: 'textSmall' },
                             { text: item.numOfScan || '', style: 'textSmall' },
-                            { text: item.rollupDepsCount || '', style: 'textSmall' },
+                            { text: item.rollupDEPSCount || '', style: 'textSmall' },
                             { text: item.awbRollupActualWeighgtkgs || '', style: 'textSmall' },
                             { text: item.awbRollupChargedWeighgtkgs || '', style: 'textSmall' },
                         ])
