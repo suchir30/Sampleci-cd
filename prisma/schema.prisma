@@ -62,6 +62,8 @@ model CRMObject {
   name                 String
   viewName             String?
   viewIndex            Int?
+  primaryFieldName     String?
+  labelFieldName       String?
   CRMObjectGroupId     Int
   SortFieldId          Int?                  @unique
   SortField            CRMField?             @relation("SortField", fields: [SortFieldId], references: [id])
@@ -71,7 +73,7 @@ model CRMObject {
   CRMObjectRelations   CRMObjectRelations[]  @relation("PrimaryObject")
   CRMObjectRelated     CRMObjectRelations[]  @relation("RelatedObject")
   CRMObjectPermissions CRMObjectPermission[] @relation("CRMObjectPermissionCRMObject")
-  cRMFieldId           Int?
+  relatedFields        CRMField[]            @relation("RelatedObject")
 }
 
 model CRMField {
@@ -81,7 +83,7 @@ model CRMField {
   viewIndex           Int?
   isRelation          Boolean              @default(false)
   idFieldName         String?
-  labelFieldName      String?
+  isRequired          Boolean              @default(false)
   isInCreateView      Boolean              @default(false)
   isInListView        Boolean              @default(false)
   isInEditView        Boolean              @default(false)
@@ -90,9 +92,11 @@ model CRMField {
   isSearchableField   Boolean              @default(false)
   filterView          Boolean              @default(false)
   CRMObjectId         Int
+  relatedObjectId     Int?
   CRMObject           CRMObject            @relation("CRMFieldTable", fields: [CRMObjectId], references: [id])
   CRMFieldPermissions CRMFieldPermission[] @relation("CRMFieldPermissionCRMField")
   CRMObjectSort       CRMObject?           @relation("SortField")
+  relatedObject       CRMObject?           @relation("RelatedObject", fields: [relatedObjectId], references: [id])
 }
 
 model CRMObjectGroup {
