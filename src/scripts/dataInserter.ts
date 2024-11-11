@@ -85,7 +85,119 @@ async function insertSchemaData(models: any) {
     const othersGroupId = await getGroupId('others');
     groupIds.set('others', othersGroupId);
 
+    const crmObjects = new Map<string, any>();
     for (const model of models) {
+        const modelName = unCapitalizeFirstLetter(model.name);
+        const groupName = getObjectGroup(modelName);
+        const groupId = groupIds.get(groupName) ?? othersGroupId;
+
+        // Determine primaryFieldName and labelFieldName
+        const primaryField = model.fields.find((field: any) => field.isId);
+        const labelField = model.fields.find((field: any) =>
+            field.name.toLowerCase().includes("name") || field.name.toLowerCase().includes("code")
+        ) || { name: primaryField?.name };
+
+        // Convert model name from camelCase to ViewName format
+        const viewName = model.name
+            .replace(/([a-z])([A-Z])/g, '$1 $2')  // Split camelCase
+            .replace(/([a-z0-9])([A-Z])/g, '$1 $2')  // Handle cases like "eXample" → "e Xample"
+            .replace(/\b([A-Z]+)\b/g, (match: string) => match.toUpperCase())  // Preserve acronyms in uppercase
+            .replace(/^[a-z]/, (match: string) => match.toUpperCase());  // Capitalize the first letter of the whole string
+
+        try {
+            const crmObject = await prisma.cRMObject.upsert({
+                where: { name: modelName },
+                update: {},
+                create: {
+                    name: modelName,
+                    viewName: viewName,
+                    viewIndex: models.indexOf(model) + 1,
+                    CRMObjectGroupId: groupId,
+                    primaryFieldName: primaryField?.name || null,
+                    labelFieldName: labelField?.name || null,
+                },
+            });
+            crmObjects.set(modelName, crmObject);
+        } catch (error) {
+            console.error(`Error creating/updating CRMObject ${modelName}:`, error);
+        }
+    }
+
+    const fieldsToSkipByModel = new Map<string, Set<string>>();
+
+    for (const model of models) {
+        const fieldsToSkip = new Set<string>();
+
+        for (const field of model.fields) {
+            if (field.relationFromFields && field.relationFromFields.length > 0) {
+                field.relationFromFields.forEach((fieldName: string) => fieldsToSkip.add(fieldName));
+            }
+        }
+
+        fieldsToSkipByModel.set(model.name, fieldsToSkip);
+    }
+
+    for (const model of models) {
+        const fieldsToSkip = fieldsToSkipByModel.get(model.name);
+        const modelName = unCapitalizeFirstLetter(model.name);
+        const crmObject = crmObjects.get(modelName);
+
+        for (const field of model.fields) {
+            if (fieldsToSkip && fieldsToSkip.has(field.name)) {
+                continue;
+            }
+
+            const isRequired = field.isRequired || false;
+            const relatedObject = field.kind === 'object' ? crmObjects.get(unCapitalizeFirstLetter(field.type)) : null;
+            const viewName = field.name
+                .replace(/([a-z])([A-Z])/g, '$1 $2')  // Split camelCase
+                .replace(/([a-z0-9])([A-Z])/g, '$1 $2')  // Handle cases like "eXample" → "e Xample"
+                .replace(/\b([A-Z]+)\b/g, (match: string) => match.toUpperCase())  // Preserve acronyms in uppercase
+                .replace(/^[a-z]/, (match: string) => match.toUpperCase());  // Capitalize the first letter of the whole string
+
+            try {
+                const existingCrmField = await prisma.cRMField.findFirst({
+                    where: {
+                        name: field.name,
+                        CRMObjectId: crmObject.id,
+                    },
+                });
+
+                if (!existingCrmField) {
+                    const crmField = await prisma.cRMField.create({
+                        data: {
+                            name: field.name,
+                            viewName: viewName,
+                            isRelation: field.kind === 'object',
+                            idFieldName: field.kind === 'object' ? field.relationFromFields?.[0] || null : null,
+                            fieldType:  field.kind === 'object' ?  'relation' || null : null,
+                            isInCreateView: false,
+                            isInListView: false,
+                            isInEditView: false,
+                            isInDetailView: false,
+                            isInRelatedList: field.kind === 'object',
+                            isSearchableField: field.kind !== 'object',
+                            isRequired,
+                            relatedObjectId: relatedObject ? relatedObject.id : null,
+                            CRMObjectId: crmObject.id,
+                        },
+                    });
+
+                    // If field is the primary ID, set it as SortFieldId for CRMObject
+                    if (field.isId) {
+                        await prisma.cRMObject.update({
+                            where: { id: crmObject.id },
+                            data: { sortFieldId: crmField.id },
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error(`Error processing field ${field.name} for CRMObject ${modelName}:`, error);
+            }
+        }
+    }
+
+    /*for (const model of models) {
         const modelName = unCapitalizeFirstLetter(model.name);
         const groupName = getObjectGroup(modelName);
         const groupId = groupIds.get(groupName);
@@ -161,7 +273,7 @@ async function insertSchemaData(models: any) {
         } catch (error) {
             console.error(`Error processing CRMObject ${modelName}:`, error);
         }
-    }
+    }*/
 }
 
 async function insertRelations(models: any) {

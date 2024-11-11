@@ -40,8 +40,14 @@ CREATE TABLE `CRMObject` (
     `name` VARCHAR(191) NOT NULL,
     `viewName` VARCHAR(191) NULL,
     `viewIndex` INTEGER NULL,
+    `primaryFieldName` VARCHAR(191) NULL,
+    `labelFieldName` VARCHAR(191) NULL,
     `CRMObjectGroupId` INTEGER NOT NULL,
+    `sortFieldId` INTEGER NULL,
+    `sortOrder` ENUM('asc', 'desc') NOT NULL DEFAULT 'desc',
 
+    UNIQUE INDEX `CRMObject_name_key`(`name`),
+    UNIQUE INDEX `CRMObject_sortFieldId_key`(`sortFieldId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -53,7 +59,9 @@ CREATE TABLE `CRMField` (
     `viewIndex` INTEGER NULL,
     `isRelation` BOOLEAN NOT NULL DEFAULT false,
     `idFieldName` VARCHAR(191) NULL,
-    `labelFieldName` VARCHAR(191) NULL,
+    `fieldType` ENUM('calculated', 'comboBox', 'currency', 'email', 'encryptedString', 'id', 'multiPicklist', 'percent', 'phone', 'picklist', 'relation', 'textArea', 'url') NULL,
+    `isInSearchModal` BOOLEAN NOT NULL DEFAULT false,
+    `isRequired` BOOLEAN NOT NULL DEFAULT false,
     `isInCreateView` BOOLEAN NOT NULL DEFAULT false,
     `isInListView` BOOLEAN NOT NULL DEFAULT false,
     `isInEditView` BOOLEAN NOT NULL DEFAULT false,
@@ -62,6 +70,7 @@ CREATE TABLE `CRMField` (
     `isSearchableField` BOOLEAN NOT NULL DEFAULT false,
     `filterView` BOOLEAN NOT NULL DEFAULT false,
     `CRMObjectId` INTEGER NOT NULL,
+    `relatedObjectId` INTEGER NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -111,10 +120,16 @@ CREATE TABLE `CRMFieldPermission` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
+ALTER TABLE `CRMObject` ADD CONSTRAINT `CRMObject_sortFieldId_fkey` FOREIGN KEY (`sortFieldId`) REFERENCES `CRMField`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE `CRMObject` ADD CONSTRAINT `CRMObject_CRMObjectGroupId_fkey` FOREIGN KEY (`CRMObjectGroupId`) REFERENCES `CRMObjectGroup`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `CRMField` ADD CONSTRAINT `CRMField_CRMObjectId_fkey` FOREIGN KEY (`CRMObjectId`) REFERENCES `CRMObject`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `CRMField` ADD CONSTRAINT `CRMField_relatedObjectId_fkey` FOREIGN KEY (`relatedObjectId`) REFERENCES `CRMObject`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `CRMObjectRelations` ADD CONSTRAINT `CRMObjectRelations_primaryObjectId_fkey` FOREIGN KEY (`primaryObjectId`) REFERENCES `CRMObject`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
