@@ -20,28 +20,28 @@ datasource db {
 }
 
 model User {
-  id                   Int             @id @default(autoincrement())
-  employeeId           String          @unique @db.VarChar(255)
-  hashedPassword       String          @db.VarChar(255)
-  firstName            String?         @db.VarChar(255)
-  lastName             String?         @db.VarChar(255)
-  email                String?         @db.VarChar(255)
-  phone1               String?         @db.VarChar(255)
-  phone2               String?         @db.VarChar(255)
-  title                String?         @db.VarChar(255)
-  roleId               Int?
-  role                 Role?           @relation("userRole", fields: [roleId], references: [id])
-  isActiveUser         Boolean         @default(true)
-  address1             String?         @db.VarChar(255)
-  address2             String?         @db.VarChar(255)
-  cityId               Int?
-  city                 CityMaster?     @relation("userCity", fields: [cityId], references: [id])
-  districtId           Int?
-  district             DistrictMaster? @relation("userDistrict", fields: [districtId], references: [id])
-  stateId              Int?
-  state                StateMaster?    @relation("userState", fields: [stateId], references: [id])
-  createdOn            DateTime        @default(now())
-  depsLoadingUserIds   DEPS[]          @relation("depsLoadingUserId")
+  id                 Int             @id @default(autoincrement())
+  employeeId         String          @unique @db.VarChar(255)
+  hashedPassword     String          @db.VarChar(255)
+  firstName          String?         @db.VarChar(255)
+  lastName           String?         @db.VarChar(255)
+  email              String?         @db.VarChar(255)
+  phone1             String?         @db.VarChar(255)
+  phone2             String?         @db.VarChar(255)
+  title              String?         @db.VarChar(255)
+  roleId             Int?
+  role               Role?           @relation("userRole", fields: [roleId], references: [id])
+  isActiveUser       Boolean         @default(true)
+  address1           String?         @db.VarChar(255)
+  address2           String?         @db.VarChar(255)
+  cityId             Int?
+  city               CityMaster?     @relation("userCity", fields: [cityId], references: [id])
+  districtId         Int?
+  district           DistrictMaster? @relation("userDistrict", fields: [districtId], references: [id])
+  stateId            Int?
+  state              StateMaster?    @relation("userState", fields: [stateId], references: [id])
+  createdOn          DateTime        @default(now())
+  depsLoadingUserIds DEPS[]          @relation("depsLoadingUserId")
 }
 
 model Role {
@@ -59,19 +59,37 @@ enum CRMFieldSortOrder {
 
 model CRMObject {
   id                   Int                   @id @default(autoincrement())
-  name                 String
+  name                 String                @unique
   viewName             String?
   viewIndex            Int?
+  primaryFieldName     String?
+  labelFieldName       String?
   CRMObjectGroupId     Int
-  SortFieldId          Int?                  @unique
-  SortField            CRMField?             @relation("SortField", fields: [SortFieldId], references: [id])
-  SortOrder            CRMFieldSortOrder     @default(desc)
+  sortFieldId          Int?                  @unique
+  sortField            CRMField?             @relation("sortField", fields: [sortFieldId], references: [id])
+  sortOrder            CRMFieldSortOrder     @default(desc)
   CRMFields            CRMField[]            @relation("CRMFieldTable")
   CRMObjectGroup       CRMObjectGroup        @relation("CRMObjectGroupCRMObject", fields: [CRMObjectGroupId], references: [id])
   CRMObjectRelations   CRMObjectRelations[]  @relation("PrimaryObject")
   CRMObjectRelated     CRMObjectRelations[]  @relation("RelatedObject")
   CRMObjectPermissions CRMObjectPermission[] @relation("CRMObjectPermissionCRMObject")
-  cRMFieldId           Int?
+  relatedFields        CRMField[]            @relation("RelatedObject")
+}
+
+enum CRMFieldType {
+  calculated
+  comboBox
+  currency
+  email
+  encryptedString
+  id
+  multiPicklist
+  percent
+  phone
+  picklist
+  relation
+  textArea
+  url
 }
 
 model CRMField {
@@ -81,7 +99,9 @@ model CRMField {
   viewIndex           Int?
   isRelation          Boolean              @default(false)
   idFieldName         String?
-  labelFieldName      String?
+  fieldType           CRMFieldType?
+  isInSearchModal     Boolean              @default(false)
+  isRequired          Boolean              @default(false)
   isInCreateView      Boolean              @default(false)
   isInListView        Boolean              @default(false)
   isInEditView        Boolean              @default(false)
@@ -90,9 +110,11 @@ model CRMField {
   isSearchableField   Boolean              @default(false)
   filterView          Boolean              @default(false)
   CRMObjectId         Int
+  relatedObjectId     Int?
   CRMObject           CRMObject            @relation("CRMFieldTable", fields: [CRMObjectId], references: [id])
   CRMFieldPermissions CRMFieldPermission[] @relation("CRMFieldPermissionCRMField")
-  CRMObjectSort       CRMObject?           @relation("SortField")
+  CRMObjectSort       CRMObject?           @relation("sortField")
+  relatedObject       CRMObject?           @relation("RelatedObject", fields: [relatedObjectId], references: [id])
 }
 
 model CRMObjectGroup {
@@ -527,23 +549,23 @@ enum DEPSStatus {
 }
 
 model DEPS {
-  id                   Int                 @id @default(autoincrement())
-  DEPSType             DEPSTypeList
-  AWBId                Int
-  AirWayBill           AirWayBill          @relation("depsAWBId", fields: [AWBId], references: [id])
-  articleId            Int
-  AwbArticle           AwbArticle          @relation("depsArticleId", fields: [articleId], references: [id])
-  hubId                Int?
-  loadingHubBranch     Branch?             @relation("depsLoadingHubId", fields: [hubId], references: [id])
-  tripId               Int?
-  trip                 TripDetails?        @relation("depsTripRoute", fields: [tripId], references: [id])
-  userId               Int?
-  loadUser             User?               @relation("depsLoadingUserId", fields: [userId], references: [id])
-  depsStatus           DEPSStatus?
-  scanType             ArticleLogsScanType
-  createdOn            DateTime?           @default(now())
-  modifiedOn           DateTime?           @updatedAt
-  depsImages           DEPSImages[]        @relation("depsImage")
+  id               Int                 @id @default(autoincrement())
+  DEPSType         DEPSTypeList
+  AWBId            Int
+  AirWayBill       AirWayBill          @relation("depsAWBId", fields: [AWBId], references: [id])
+  articleId        Int
+  AwbArticle       AwbArticle          @relation("depsArticleId", fields: [articleId], references: [id])
+  hubId            Int?
+  loadingHubBranch Branch?             @relation("depsLoadingHubId", fields: [hubId], references: [id])
+  tripId           Int?
+  trip             TripDetails?        @relation("depsTripRoute", fields: [tripId], references: [id])
+  userId           Int?
+  loadUser         User?               @relation("depsLoadingUserId", fields: [userId], references: [id])
+  depsStatus       DEPSStatus?
+  scanType         ArticleLogsScanType
+  createdOn        DateTime?           @default(now())
+  modifiedOn       DateTime?           @updatedAt
+  depsImages       DEPSImages[]        @relation("depsImage")
 }
 
 model DEPSImages {

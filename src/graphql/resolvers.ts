@@ -78,9 +78,11 @@ import {
     VehicleMasterRelationsResolver,
     DriverMasterRelationsResolver,
 } from "@generated/type-graphql";
-import { Authorized, NonEmptyArray } from "type-graphql";
+import {Authorized, NonEmptyArray, UseMiddleware} from "type-graphql";
 import { ResolversEnhanceMap, ModelsEnhanceMap, applyResolversEnhanceMap, applyModelsEnhanceMap } from "@generated/type-graphql";
 import {CreateManyGeneral} from "./components/customResolvers/CreateManyGeneral";
+import {TripDetailsInterceptor} from "./components/middlewares/tripDetailsInterceptor";
+import {getEnum} from "./components/customResolvers/getEnum"
 
 const resolversEnhanceMap: ResolversEnhanceMap = {
     User: { _all: [Authorized()] },
@@ -102,7 +104,7 @@ const resolversEnhanceMap: ResolversEnhanceMap = {
     HLFLineItem: { _all: [Authorized()] },
     StateMaster: { _all: [Authorized()] },
     TripCheckIn: { _all: [Authorized()] },
-    TripDetails: { _all: [Authorized()] },
+    TripDetails: { _all: [Authorized()], createOneTripDetails: [UseMiddleware(TripDetailsInterceptor)] },
     DriverMaster: { _all: [Authorized()] },
     TripLineItem: { _all: [Authorized()] },
     VendorMaster: { _all: [Authorized()] },
@@ -250,5 +252,6 @@ export const generatedRelationResolvers: NonEmptyArray<Function> = [
 ];
 
 export const customResolvers: NonEmptyArray<Function> = [
-    CreateManyGeneral
+    CreateManyGeneral,
+    getEnum,
 ]

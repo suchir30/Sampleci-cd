@@ -5,7 +5,7 @@ import { AWBCreateData } from '../types/awbTypes';
 
 
 // Helper function to increment alphanumeric code
-function incrementAlphanumericCode(code: string): string {
+export function incrementAlphanumericCode(code: string): string {
     let chars = code.split('');
     for (let i = chars.length - 1; i >= 0; i--) {
         if (chars[i] === 'Z') {
@@ -45,7 +45,7 @@ export const generateBulkAWBForConsignor = async (
             select: { AWBCode: true }
         });
         console.log(latestAWB,"latestAWBREsponse")
-       
+
 
         // Set initial alphanumeric and numeric parts
         let alphanumericPart = 'AAA';
@@ -382,7 +382,7 @@ export const markAWBArticlesAsPrinted = async (AWBId: number) => {
     return true;
 };
 export const markAWBArticleAsDeleted = async (articleId: number, AWBId: number) => {
-   
+
     let checkstatus= await prisma.awbArticle.findFirst({
         where: {
             id:articleId
@@ -398,7 +398,7 @@ export const markAWBArticleAsDeleted = async (articleId: number, AWBId: number) 
             status: ArticleStatus.Deleted,
         }
     });
-   
+
     const deletedArticle = await prisma.awbArticle.findMany({
         where: {
             AWBId: AWBId,
@@ -550,7 +550,7 @@ export const getUpdateAWB = async (AWBId: number) => {
 // export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem[]) => {
 //     try {
 //         const result = await prisma.$transaction(async (prisma) => {
-            
+
 //             let AWBConsignorId=await prisma.airWayBill.findUnique({
 //                 where: {id:AWBId}
 //             });
@@ -558,7 +558,7 @@ export const getUpdateAWB = async (AWBId: number) => {
 //                 where: {consignorId:AWBConsignorId?.consignorId}
 //             });
 //             console.log(AWBConsignorId,factorRes,factorRes?.actualWeightFactor,factorRes?.volumetricWeightFactor)
-            
+
 
 //                     await prisma.awbLineItem.deleteMany({
 //                         where: {AWBId:AWBId}
@@ -568,7 +568,7 @@ export const getUpdateAWB = async (AWBId: number) => {
 //                     if(!factorRes?.actualWeightFactor || !factorRes?.volumetricWeightFactor){
 //                         return "f"
 //                     }
-                    
+
 //                     for (const item of awbLineItems) {
 //                         await prisma.awbLineItem.create({
 //                             data: {
@@ -622,7 +622,7 @@ export const getUpdateAWB = async (AWBId: number) => {
 //             });
 //             const { numOfArticles } = aggregateResults._sum;
 
-       
+
 //         const updatedAirWayBill = await prisma.airWayBill.update({
 //             where: {
 //                 id: AWBId
@@ -632,7 +632,7 @@ export const getUpdateAWB = async (AWBId: number) => {
 //                 rollupWeight: totalActualWeight || 0,
 //                 rollupVolume: totalVolume || 0,
 //                 rollupSKU:totalSKUChargedWeight || 0
-                
+
 //             }
 //         });
 //         return true;
@@ -659,7 +659,7 @@ export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem
             const factorRes = await prisma.contract.findFirst({
                 where: { consignorId: AWBConsignorId.consignorId }
             });
-        
+
             await prisma.awbLineItem.deleteMany({
                 where: { AWBId: AWBId }
             });
@@ -678,15 +678,15 @@ export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem
                         }
                     });
                 });
-                
+
             await Promise.all(createPromises);
             }
             else{
                 if (factorRes?.actualWeightFactor == null || factorRes?.volumetricWeightFactor == null || factorRes?.cwCeiling==null) {
                     console.log("Invalid factors", factorRes);
                     return "Invalid factors";
-                } 
-                
+                }
+
                 const createPromises = awbLineItems.map(item => {
                     return prisma.awbLineItem.create({
                         data: {
@@ -706,10 +706,10 @@ export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem
                         }
                     });
                 });
-                
+
             await Promise.all(createPromises);
             }
-            
+
             const aggregateResults = await prisma.awbLineItem.aggregate({
                 _sum: {
                     articleWeightKg: true,
@@ -721,7 +721,7 @@ export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem
                     AWBId: AWBId
                 }
             });
-            
+
             const { numOfArticles,articleWeightKg,volume,weightKgs} = aggregateResults._sum;
 
             const awbLineItemsList = await prisma.awbLineItem.findMany({
@@ -762,11 +762,11 @@ export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem
                     rollupWeight: weightKgs|| 0,
                     rollupVolume: volume || 0,
                     rollupChargedWtInKgs: rollupChargedWtInKgs || 0,
-                    chargedWeightWithCeiling: rollupChargedWtCeiling || 0 
+                    chargedWeightWithCeiling: rollupChargedWtCeiling || 0
                 }
             });
 
-          
+
             return updatedAirWayBill;
         });
         await checkAWBComplete(AWBId)
@@ -973,9 +973,9 @@ export const getSKUs = async (consignorId: number) => {
       },
     });
     return SKUDetails;
-     
+
   };
-  
+
 export const getBoxTypes = async (consignorId: number) => {
     const results = await prisma.consignorRateTable.findMany({
       where: {
@@ -989,6 +989,6 @@ export const getBoxTypes = async (consignorId: number) => {
         ratePerBox:true
       }
     });
-  
+
    return results;
 };
