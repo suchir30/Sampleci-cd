@@ -16,8 +16,6 @@
   - You are about to drop the column `consignorContractType` on the `contract` table. All the data in the column will be lost.
   - You are about to drop the column `cwCeiling` on the `contract` table. All the data in the column will be lost.
   - You are about to drop the column `odaChargeType` on the `contract` table. All the data in the column will be lost.
-  - Added the required column `chargedWeightModel` to the `Contract` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `consignorPricingModel` to the `Contract` table without a default value. This is not possible if the table is not empty.
 
 */
 -- AlterTable
@@ -45,7 +43,8 @@ ALTER TABLE `AwbLineItem` DROP COLUMN `articleWeightKg`,
 
 -- AlterTable
 ALTER TABLE `Contract` DROP COLUMN `baseChargeType`,
-    DROP COLUMN  `cwCeiling`,
+    DROP COLUMN `consignorContractType`,
+    DROP COLUMN `cwCeiling`,
     DROP COLUMN `odaChargeType`,
     ADD COLUMN `AWBCDMAccess` ENUM('Read', 'Write', 'None') NOT NULL DEFAULT 'None',
     ADD COLUMN `AWBChargedWeightAccess` ENUM('Read', 'Write', 'None') NOT NULL DEFAULT 'None',
@@ -56,5 +55,5 @@ ALTER TABLE `Contract` DROP COLUMN `baseChargeType`,
     ADD COLUMN `baseChargeChargedWeightRange` BOOLEAN NOT NULL DEFAULT false,
     ADD COLUMN `chargedWeightCeilingFactor` INTEGER NULL,
     ADD COLUMN `chargedWeightFactor` FLOAT NULL,
-    ADD COLUMN `chargedWeightModel` ENUM('Actual', 'Volumetric', 'ActualVsVolumnetric', 'SKU') NOT NULL,
-    ADD COLUMN `consignorPricingModel` ENUM('ChargedWeight', 'BoxRate') NOT NULL;
+    ADD COLUMN `chargedWeightModel` ENUM('Actual', 'Volumetric', 'ActualVsVolumnetric', 'SKU') NULL,
+    ADD COLUMN `consignorPricingModel` ENUM('ChargedWeight', 'BoxRate') NULL;

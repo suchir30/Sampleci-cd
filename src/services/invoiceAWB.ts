@@ -112,8 +112,8 @@ export const calculateShippingCosts = async (AWBId: number) => {
       return;
     } else {
       // Handle non-box rate calculations
-      const baseChargeRes = await baseChargeCalculation(AWBId, AWB.consignorId, AWB.toBranchId, AWB.AWBChargedWeightWithCeiling, baseChargeChargedWeightRange, [], consignorPricingModel);
-      const ODAChargeRes = await odaChargeCalculation(AWBId, AWB.consignorId, AWB.consigneeId, AWB.AWBChargedWeightWithCeiling, ODAChargedWeightRange, [], consignorPricingModel);
+      const baseChargeRes = await baseChargeCalculation(AWBId, AWB.consignorId, AWB.toBranchId, AWB.AWBChargedWeightWithCeiling, baseChargeChargedWeightRange, [], consignorPricingModel?? "");
+      const ODAChargeRes = await odaChargeCalculation(AWBId, AWB.consignorId, AWB.consigneeId, AWB.AWBChargedWeightWithCeiling, ODAChargedWeightRange, [], consignorPricingModel??"");
       // Perform delete and create in a single transaction
       if(typeof baseChargeRes === 'number' && baseChargeRes !== null && baseChargeRes !== undefined && ODAChargeRes !== undefined){
         await prisma.$transaction(async (tx) => {
