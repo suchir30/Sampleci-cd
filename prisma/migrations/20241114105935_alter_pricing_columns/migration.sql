@@ -37,7 +37,7 @@ ALTER TABLE `AirWayBill` DROP COLUMN `CDM`,
     ADD COLUMN `rollupChargedWeight` FLOAT NULL;
 
 -- AlterTable
-ALTER TABLE `AWBLineItem` DROP COLUMN `articleWeightKg`,
+ALTER TABLE `AwbLineItem` DROP COLUMN `articleWeightKg`,
     DROP COLUMN `weightKgs`,
     ADD COLUMN `AWBLineItemChargedWeight` FLOAT NULL,
     ADD COLUMN `AWBLineItemweight` FLOAT NULL,
