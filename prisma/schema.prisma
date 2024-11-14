@@ -323,6 +323,7 @@ model AirWayBill {
   AWBChargedWeightWithCeiling Float? @db.Float
 }
 
+
 model AwbLineItem {
   id                     Int                        @id @default(autoincrement())
   AWBId                  Int
@@ -649,8 +650,8 @@ model Contract {
   consignor                   Consignor             @relation("contractConsignorId", fields: [consignorId], references: [consignorId])
  
   ContractType                ContractType?
-  consignorPricingModel       consignorPricingModelType
-  chargedWeightModel          chargedWeightModelType
+  consignorPricingModel       consignorPricingModelType?
+  chargedWeightModel          chargedWeightModelType?
   isActive                    Boolean?
   startDate                   DateTime?
   endDate                     DateTime?
@@ -679,13 +680,6 @@ model Contract {
   AWBContractTypes            AirWayBill[]          @relation("AWBContractType")
   internalInvocieContracts    InternalInvoice[]     @relation("internalInvocieContract")
 }
-
-//  consignorContractType       ContractConsignorType
-//  odaChargeType               chargeType?  -- rename to ODA - Charged Weight Range
-//  baseChargeType              chargeType?  -- rename to Base Charge - Charged Weight Range
-//  cwCeiling                                -- rename to Charged Weight Ceiling Factor
-
-
 enum ArticleLogsScanType {
   Load
   Unload
