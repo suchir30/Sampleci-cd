@@ -45,8 +45,8 @@ ALTER TABLE `AwbLineItem` DROP COLUMN `articleWeightKg`,
 
 -- AlterTable
 ALTER TABLE `Contract` DROP COLUMN `baseChargeType`,
-UMN `baseChargeType`,
-OP COLUMN `cwCeiling`,
+DROP COLUMN  `baseChargeType`,
+DROP COLUMN  `cwCeiling`,
     DROP COLUMN `odaChargeType`,
     ADD COLUMN `AWBCDMAccess` ENUM('Read', 'Write', 'None') NOT NULL DEFAULT 'None',
     ADD COLUMN `AWBChargedWeightAccess` ENUM('Read', 'Write', 'None') NOT NULL DEFAULT 'None',
