@@ -21,7 +21,7 @@
 
 */
 -- AlterTable
-ALTER TABLE `airwaybill` DROP COLUMN `CDM`,
+ALTER TABLE `AirWayBill` DROP COLUMN `CDM`,
     DROP COLUMN `chargedWeightWithCeiling`,
     DROP COLUMN `grandTotal`,
     DROP COLUMN `rollupArticleWeightKg`,
@@ -37,16 +37,16 @@ ALTER TABLE `airwaybill` DROP COLUMN `CDM`,
     ADD COLUMN `rollupChargedWeight` FLOAT NULL;
 
 -- AlterTable
-ALTER TABLE `awblineitem` DROP COLUMN `articleWeightKg`,
+ALTER TABLE `AWBLineItem` DROP COLUMN `articleWeightKg`,
     DROP COLUMN `weightKgs`,
     ADD COLUMN `AWBLineItemChargedWeight` FLOAT NULL,
     ADD COLUMN `AWBLineItemweight` FLOAT NULL,
     ADD COLUMN `articleWeight` FLOAT NULL;
 
 -- AlterTable
-ALTER TABLE `contract` DROP COLUMN `baseChargeType`,
-    DROP COLUMN `consignorContractType`,
-    DROP COLUMN `cwCeiling`,
+ALTER TABLE `Contract` DROP COLUMN `baseChargeType`,
+UMN `baseChargeType`,
+OP COLUMN `cwCeiling`,
     DROP COLUMN `odaChargeType`,
     ADD COLUMN `AWBCDMAccess` ENUM('Read', 'Write', 'None') NOT NULL DEFAULT 'None',
     ADD COLUMN `AWBChargedWeightAccess` ENUM('Read', 'Write', 'None') NOT NULL DEFAULT 'None',
