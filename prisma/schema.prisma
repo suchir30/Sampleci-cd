@@ -323,14 +323,6 @@ model AirWayBill {
   AWBChargedWeightWithCeiling Float? @db.Float
 }
 
-// rollupSKU             Float?            @db.Float
-// rollupCwWeight        Float?            @db.Float
-// rollupArticleWeightKg Float?            @db.Float
-// grandTotal            Float?            @db.Float
-// subTotal              Float?            @db.Float
-// rollupChargedWtInKgs     Float? @db.Float
-//fuckAWB
-
 model AwbLineItem {
   id                     Int                        @id @default(autoincrement())
   AWBId                  Int
