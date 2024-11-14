@@ -13,30 +13,28 @@ export const calculateShippingCosts = async (AWBId: number) => {
       select: {
         consignorId: true,
         consigneeId: true,
-        rollupChargedWtInKgs: true,
+        AWBChargedWeight: true,
         toBranchId: true,
-        chargedWeightWithCeiling: true,
+        AWBChargedWeightWithCeiling: true,
       },
     });
     console.log(AWB, "@@@@@@@@@@@@@@@@@@@@@@ AWB DATA");
     if (!AWB) return "NoAWB";
     if (!AWB.consigneeId) return "AWBInvalidConsigneeId"
-     if (!AWB.chargedWeightWithCeiling) return "AWBInvalidCeilingCW"
+     if (!AWB.AWBChargedWeightWithCeiling) return "AWBInvalidCeilingCW"
     const contractRes = await prisma.contract.findFirst({
       where: { consignorId: AWB.consignorId },
       select: {
         id: true,
-        consignorContractType: true,
-        baseChargeType: true,
-        odaChargeType: true,
+        consignorPricingModel: true,
+        baseChargeChargedWeightRange: true,
+        ODAChargedWeightRange: true,
       },
     });
-    if (!contractRes || !contractRes.baseChargeType || !contractRes.odaChargeType) return 'NoContract';
-    const { baseChargeType, consignorContractType, odaChargeType } = contractRes;
-    if (consignorContractType === "BoxRate") {
-      if (baseChargeType !== "withoutChargedWeightRange" || contractRes.odaChargeType !== "withoutChargedWeightRange") {
-        return "boxTypeWithChargeNoExists";
-      }
+    if (!contractRes || !contractRes.baseChargeChargedWeightRange || !contractRes.ODAChargedWeightRange) return 'NoContract';
+    const { baseChargeChargedWeightRange, consignorPricingModel, ODAChargedWeightRange } = contractRes;
+    if (consignorPricingModel === "BoxRate") {
+     
       console.log("innnnnnnn box type");
       const awbLineItemRes = await prisma.awbLineItem.findMany({
         where: { AWBId },
@@ -47,15 +45,15 @@ export const calculateShippingCosts = async (AWBId: number) => {
           ratePerBox: true,
         },
       });
-      if (awbLineItemRes.length === 0 || !AWB.chargedWeightWithCeiling) return "noAWBLineItem";
-      const baseChargeCalcRes = await baseChargeCalculation(AWBId, AWB.consignorId, AWB.toBranchId, AWB.chargedWeightWithCeiling, baseChargeType, awbLineItemRes, consignorContractType);
+      if (awbLineItemRes.length === 0 || !AWB.AWBChargedWeightWithCeiling) return "noAWBLineItem";
+      const baseChargeCalcRes = await baseChargeCalculation(AWBId, AWB.consignorId, AWB.toBranchId, AWB.AWBChargedWeightWithCeiling, baseChargeChargedWeightRange, awbLineItemRes, consignorPricingModel);
       if(typeof baseChargeCalcRes === 'object' && baseChargeCalcRes !== null){
         const { internalInvoiceData, totalBaseCharge } = baseChargeCalcRes;
         const ODACharges = await Promise.all(
             awbLineItemRes.map(async (lineItem) => {
               return {
                 AWBLineItemId: lineItem.id,
-                ODACharge: await odaChargeCalculation(AWBId, AWB.consignorId, AWB.consigneeId??0, AWB.chargedWeightWithCeiling??0, odaChargeType, [lineItem], consignorContractType)
+                ODACharge: await odaChargeCalculation(AWBId, AWB.consignorId, AWB.consigneeId??0, AWB.AWBChargedWeightWithCeiling??0, ODAChargedWeightRange, [lineItem], consignorPricingModel)
               };
             })
           );
@@ -107,15 +105,15 @@ export const calculateShippingCosts = async (AWBId: number) => {
       });
 
       }
-    //   const { internalInvoiceData, totalBaseCharge } = await baseChargeCalculation(AWBId, AWB.consignorId, AWB.toBranchId, AWB.chargedWeightWithCeiling, baseChargeType, awbLineItemRes, consignorContractType);
+    //   const { internalInvoiceData, totalBaseCharge } = await baseChargeCalculation(AWBId, AWB.consignorId, AWB.toBranchId, AWB.AWBchargedWeightWithCeiling, baseChargeChargedWeightRange, awbLineItemRes, consignorPricingModel);
       // Calculate ODA charges per line item
      
      
       return;
     } else {
       // Handle non-box rate calculations
-      const baseChargeRes = await baseChargeCalculation(AWBId, AWB.consignorId, AWB.toBranchId, AWB.chargedWeightWithCeiling, baseChargeType, [], consignorContractType);
-      const ODAChargeRes = await odaChargeCalculation(AWBId, AWB.consignorId, AWB.consigneeId, AWB.chargedWeightWithCeiling, odaChargeType, [], consignorContractType);
+      const baseChargeRes = await baseChargeCalculation(AWBId, AWB.consignorId, AWB.toBranchId, AWB.AWBChargedWeightWithCeiling, baseChargeChargedWeightRange, [], consignorPricingModel);
+      const ODAChargeRes = await odaChargeCalculation(AWBId, AWB.consignorId, AWB.consigneeId, AWB.AWBChargedWeightWithCeiling, ODAChargedWeightRange, [], consignorPricingModel);
       // Perform delete and create in a single transaction
       if(typeof baseChargeRes === 'number' && baseChargeRes !== null && baseChargeRes !== undefined && ODAChargeRes !== undefined){
         await prisma.$transaction(async (tx) => {
@@ -157,7 +155,7 @@ export const calculateShippingCosts = async (AWBId: number) => {
   }
 };
 
-export const baseChargeCalculation = async (AWBId: number, consignorId: number, AWBToBranch: number, chargedWeightWithCeiling: number, baseChargeType: string, awbLineItemRes:AWBLineItem[], consignorContractType: string) => {
+export const baseChargeCalculation = async (AWBId: number, consignorId: number, AWBToBranch: number, AWBChargedWeightWithCeiling: number, baseChargeChargedWeightRange: boolean, awbLineItemRes:AWBLineItem[], consignorPricingModel: string) => {
   let baseCharge;
   let applicableRange;
   const consignorRateTableRes = await prisma.consignorRateTable.findMany({
@@ -175,8 +173,8 @@ export const baseChargeCalculation = async (AWBId: number, consignorId: number, 
   });
   if(consignorRateTableRes.length>0){
     console.log(consignorRateTableRes, "consignorRateTableRes");
-  if (consignorContractType === "BoxRate") {
-    if (baseChargeType === "withoutChargedWeightRange") {
+  if (consignorPricingModel === "BoxRate") {
+    if (baseChargeChargedWeightRange === false) {
       console.log(awbLineItemRes, "awblineitems");
       let totalBaseCharge = 0;
       const internalInvoiceData = awbLineItemRes.map(({ id, numOfArticles, ratePerBox }) => {
@@ -191,27 +189,27 @@ export const baseChargeCalculation = async (AWBId: number, consignorId: number, 
       return { internalInvoiceData, totalBaseCharge };
     }
   } else {
-    if (baseChargeType === "withChargedWeightRange") {
+    if (baseChargeChargedWeightRange === true) {
       console.log("in withCharge otherthanboxRate:- baseCharge", consignorRateTableRes);
       applicableRange = consignorRateTableRes.find((range) => {
         console.log(`Checking range: ${range.chargedWeightLower} - ${range.chargedWeightHigher}`);
-        return chargedWeightWithCeiling >= (range.chargedWeightLower || 0) &&
-          chargedWeightWithCeiling <= (range.chargedWeightHigher || 0);
+        return AWBChargedWeightWithCeiling >= (range.chargedWeightLower || 0) &&
+        AWBChargedWeightWithCeiling <= (range.chargedWeightHigher || 0);
       });
       if(applicableRange && applicableRange.ratePerKg){
         console.log("Applicable Range:", applicableRange);
-        baseCharge = chargedWeightWithCeiling * applicableRange.ratePerKg;
-        console.log(chargedWeightWithCeiling, applicableRange.ratePerKg);
+        baseCharge = AWBChargedWeightWithCeiling * applicableRange.ratePerKg;
+        console.log(AWBChargedWeightWithCeiling, applicableRange.ratePerKg);
         return baseCharge;
       }
       else{
         throw new Error('No applicable range found for the charged weight.');
       }
     }
-    if (baseChargeType === "withoutChargedWeightRange") {
+    if (baseChargeChargedWeightRange === false) {
         if(consignorRateTableRes[0].ratePerKg){
-            console.log("in withoutCharge otherthanboxRate:- baseCharge", chargedWeightWithCeiling, consignorRateTableRes[0].ratePerKg);
-            baseCharge = chargedWeightWithCeiling * consignorRateTableRes[0].ratePerKg;
+            console.log("in withoutCharge otherthanboxRate:- baseCharge", AWBChargedWeightWithCeiling, consignorRateTableRes[0].ratePerKg);
+            baseCharge = AWBChargedWeightWithCeiling * consignorRateTableRes[0].ratePerKg;
             return baseCharge;
         }
         else{
@@ -226,7 +224,7 @@ export const baseChargeCalculation = async (AWBId: number, consignorId: number, 
   
 };
 
-export const odaChargeCalculation=async(AWBId: number, consignorId: number,consigneeId: number,chargedWeightWithCeiling: number,odaChargeType: string,awbLineItemRes:AWBLineItem[],consignorContractType: string)=>{
+export const odaChargeCalculation=async(AWBId: number, consignorId: number,consigneeId: number,AWBChargedWeightWithCeiling: number,ODAChargedWeightRange: boolean,awbLineItemRes:AWBLineItem[],consignorPricingModel: string)=>{
   let ODACharge;
   let applicableRange;
   const odaResponse = await prisma.oDA.findMany({
@@ -247,8 +245,8 @@ export const odaChargeCalculation=async(AWBId: number, consignorId: number,consi
         throw new Error('DistanceToBranchKms in consignee not exists.');
     }
     let distance=consigneeResponse?.distanceToBranchKms
-    if (consignorContractType === "BoxRate") {
-    console.log(consignorContractType, "oda charge type boxtype innnn");
+    if (consignorPricingModel === "BoxRate") {
+    console.log(consignorPricingModel, "oda charge type boxtype innnn");
     // Log the distance for verification
     console.log("Distance to Branch (km):", distance);
     applicableRange = odaResponse.find((range) => 
@@ -299,23 +297,23 @@ export const odaChargeCalculation=async(AWBId: number, consignorId: number,consi
     return ODACharge;
   }
   else{
-    if(odaChargeType=="withChargedWeightRange"){
+    if(ODAChargedWeightRange==true){
       applicableRange = odaResponse.find(range =>
         distance >= (range.kmStartingRange || 0) &&
         distance <= (range.kmEndingRange || 0) &&
-        chargedWeightWithCeiling >= (range.chargedWeightLower || 0) &&
-        chargedWeightWithCeiling <= (range.chargedWeightHigher || Number.MAX_VALUE)
+        AWBChargedWeightWithCeiling >= (range.chargedWeightLower || 0) &&
+        AWBChargedWeightWithCeiling <= (range.chargedWeightHigher || Number.MAX_VALUE)
       );
       if (applicableRange) {
         const ODARatePerKg = applicableRange.ODARatePerKg ?? 0;
         const minimumCharge = applicableRange.minimumCharge ?? 0;
-        const ODACalculation = ODARatePerKg * chargedWeightWithCeiling;
+        const ODACalculation = ODARatePerKg * AWBChargedWeightWithCeiling;
         ODACharge = Math.max(minimumCharge, ODACalculation);
         console.log(minimumCharge, ODACalculation, ODACharge);
         return ODACharge
       }
     }
-    if(odaChargeType=="withoutChargedWeightRange"){
+    if(ODAChargedWeightRange==false){
       applicableRange = odaResponse.find(range =>
         distance >= (range.kmStartingRange || 0) &&
         distance <= (range.kmEndingRange || 0)
@@ -323,9 +321,9 @@ export const odaChargeCalculation=async(AWBId: number, consignorId: number,consi
       if (applicableRange) {
         const ODARatePerKg = applicableRange.ODARatePerKg ?? 0;
         const minimumCharge = applicableRange.minimumCharge ?? 0;
-        const ODACalculation = ODARatePerKg * chargedWeightWithCeiling;
+        const ODACalculation = ODARatePerKg * AWBChargedWeightWithCeiling;
         ODACharge = Math.max(minimumCharge, ODACalculation);
-        console.log(minimumCharge, ODARatePerKg,chargedWeightWithCeiling,ODACalculation);
+        console.log(minimumCharge, ODARatePerKg,AWBChargedWeightWithCeiling,ODACalculation);
         return ODACharge
       }
     }

@@ -1136,9 +1136,7 @@ export const calculateShippingCosts = async (req: Request, res: Response, next: 
     else if (Result=="NoContract") {
       res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWB doesn't have required contract details"));
     }
-    else if (Result=="boxTypeWithChargeNoExists") {
-      res.status(HttpStatusCode.OK).json(buildNoContentResponse("chargeType should never be withChargedWeightRange for BoxRate ContractType"));
-    }
+   
     else if (Result=="noAWBLineItem") {
       res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWB has BoxType contract but doesn't have AWBLineItems"));
     }
