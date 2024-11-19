@@ -7,7 +7,7 @@ SELECT
     AirWayBill.numOfArticles AS 'numOfArticles',
     AirWayBill.rollupWeight AS 'actualWeight',
     AirWayBill.rollupVolume / 1000 AS 'CDM',
-    AirWayBill.rollupChargedWtInKgs AS 'chargedWeight',
+    AirWayBill.AWBChargedWeight AS 'chargedWeight',
     Branch.branchCode AS 'currentHub',
     ToBranch.branchCode AS 'finalDestination',
     HLFLineItem.HLFLineStatus AS 'status',
