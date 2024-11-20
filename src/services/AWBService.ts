@@ -496,6 +496,7 @@ export const getUpdateAWB = async (AWBId: number) => {
           toBranchId:true,
           AWBCDM:true,
           AWBWeight:true,
+          AWBChargedWeight:true,
           AWBLineItems: {
             select: {
                 id: true,
