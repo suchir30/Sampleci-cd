@@ -2,6 +2,7 @@ import { ArticleStatus,AwbLineItem,ArticleLogsScanType} from '@prisma/client';
 import moment from 'moment';
 import prisma from '../client';
 import { AWBCreateData } from '../types/awbTypes';
+import { float } from 'aws-sdk/clients/cloudfront';
 
 
 // Helper function to increment alphanumeric code
@@ -783,7 +784,7 @@ export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem
     }
 };
 
-export const updateAWB = async (AWBId: number,consigneeId: number, appointmentDate: Date | undefined,invoiceNumber: string,invoiceValue: number,ewayBillNumber: string,CDM:any): Promise<string | boolean> => {
+export const updateAWB = async (AWBId: number,consigneeId: number, appointmentDate: Date | undefined,invoiceNumber: string,invoiceValue: number,ewayBillNumber: string,AWBCDM:any,AWBChargedWeight:float,AWBWeight:float): Promise<string | boolean> => {
     try {
       const result = await prisma.$transaction(async (prisma) => {
         const AWBRes = await prisma.airWayBill.findMany({
@@ -806,7 +807,9 @@ export const updateAWB = async (AWBId: number,consigneeId: number, appointmentDa
             invoiceNumber: invoiceNumber,
             invoiceValue: invoiceValue,
             ewayBillNumber: ewayBillNumber,
-            AWBCDM:CDM
+            AWBCDM:AWBCDM,
+            AWBChargedWeight:AWBChargedWeight,
+            AWBWeight:AWBWeight
           },
         });
         return true;
