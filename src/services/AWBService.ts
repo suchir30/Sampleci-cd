@@ -494,6 +494,7 @@ export const getUpdateAWB = async (AWBId: number) => {
           fromBranchId:true,
           toBranchId:true,
           AWBCDM:true,
+          AWBWeight:true,
           AWBLineItems: {
             select: {
                 id: true,
@@ -520,6 +521,7 @@ export const getUpdateAWB = async (AWBId: number) => {
                     AWBLineItemArticleWeightAccess:true,
                     AWBChargedWeightAccess:true,
                     AWBCDMAccess:true,
+                    AWBWeightAccess:true,
                     ContractType:true,
                     actualWeightFactor:true,
                     volumetricWeightFactor:true,
