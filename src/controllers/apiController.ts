@@ -29,6 +29,7 @@ import {
 } from "@aws-sdk/client-s3";
 import {UploadResult} from "../services/fileService.js";
 import {handleFileUpload, refreshSignedUrlIfNeeded, uploadPDF} from "../services/fileService";
+import { float } from 'aws-sdk/clients/cloudfront';
 
 export const getIndustryTypes = async (_req: Request, res: Response, next: NextFunction) => {
   try {
@@ -447,7 +448,10 @@ export const updateAWB = async (req: Request, res: Response, next: NextFunction)
     const invoiceNumber: string = req.body.invoiceNumber;
     const invoiceValue: number = req.body.invoiceValue;
     const ewayBillNumber: string = req.body.ewayBillNumber;
-    const CDM: number = req.body.CDM;
+    const AWBCDM: number = req.body.AWBCDM;
+    const AWBChargedWeight: float = req.body.AWBChargedWeight;
+    const AWBWeight: float = req.body.AWBWeight;
+    
 
     let appointmentDate: Date | null = null;
     if (req.body.appointmentDate) {
@@ -461,7 +465,7 @@ export const updateAWB = async (req: Request, res: Response, next: NextFunction)
       throwValidationError([{ message: "AWB ID is required" }]);
     }
 
-    const updateAWBRes = await AWBService.updateAWB(AWBId, consigneeId, appointmentDate ? appointmentDate : undefined, invoiceNumber, invoiceValue, ewayBillNumber, CDM);
+    const updateAWBRes = await AWBService.updateAWB(AWBId, consigneeId, appointmentDate ? appointmentDate : undefined, invoiceNumber, invoiceValue, ewayBillNumber, AWBCDM,AWBChargedWeight,AWBWeight);
     if (updateAWBRes === "NotExists") {
       throwValidationError([{ message: "Invalid AWB ID" }]);
     } else {
