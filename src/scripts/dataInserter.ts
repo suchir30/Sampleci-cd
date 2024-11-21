@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import {CRMFieldType, PrismaClient} from '@prisma/client';
 import { getDMMF } from '@prisma/internals';
 import path from 'path';
 
@@ -74,6 +74,33 @@ function getObjectGroup(modelName: string): string {
     return 'others'; // Default group for unmapped objects
 }
 
+function guessFieldType (kind: string, type: string): CRMFieldType | null {
+    const typeMapping: Record<string, CRMFieldType> = {
+        Float: "calculated",
+        Boolean: "checkbox",
+        DateTime: "datePicker",
+        String: "textInput",
+        Int: "numberInput",
+    }
+
+    const kindMapping: Record<string, CRMFieldType> = {
+        enum: "picklist",
+        object: "relation",
+    }
+
+    if (kind === 'scalar'){
+        if (typeMapping[type]) {
+            return typeMapping[type];
+        }
+    }else {
+        if (kindMapping[kind]) {
+            return kindMapping[kind];
+        }
+    }
+
+    return null;
+}
+
 async function insertSchemaData(models: any) {
     // Create all groups first
     const groupIds = new Map<string, number>();
@@ -113,7 +140,7 @@ async function insertSchemaData(models: any) {
                     viewName: viewName,
                     viewIndex: models.indexOf(model) + 1,
                     CRMObjectGroupId: groupId,
-                    primaryFieldName: primaryField?.name || null,
+                    primaryKeyName: primaryField?.name || null,
                     labelFieldName: labelField?.name || null,
                 },
             });
@@ -170,7 +197,8 @@ async function insertSchemaData(models: any) {
                             viewName: viewName,
                             isRelation: field.kind === 'object',
                             idFieldName: field.kind === 'object' ? field.relationFromFields?.[0] || null : null,
-                            fieldType:  field.kind === 'object' ?  'relation' || null : null,
+                            fieldType:  guessFieldType(field.kind, field.type),
+                            enumListName: field.kind === 'enum' ?  field.type : null,
                             isInCreateView: false,
                             isInListView: false,
                             isInEditView: false,
