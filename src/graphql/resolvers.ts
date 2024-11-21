@@ -82,7 +82,7 @@ import {Authorized, NonEmptyArray, UseMiddleware} from "type-graphql";
 import { ResolversEnhanceMap, ModelsEnhanceMap, applyResolversEnhanceMap, applyModelsEnhanceMap } from "@generated/type-graphql";
 import {CreateManyGeneral} from "./components/customResolvers/CreateManyGeneral";
 import {TripDetailsInterceptor} from "./components/middlewares/tripDetailsInterceptor";
-import {getEnum} from "./components/customResolvers/getEnum"
+import {ENUMS} from "./components/customResolvers/ENUMS"
 
 const resolversEnhanceMap: ResolversEnhanceMap = {
     User: { _all: [Authorized()] },
@@ -253,5 +253,5 @@ export const generatedRelationResolvers: NonEmptyArray<Function> = [
 
 export const customResolvers: NonEmptyArray<Function> = [
     CreateManyGeneral,
-    getEnum,
+    ENUMS,
 ]
