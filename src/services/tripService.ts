@@ -543,6 +543,7 @@ if (unloadLocationId) {
             rollupPilferageCount:true,
             completeFlag:true,
             consignorId:true,
+            AWBWeight:true,
             consignor:{
               select:{
                 publicName:true,
@@ -607,7 +608,7 @@ if (unloadLocationId) {
       finalDestinationCode:item.finalBranch?.branchCode,
       awbFromLocationCOde: item.AirWayBill.fromBranch.branchCode,
       awbToLocationCOde: item.AirWayBill.toBranch.branchCode,
-      awbRollupActualWeighgtkgs: item.AirWayBill.rollupWeight,
+      awbRollupActualWeighgtkgs: item.AirWayBill.AWBWeight,
       awbRollupChargedWeighgtkgs: item.AirWayBill.AWBChargedWeight,
       completeFlag: item.AirWayBill.completeFlag,
       TripLineItemStatus: item.status,

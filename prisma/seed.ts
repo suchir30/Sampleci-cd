@@ -1,6 +1,6 @@
 import fs from 'fs';
 import csvParser from 'csv-parser';
-const { PrismaClient,AWBStatus,ArticleStatus,ContractConsignorType,ContractType,DEPSStatus,DEPSTypeList,PTlRateType,TripLineItemStatus,HLFLineItemStatus,BoxType} = require('@prisma/client');
+const { PrismaClient,AWBStatus,ArticleStatus,ContractConsignorType,ContractType,DEPSStatus,DEPSTypeList,PTlRateType,TripLineItemStatus,HLFLineItemStatus,BoxType,ArticleLogsScanType} = require('@prisma/client');
 const prisma = new PrismaClient();
 import bcrypt from 'bcrypt';
 const models = [
@@ -39,7 +39,8 @@ const enum_lookup: { [key: string]: any } = {
     ContractType,
     PTlRateType,
     HLFLineItemStatus,
-    BoxType
+    BoxType,
+    ArticleLogsScanType
     
     // Add other enum types here...
 };
