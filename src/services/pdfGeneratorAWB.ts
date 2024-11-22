@@ -286,8 +286,8 @@ export const AWBPdfGenerator = async (pdfData: any): Promise<Buffer> => {
                             { text: item.lineItemDescription, style: 'textSmall' },
                             { text: item.numOfArticles, style: 'textSmall' },
                             //{ text: '500', style: 'textSmall' },
-                            { text: item.ActualWeightKg, style: 'textSmall' }, // Actual weight
-                            { text: item.chargedWeight, style: 'textSmall' }, // Charged weight
+                            { text: item.AWBWeight, style: 'textSmall' }, // Actual weight
+                            { text: item.AWBChargedWeight, style: 'textSmall' }, // Charged weight
                             { text: pdfData.ratePerKg, style: 'textSmall' },
                             { text: 'NULL', style: 'textSmall' },
                             { text: 'Billed HO', style: 'textSmall' },
