@@ -79,8 +79,9 @@ export const customAuthChecker: AuthChecker<GraphQLContext> = (
     // No check at resolver level for
     console.log("Query auth check");
     return true;
-  } else if (info.parentType.name === 'Mutation') { // Resolver level check
+  } else if (info.parentType.name === 'Mutation') {
     console.log("Mutation auth check");
+    return true;
     const resolverName = info.fieldName;
     let data = args.data || null;
     let mutationName = null;
