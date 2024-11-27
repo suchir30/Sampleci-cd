@@ -15,7 +15,7 @@ import { GraphQLContext, buildGraphQLContext } from './graphql/context';
 const app = express();
 
 const corsOptions = {
-  origin: 'http://localhost:5173',
+  origin: ['http://localhost:5173','http://13.200.144.182:5173'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'], 
   credentials: true, // Allow credentials (cookies, authorization headers)
 };
