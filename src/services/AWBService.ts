@@ -672,6 +672,7 @@ export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem
             await prisma.awbLineItem.deleteMany({
                 where: { AWBId: AWBId }
             });
+            console.log(factorRes,"factorRes")
             if (factorRes?.consignorPricingModel == "BoxRate") {
                 console.log("boxrate")
                 const createPromises = awbLineItems.map(item => {
@@ -691,6 +692,7 @@ export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem
             await Promise.all(createPromises);
             }
             else{
+                // console.log("in else actual volume")
                 if (factorRes?.actualWeightFactor == null || factorRes?.volumetricWeightFactor == null || factorRes?.chargedWeightCeilingFactor==null) {
                     console.log("Invalid factors", factorRes);
                     return "Invalid factors";
@@ -730,7 +732,7 @@ export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem
                     AWBId: AWBId
                 }
             });
-
+            // console.log(aggregateResults,"aggregateResults")
             const { numOfArticles,articleWeight,volume,AWBLineItemweight} = aggregateResults._sum;
 
             const awbLineItemsList = await prisma.awbLineItem.findMany({
@@ -768,8 +770,11 @@ export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem
                 data: {
                     rollupArticleCnt: numOfArticles || 0,
                     rollupWeight: AWBLineItemweight|| 0,
+                    AWBWeight:AWBLineItemweight || 0,
                     rollupVolume: volume || 0,
+                    AWBCDM: (volume ?? 0) / 1000,
                     AWBChargedWeight: AWBChargedWeight || 0,
+                    rollupChargedWeight:AWBChargedWeight || 0,
                     AWBChargedWeightWithCeiling: rollupChargedWtCeiling || 0
                 }
             });

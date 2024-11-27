@@ -431,46 +431,47 @@ export const odaChargeCalculation=async(AWBId: number, consignorId: number,consi
     // Log the applicable range details
     if (applicableRange) {
       console.log("Applicable ODA Range:", applicableRange);
+      console.log("ODA calculation innn applicable Range$$$");
+      let totalODACharge = 0;
+      for (const lineItem of awbLineItemRes) {
+        const { boxType, numOfArticles } = lineItem;
+      
+        // Find matching ODA rate for the box type
+        
+          const odaBoxRate = odaResponse.find((oda) => oda.ODABoxType === boxType);
+    
+        if (odaBoxRate) {
+          // Check if the distance falls within the km range of the found ODA rate
+          const isDistanceApplicable = distance >= (odaBoxRate.kmStartingRange??0) && distance <= (odaBoxRate.kmEndingRange??0);
+      
+          if (isDistanceApplicable) {
+            console.log("Found applicable ODA Box Rate:", odaBoxRate);
+      
+            const ratePerBox = odaBoxRate.ODARatePerBox ?? 0;
+            const minimumCharge = odaBoxRate.minimumCharge ?? 0;
+      
+            // Calculate charge for the current box type
+            const chargeForBox = Math.max(minimumCharge, ratePerBox * numOfArticles);
+            totalODACharge += chargeForBox;
+      
+            // Log charge for the current box type
+            console.log(`Charge for ${numOfArticles} articles of box type ${boxType}:`, chargeForBox);
+          } else {
+            console.log(`Box type ${boxType} is not applicable due to distance. Skipping charge calculation.`);
+          }
+        } else {
+          console.log(`No ODA Box Rate found for box type: ${boxType}`);
+        }
+      }
+  
+      ODACharge = totalODACharge;
+      console.log("Total ODA Charge:", ODACharge);
+      return ODACharge;
     } else {
       console.log("No applicable range found for the distance:", distance);
       return 0; // Or handle as needed
     }
-    console.log("ODA calculation innn applicable Range$$$");
-    let totalODACharge = 0;
-    for (const lineItem of awbLineItemRes) {
-      const { boxType, numOfArticles } = lineItem;
-    
-      // Find matching ODA rate for the box type
-      
-        const odaBoxRate = odaResponse.find((oda) => oda.ODABoxType === boxType);
-  
-      if (odaBoxRate) {
-        // Check if the distance falls within the km range of the found ODA rate
-        const isDistanceApplicable = distance >= (odaBoxRate.kmStartingRange??0) && distance <= (odaBoxRate.kmEndingRange??0);
-    
-        if (isDistanceApplicable) {
-          console.log("Found applicable ODA Box Rate:", odaBoxRate);
-    
-          const ratePerBox = odaBoxRate.ODARatePerBox ?? 0;
-          const minimumCharge = odaBoxRate.minimumCharge ?? 0;
-    
-          // Calculate charge for the current box type
-          const chargeForBox = Math.max(minimumCharge, ratePerBox * numOfArticles);
-          totalODACharge += chargeForBox;
-    
-          // Log charge for the current box type
-          console.log(`Charge for ${numOfArticles} articles of box type ${boxType}:`, chargeForBox);
-        } else {
-          console.log(`Box type ${boxType} is not applicable due to distance. Skipping charge calculation.`);
-        }
-      } else {
-        console.log(`No ODA Box Rate found for box type: ${boxType}`);
-      }
-    }
 
-    ODACharge = totalODACharge;
-    console.log("Total ODA Charge:", ODACharge);
-    return ODACharge;
   }
   else{
     if(ODAChargedWeightRange==true){
