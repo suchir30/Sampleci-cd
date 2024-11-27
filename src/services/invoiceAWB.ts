@@ -6,11 +6,163 @@ interface AWBLineItem {
     boxType: string | null;
     numOfArticles: number;
   }
-export const calculateShippingCosts = async (AWBId: number) => {
+// export const calculateShippingCosts = async (AWBId: number) => {
+//   try {
+//     const AWB = await prisma.airWayBill.findUnique({
+//       where: { id: AWBId },
+//       select: {
+//         consignorId: true,
+//         consigneeId: true,
+//         AWBChargedWeight: true,
+//         toBranchId: true,
+//         AWBChargedWeightWithCeiling: true,
+//       },
+//     });
+//     console.log(AWB, "@@@@@@@@@@@@@@@@@@@@@@ AWB DATA");
+//     if (!AWB) return "NoAWB";
+//     if (!AWB.consigneeId) return "AWBInvalidConsigneeId"
+//      if (!AWB.AWBChargedWeightWithCeiling) return "AWBInvalidCeilingCW"
+//     const contractRes = await prisma.contract.findFirst({
+//       where: { consignorId: AWB.consignorId },
+//       select: {
+//         id: true,
+//         consignorPricingModel: true,
+//         baseChargeChargedWeightRange: true,
+//         ODAChargedWeightRange: true,
+//       },
+//     });
+//     if (!contractRes || !contractRes.baseChargeChargedWeightRange || !contractRes.ODAChargedWeightRange) return 'NoContract';
+//     const { baseChargeChargedWeightRange, consignorPricingModel, ODAChargedWeightRange } = contractRes;
+//     if (consignorPricingModel === "BoxRate") {
+     
+//       console.log("innnnnnnn box type");
+//       const awbLineItemRes = await prisma.awbLineItem.findMany({
+//         where: { AWBId },
+//         select: {
+//           id: true,
+//           numOfArticles: true,
+//           boxType: true,
+//           ratePerBox: true,
+//         },
+//       });
+//       if (awbLineItemRes.length === 0 || !AWB.AWBChargedWeightWithCeiling) return "noAWBLineItem";
+//       const baseChargeCalcRes = await baseChargeCalculation(AWBId, AWB.consignorId, AWB.toBranchId, AWB.AWBChargedWeightWithCeiling, baseChargeChargedWeightRange, awbLineItemRes, consignorPricingModel);
+//       if(typeof baseChargeCalcRes === 'object' && baseChargeCalcRes !== null){
+//         const { internalInvoiceData, totalBaseCharge } = baseChargeCalcRes;
+//         const ODACharges = await Promise.all(
+//             awbLineItemRes.map(async (lineItem) => {
+//               return {
+//                 AWBLineItemId: lineItem.id,
+//                 ODACharge: await odaChargeCalculation(AWBId, AWB.consignorId, AWB.consigneeId??0, AWB.AWBChargedWeightWithCeiling??0, ODAChargedWeightRange, [lineItem], consignorPricingModel)
+//               };
+//             })
+//           );
+//           console.log(ODACharges, "Individual ODA Charges");
+          
+//       // Perform delete and create in a single transaction
+//       await prisma.$transaction(async (tx) => {
+//         // Step 1: Delete related records in InternalInvoiceLineItems
+//         await tx.internalInvoiceLineItems.deleteMany({
+//           where: {
+//             internalInvoiceId: {
+//               in: (await tx.internalInvoice.findMany({
+//                 where: { AWBId },
+//                 select: { id: true },
+//               })).map(inv => inv.id),
+//             },
+//           },
+//         });
+//         // Step 2: Delete InternalInvoice(s)
+//         await tx.internalInvoice.deleteMany({
+//           where: { AWBId },
+//         });
+//         // Create a new internal invoice
+//         if(totalBaseCharge !== undefined && ODACharges !== undefined){
+//             const internalInvoice = await tx.internalInvoice.create({
+//                 data: {
+//                   AWBId,
+//                   baseCharge: totalBaseCharge,
+//                   consignorId: AWB.consignorId,
+//                   consigneeId: AWB.consigneeId??0,
+//                   contractId: contractRes.id,
+//                   ODACharge: ODACharges.reduce((sum, item) => sum + (item.ODACharge ?? 0), 0), // Total ODA Charge
+//                 },
+//               });
+//               console.log(internalInvoice.id, "primary key of internal invoice",ODACharges.reduce((sum, item) => sum + (item.ODACharge ?? 0), 0),);
+//               await tx.internalInvoiceLineItems.createMany({
+//                 data: internalInvoiceData.map(item => {
+//                   const ODAChargeItem = ODACharges.find(oda => oda.AWBLineItemId === item.AWBLineItemId);
+//                   return {
+//                     AWBLineItemId: item.AWBLineItemId,
+//                     internalInvoiceId: internalInvoice.id,
+//                     baseCharge: item.baseCharge,
+//                     ODACharge: ODAChargeItem ? ODAChargeItem.ODACharge?? 0:0, // Use calculated ODA Charge
+//                   };
+//                 }),
+//               });
+//         }
+      
+//       });
+
+//       }
+//     //   const { internalInvoiceData, totalBaseCharge } = await baseChargeCalculation(AWBId, AWB.consignorId, AWB.toBranchId, AWB.AWBchargedWeightWithCeiling, baseChargeChargedWeightRange, awbLineItemRes, consignorPricingModel);
+//       // Calculate ODA charges per line item
+     
+     
+//       return;
+//     } else {
+//       // Handle non-box rate calculations
+//       const baseChargeRes = await baseChargeCalculation(AWBId, AWB.consignorId, AWB.toBranchId, AWB.AWBChargedWeightWithCeiling, baseChargeChargedWeightRange, [], consignorPricingModel?? "");
+//       const ODAChargeRes = await odaChargeCalculation(AWBId, AWB.consignorId, AWB.consigneeId, AWB.AWBChargedWeightWithCeiling, ODAChargedWeightRange, [], consignorPricingModel??"");
+//       // Perform delete and create in a single transaction
+//       if(typeof baseChargeRes === 'number' && baseChargeRes !== null && baseChargeRes !== undefined && ODAChargeRes !== undefined){
+//         await prisma.$transaction(async (tx) => {
+//             // Step 1: Delete related records in InternalInvoiceLineItems
+//             await tx.internalInvoiceLineItems.deleteMany({
+//               where: {
+//                 internalInvoiceId: {
+//                   in: (await tx.internalInvoice.findMany({
+//                     where: { AWBId },
+//                     select: { id: true },
+//                   })).map(inv => inv.id),
+//                 },
+//               },
+//             });
+//             // Step 2: Delete InternalInvoice(s)
+//             await tx.internalInvoice.deleteMany({
+//               where: { AWBId },
+//             });
+//             // Create a new internal invoice
+//             const internalInvoice = await tx.internalInvoice.create({
+//               data: {
+//                 baseCharge: baseChargeRes,
+//                 ODACharge: ODAChargeRes,
+//                 AirWayBill: { connect: { id: AWBId } },
+//                 consignor: { connect: { consignorId: AWB.consignorId } },
+//                 consignee: { connect: { consigneeId: AWB.consigneeId??0} },
+//                 contract: { connect: { id: contractRes.id } },
+//               },
+//             });
+//             console.log(internalInvoice.id, "primary key of internal invoice", baseChargeRes, "baseChargeRes*********");
+//           });
+//       }
+     
+//       return;
+//     }
+//   } catch (error) {
+//     console.error("Error calculating shipping costs:", error);
+//     throw new Error("Failed to calculate shipping costs");
+//   }
+// };
+
+export const calculateShippingCosts = async (AWBIds: number[]) => {
   try {
-    const AWB = await prisma.airWayBill.findUnique({
-      where: { id: AWBId },
+    const AWBs = await prisma.airWayBill.findMany({
+      where: {
+        id: { in: AWBIds },
+      },
       select: {
+        id: true,
         consignorId: true,
         consigneeId: true,
         AWBChargedWeight: true,
@@ -18,77 +170,102 @@ export const calculateShippingCosts = async (AWBId: number) => {
         AWBChargedWeightWithCeiling: true,
       },
     });
-    console.log(AWB, "@@@@@@@@@@@@@@@@@@@@@@ AWB DATA");
-    if (!AWB) return "NoAWB";
-    if (!AWB.consigneeId) return "AWBInvalidConsigneeId"
-     if (!AWB.AWBChargedWeightWithCeiling) return "AWBInvalidCeilingCW"
-    const contractRes = await prisma.contract.findFirst({
-      where: { consignorId: AWB.consignorId },
-      select: {
-        id: true,
-        consignorPricingModel: true,
-        baseChargeChargedWeightRange: true,
-        ODAChargedWeightRange: true,
-      },
-    });
-    if (!contractRes || !contractRes.baseChargeChargedWeightRange || !contractRes.ODAChargedWeightRange) return 'NoContract';
-    const { baseChargeChargedWeightRange, consignorPricingModel, ODAChargedWeightRange } = contractRes;
-    if (consignorPricingModel === "BoxRate") {
-     
-      console.log("innnnnnnn box type");
-      const awbLineItemRes = await prisma.awbLineItem.findMany({
-        where: { AWBId },
+    console.log(AWBs, "@@@@@@@@@@@@@@@@@@@@@@ AWB DATA");
+
+    if (AWBs.length === 0) return "NoAWBs";
+    const missingAWBIds = AWBIds.filter((AWBId) => !AWBs.some((awb) => awb.id === AWBId));
+    if (missingAWBIds.length > 0) {
+      console.log(`AWBs not found: ${missingAWBIds.join(", ")}`);
+      return "NoAWBs"
+    }
+
+    
+    // Loop through each AWB
+    for (const AWB of AWBs) {
+      if (!AWB.consigneeId) return "AWBInvalidConsigneeId";
+      if (!AWB.AWBChargedWeightWithCeiling) return "AWBInvalidCeilingCW";
+
+      const contractRes = await prisma.contract.findFirst({
+        where: { consignorId: AWB.consignorId },
         select: {
           id: true,
-          numOfArticles: true,
-          boxType: true,
-          ratePerBox: true,
+          consignorPricingModel: true,
+          baseChargeChargedWeightRange: true,
+          ODAChargedWeightRange: true,
         },
       });
-      if (awbLineItemRes.length === 0 || !AWB.AWBChargedWeightWithCeiling) return "noAWBLineItem";
-      const baseChargeCalcRes = await baseChargeCalculation(AWBId, AWB.consignorId, AWB.toBranchId, AWB.AWBChargedWeightWithCeiling, baseChargeChargedWeightRange, awbLineItemRes, consignorPricingModel);
-      if(typeof baseChargeCalcRes === 'object' && baseChargeCalcRes !== null){
-        const { internalInvoiceData, totalBaseCharge } = baseChargeCalcRes;
-        const ODACharges = await Promise.all(
+
+      if (!contractRes || !contractRes.baseChargeChargedWeightRange || !contractRes.ODAChargedWeightRange) return 'NoContract';
+
+      const { baseChargeChargedWeightRange, consignorPricingModel, ODAChargedWeightRange } = contractRes;
+      console.log(consignorPricingModel,"1pppppppppppppppppppppppppppppppp")
+
+      if (consignorPricingModel === "BoxRate") {
+        console.log("innnnnnnn box type");
+
+        const awbLineItemRes = await prisma.awbLineItem.findMany({
+          where: { AWBId: AWB.id },
+          select: {
+            id: true,
+            numOfArticles: true,
+            boxType: true,
+            ratePerBox: true,
+          },
+        });
+
+        if (awbLineItemRes.length === 0 || !AWB.AWBChargedWeightWithCeiling) return "noAWBLineItem";
+
+        const baseChargeCalcRes = await baseChargeCalculation(AWB.id, AWB.consignorId, AWB.toBranchId, AWB.AWBChargedWeightWithCeiling, baseChargeChargedWeightRange, awbLineItemRes, consignorPricingModel);
+        
+        if (typeof baseChargeCalcRes === 'object' && baseChargeCalcRes !== null) {
+          const { internalInvoiceData, totalBaseCharge } = baseChargeCalcRes;
+
+          const ODACharges = await Promise.all(
             awbLineItemRes.map(async (lineItem) => {
               return {
                 AWBLineItemId: lineItem.id,
-                ODACharge: await odaChargeCalculation(AWBId, AWB.consignorId, AWB.consigneeId??0, AWB.AWBChargedWeightWithCeiling??0, ODAChargedWeightRange, [lineItem], consignorPricingModel)
+                ODACharge: await odaChargeCalculation(AWB.id, AWB.consignorId, AWB.consigneeId ?? 0, AWB.AWBChargedWeightWithCeiling ?? 0, ODAChargedWeightRange, [lineItem], consignorPricingModel),
               };
             })
           );
           console.log(ODACharges, "Individual ODA Charges");
-          
-      // Perform delete and create in a single transaction
-      await prisma.$transaction(async (tx) => {
-        // Step 1: Delete related records in InternalInvoiceLineItems
-        await tx.internalInvoiceLineItems.deleteMany({
-          where: {
-            internalInvoiceId: {
-              in: (await tx.internalInvoice.findMany({
-                where: { AWBId },
-                select: { id: true },
-              })).map(inv => inv.id),
-            },
-          },
-        });
-        // Step 2: Delete InternalInvoice(s)
-        await tx.internalInvoice.deleteMany({
-          where: { AWBId },
-        });
-        // Create a new internal invoice
-        if(totalBaseCharge !== undefined && ODACharges !== undefined){
-            const internalInvoice = await tx.internalInvoice.create({
+
+          // Perform delete and create in a single transaction
+          await prisma.$transaction(async (tx) => {
+            // Step 1: Delete related records in InternalInvoiceLineItems
+            await tx.internalInvoiceLineItems.deleteMany({
+              where: {
+                internalInvoiceId: {
+                  in: (await tx.internalInvoice.findMany({
+                    where: { AWBId: AWB.id },
+                    select: { id: true },
+                  })).map(inv => inv.id),
+                },
+              },
+            });
+
+            // Step 2: Delete InternalInvoice(s)
+            await tx.internalInvoice.deleteMany({
+              where: { AWBId: AWB.id },
+            });
+
+            // Create a new internal invoice
+            console.log(totalBaseCharge,ODACharges,"PPPPPPPPPPPPPPPPPPPPPPPPPPPPPP")
+            if (totalBaseCharge !== undefined && ODACharges !== undefined) {
+              const internalInvoice = await tx.internalInvoice.create({
                 data: {
-                  AWBId,
+                  AWBId: AWB.id,
                   baseCharge: totalBaseCharge,
                   consignorId: AWB.consignorId,
-                  consigneeId: AWB.consigneeId??0,
+                  consigneeId: AWB.consigneeId ?? 0,
                   contractId: contractRes.id,
+                  // ODACharge: typeof(item.ODACharge) === "string" ? parseFloat(item.ODACharge) : item.ODACharge,
                   ODACharge: ODACharges.reduce((sum, item) => sum + (item.ODACharge ?? 0), 0), // Total ODA Charge
                 },
               });
-              console.log(internalInvoice.id, "primary key of internal invoice",ODACharges.reduce((sum, item) => sum + (item.ODACharge ?? 0), 0),);
+
+              // console.log(internalInvoice.id, "primary key of internal invoice", ODACharges.reduce((sum, item) => sum + (parseFloat(item.ODACharge ?? 0)), 0));
+
               await tx.internalInvoiceLineItems.createMany({
                 data: internalInvoiceData.map(item => {
                   const ODAChargeItem = ODACharges.find(oda => oda.AWBLineItemId === item.AWBLineItemId);
@@ -96,59 +273,57 @@ export const calculateShippingCosts = async (AWBId: number) => {
                     AWBLineItemId: item.AWBLineItemId,
                     internalInvoiceId: internalInvoice.id,
                     baseCharge: item.baseCharge,
-                    ODACharge: ODAChargeItem ? ODAChargeItem.ODACharge?? 0:0, // Use calculated ODA Charge
+                    ODACharge: ODAChargeItem ? ODAChargeItem.ODACharge ?? 0 : 0, // Use calculated ODA Charge
                   };
                 }),
               });
+            }
+          });
         }
-      
-      });
+      } 
+      else {
+        // Handle non-box rate calculations
+        const baseChargeRes = await baseChargeCalculation(AWB.id, AWB.consignorId, AWB.toBranchId, AWB.AWBChargedWeightWithCeiling, baseChargeChargedWeightRange, [], consignorPricingModel ?? "");
+        const ODAChargeRes = await odaChargeCalculation(AWB.id, AWB.consignorId, AWB.consigneeId, AWB.AWBChargedWeightWithCeiling, ODAChargedWeightRange, [], consignorPricingModel ?? "");
 
-      }
-    //   const { internalInvoiceData, totalBaseCharge } = await baseChargeCalculation(AWBId, AWB.consignorId, AWB.toBranchId, AWB.AWBchargedWeightWithCeiling, baseChargeChargedWeightRange, awbLineItemRes, consignorPricingModel);
-      // Calculate ODA charges per line item
-     
-     
-      return;
-    } else {
-      // Handle non-box rate calculations
-      const baseChargeRes = await baseChargeCalculation(AWBId, AWB.consignorId, AWB.toBranchId, AWB.AWBChargedWeightWithCeiling, baseChargeChargedWeightRange, [], consignorPricingModel?? "");
-      const ODAChargeRes = await odaChargeCalculation(AWBId, AWB.consignorId, AWB.consigneeId, AWB.AWBChargedWeightWithCeiling, ODAChargedWeightRange, [], consignorPricingModel??"");
-      // Perform delete and create in a single transaction
-      if(typeof baseChargeRes === 'number' && baseChargeRes !== null && baseChargeRes !== undefined && ODAChargeRes !== undefined){
-        await prisma.$transaction(async (tx) => {
+        // Perform delete and create in a single transaction
+        if (typeof baseChargeRes === 'number' && baseChargeRes !== null && baseChargeRes !== undefined && ODAChargeRes !== undefined) {
+          await prisma.$transaction(async (tx) => {
             // Step 1: Delete related records in InternalInvoiceLineItems
             await tx.internalInvoiceLineItems.deleteMany({
               where: {
                 internalInvoiceId: {
                   in: (await tx.internalInvoice.findMany({
-                    where: { AWBId },
+                    where: { AWBId: AWB.id },
                     select: { id: true },
                   })).map(inv => inv.id),
                 },
               },
             });
+
             // Step 2: Delete InternalInvoice(s)
             await tx.internalInvoice.deleteMany({
-              where: { AWBId },
+              where: { AWBId: AWB.id },
             });
+
             // Create a new internal invoice
             const internalInvoice = await tx.internalInvoice.create({
               data: {
                 baseCharge: baseChargeRes,
                 ODACharge: ODAChargeRes,
-                AirWayBill: { connect: { id: AWBId } },
+                AirWayBill: { connect: { id: AWB.id } },
                 consignor: { connect: { consignorId: AWB.consignorId } },
-                consignee: { connect: { consigneeId: AWB.consigneeId??0} },
+                consignee: { connect: { consigneeId: AWB.consigneeId ?? 0 } },
                 contract: { connect: { id: contractRes.id } },
               },
             });
+
             console.log(internalInvoice.id, "primary key of internal invoice", baseChargeRes, "baseChargeRes*********");
           });
+        }
       }
-     
-      return;
     }
+    return "Success";
   } catch (error) {
     console.error("Error calculating shipping costs:", error);
     throw new Error("Failed to calculate shipping costs");
@@ -158,6 +333,7 @@ export const calculateShippingCosts = async (AWBId: number) => {
 export const baseChargeCalculation = async (AWBId: number, consignorId: number, AWBToBranch: number, AWBChargedWeightWithCeiling: number, baseChargeChargedWeightRange: boolean, awbLineItemRes:AWBLineItem[], consignorPricingModel: string) => {
   let baseCharge;
   let applicableRange;
+
   const consignorRateTableRes = await prisma.consignorRateTable.findMany({
     where: {
       consignorId:consignorId,
@@ -172,9 +348,9 @@ export const baseChargeCalculation = async (AWBId: number, consignorId: number, 
     },
   });
   if(consignorRateTableRes.length>0){
-    console.log(consignorRateTableRes, "consignorRateTableRes");
+    console.log(consignorRateTableRes, "consignorRateTableRes",consignorPricingModel,baseChargeChargedWeightRange);
   if (consignorPricingModel === "BoxRate") {
-    if (baseChargeChargedWeightRange === false) {
+    // if (baseChargeChargedWeightRange === true) {
       console.log(awbLineItemRes, "awblineitems");
       let totalBaseCharge = 0;
       const internalInvoiceData = awbLineItemRes.map(({ id, numOfArticles, ratePerBox }) => {
@@ -187,7 +363,7 @@ export const baseChargeCalculation = async (AWBId: number, consignorId: number, 
       });
       console.log("Prepared data for bulk insertion:", internalInvoiceData, totalBaseCharge);
       return { internalInvoiceData, totalBaseCharge };
-    }
+    // }
   } else {
     if (baseChargeChargedWeightRange === true) {
       console.log("in withCharge otherthanboxRate:- baseCharge", consignorRateTableRes);

@@ -1127,14 +1127,14 @@ export const deliverAWBCheck = async (req: Request, res: Response, next: NextFun
 
 export const calculateShippingCosts = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const AWBId:number= req.body.AWBId;
+    const AWBId:[number]= req.body.AWBId;
    
     if (!AWBId) {
       throwValidationError([{ message: "consignorId is mandatory" }]);
     }
     const Result = await invoiceAWB.calculateShippingCosts(AWBId);
     console.log(Result,"%%controller6")
-    if (Result=="NoAWB") {
+    if (Result=="NoAWBs") {
       res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWB doesn't exists"));
     }
     else if (Result=="NoContract") {
