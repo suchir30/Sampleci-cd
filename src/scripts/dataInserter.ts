@@ -321,7 +321,7 @@ async function insertRelations(models: any) {
             }
 
             for (const field of model.fields) {
-                if (field.kind === 'object') {
+                if (field.kind === 'object' && field.relationFromFields?.length === 0 && field.relationToFields?.length === 0) {
                     try {
                         const relatedObjectName = field.type;
                         const relatedCrmObject = await prisma.cRMObject.findFirst({
