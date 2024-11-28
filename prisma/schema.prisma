@@ -124,7 +124,7 @@ model CRMField {
 model CRMObjectGroup {
   id         Int         @id @default(autoincrement())
   viewName   String
-  viewIndex  Int
+  viewIndex  Float
   CRMObjects CRMObject[] @relation("CRMObjectGroupCRMObject")
 }
 
@@ -132,7 +132,8 @@ model CRMObjectRelations {
   id                  Int       @id @default(autoincrement())
   primaryObjectId     Int
   relatedObjectId     Int
-  viewIndex           Int?
+  viewIndex           Float?
+  relatedFieldName    String
   isInRelatedListView Boolean   @default(false)
   PrimaryObject       CRMObject @relation("PrimaryObject", fields: [primaryObjectId], references: [id])
   RelatedObject       CRMObject @relation("RelatedObject", fields: [relatedObjectId], references: [id])

@@ -203,8 +203,8 @@ async function insertSchemaData(models: any) {
                             isInListView: false,
                             isInEditView: false,
                             isInDetailView: false,
-                            isInRelatedList: field.kind === 'object',
-                            isSearchableField: field.kind !== 'object',
+                            isInRelatedList: false,
+                            isSearchableField: false,
                             isRequired,
                             relatedObjectId: relatedObject ? relatedObject.id : null,
                             CRMObjectId: crmObject.id,
@@ -343,6 +343,7 @@ async function insertRelations(models: any) {
                                     data: {
                                         primaryObjectId: crmObject.id,
                                         relatedObjectId: relatedCrmObject.id,
+                                        relatedFieldName: field.name,
                                     },
                                 });
                             }
