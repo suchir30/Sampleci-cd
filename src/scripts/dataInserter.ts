@@ -159,6 +159,9 @@ async function insertSchemaData(models: any) {
             if (field.relationFromFields && field.relationFromFields.length > 0) {
                 field.relationFromFields.forEach((fieldName: string) => fieldsToSkip.add(fieldName));
             }
+            if (field.kind === 'object' && field.relationFromFields?.length === 0 && field.relationToFields?.length === 0) {
+                 fieldsToSkip.add(field.name);
+            }
         }
 
         fieldsToSkipByModel.set(model.name, fieldsToSkip);
