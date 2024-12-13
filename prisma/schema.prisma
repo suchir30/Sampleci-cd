@@ -133,7 +133,7 @@ model CRMObjectRelations {
   primaryObjectId     Int
   relatedObjectId     Int
   viewIndex           Float?
-  relatedFieldName    String
+  foriegnKeyName      String
   isInRelatedListView Boolean   @default(false)
   PrimaryObject       CRMObject @relation("PrimaryObject", fields: [primaryObjectId], references: [id])
   RelatedObject       CRMObject @relation("RelatedObject", fields: [relatedObjectId], references: [id])
