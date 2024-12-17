@@ -1,0 +1,24 @@
+-- AlterTable
+ALTER TABLE `sku` ADD COLUMN `articleWeight` FLOAT NULL;
+
+-- CreateTable
+CREATE TABLE `POD` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `AWBId` INTEGER NULL,
+    `fileId` INTEGER NULL,
+    `PODAWBCode` VARCHAR(191) NULL,
+    `PODBookingDate` DATETIME(3) NULL,
+    `PODNumberOfArticles` INTEGER NULL,
+    `PODNSCSDestHub` VARCHAR(191) NULL,
+    `stampPresent` VARCHAR(191) NULL,
+    `signature` VARCHAR(191) NULL,
+    `remarks` VARCHAR(191) NULL,
+    `PODInvoiceNumber` VARCHAR(191) NULL,
+    `response` VARCHAR(191) NULL,
+    `createdOn` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- AddForeignKey
+ALTER TABLE `POD` ADD CONSTRAINT `POD_AWBId_fkey` FOREIGN KEY (`AWBId`) REFERENCES `AirWayBill`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
