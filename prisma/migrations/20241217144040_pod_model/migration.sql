@@ -1,5 +1,5 @@
 -- AlterTable
-ALTER TABLE `sku` ADD COLUMN `articleWeight` FLOAT NULL;
+ALTER TABLE `SKU` ADD COLUMN `articleWeight` FLOAT NULL;
 
 -- CreateTable
 CREATE TABLE `POD` (
