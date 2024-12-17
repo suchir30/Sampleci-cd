@@ -27,8 +27,9 @@ import {
   PutObjectCommand,
   GetObjectCommand
 } from "@aws-sdk/client-s3";
+
 import {UploadResult} from "../services/fileService.js";
-import {handleFileUpload, refreshSignedUrlIfNeeded, uploadPDF} from "../services/fileService";
+import {handleFileUpload, refreshSignedUrlIfNeeded, uploadPDF,triggerExternalService,fileUploadRes,podCreation} from "../services/fileService";
 import { float } from 'aws-sdk/clients/cloudfront';
 
 export const getIndustryTypes = async (_req: Request, res: Response, next: NextFunction) => {
@@ -821,30 +822,40 @@ export const inwardAWBs = async (req: Request, res: Response, next: NextFunction
   }
 }
 
+
 export const fileUpload = async (req: Request, res: Response, next: NextFunction) => {
   const { files } = req as Request & { files?: { file: MulterFile[] } };
 
   try {
     if (!files || !files.file || files.file.length === 0) {
-      return throwValidationError([{ message: "No file uploaded" }]);
+      return res.status(400).json({ message: "No file uploaded" });
     }
 
     if (files.file.length > 6) {
-      return throwValidationError([{ message: "Number of files exceeded. Maximum allowed: 6" }]);
+      return res.status(400).json({ message: "Number of files exceeded. Maximum allowed: 6" });
     }
 
     const type = req.body.type || 'defaultScreen';
-    const uploadResults = await fileService.handleFileUpload(files.file, type);
-    const fileUploadRes = await fileService.fileUploadRes(uploadResults, type);
-
-
-    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(fileUploadRes));
+    const fileName = req.body.fileName;
+   
+    
+    const uploadResults = await handleFileUpload(files.file, type);
+    console.log(uploadResults,"uploadResultsuploadResults") 
+    const fileUploadResp = await fileUploadRes(uploadResults, type); 
+     // Run triggerExternalService and podCreation asynchronously in the background
+    if(type=="POD"){  
+      triggerExternalService(files.file,fileUploadResp)
+      .then(async (externalApiResponses) => {
+          await podCreation(externalApiResponses,fileName,fileUploadResp); // Chain pod creation
+      })
+      .catch((error) => console.error("Error in external service or pod creation:", error));
+    }
+    res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(fileUploadResp));
   } catch (error) {
     console.error('Error in fileUpload:', error);
     next(error);
   }
 };
-
 export const getFile = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { fileId } = req.query;

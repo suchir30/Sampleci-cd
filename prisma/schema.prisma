@@ -322,6 +322,7 @@ model AirWayBill {
   hlfLineAWBIds               HLFLineItem[]     @relation("hlfLineAWBId")
   depsAWBIds                  DEPS[]            @relation("depsAWBId")
   internalInvocieAWBs         InternalInvoice[] @relation("internalInvocieAWB")
+  PODAWBs                     POD[]             @relation("PODAWB")
   AWBWeight                   Float?            @db.Float
   AWBCDM                      Float?            @db.Float
   AWBChargedWeight            Float?            @db.Float
@@ -716,6 +717,7 @@ model SKU {
   heightCms     Float?     @db.Float
   CDM           Float?     @db.Float
   chargedWeight Float?     @db.Float
+  articleWeight Float?     @db.Float
   createdOn     DateTime   @default(now())
   modifiedOn    DateTime?  @updatedAt
 }
@@ -747,6 +749,23 @@ model InternalInvoiceLineItems {
   baseCharge        Float           @db.Float
   createdOn         DateTime        @default(now())
   modifiedOn        DateTime?       @updatedAt
+}
+
+model POD {
+  id                  Int         @id @default(autoincrement())
+  AWBId               Int?
+  AirWayBill          AirWayBill? @relation("PODAWB", fields: [AWBId], references: [id])
+  fileId              Int?
+  PODAWBCode          String?
+  PODBookingDate      DateTime?
+  PODNumberOfArticles Int?
+  PODNSCSDestHub      String?
+  stampPresent        String?
+  signature           String?
+  remarks             String?
+  PODInvoiceNumber    String?
+  response            String?
+  createdOn           DateTime    @default(now())
 }
 
 //MASTER TABLES
