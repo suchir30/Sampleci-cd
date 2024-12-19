@@ -436,6 +436,20 @@ async function cleanUpDeletedEnteries(models: any) {
 
     for (const crmObject of existingCrmObjects) {
       if (!modelNamesSet.has(crmObject.name)) {
+        await prisma.cRMFieldPermission.deleteMany({
+          where: {
+            CRMField: {
+              CRMObjectId: crmObject.id,
+            },
+          },
+        });
+
+        await prisma.cRMObjectPermission.deleteMany({
+          where: {
+            CRMObjectId: crmObject.id,
+          },
+        });
+
         await prisma.cRMField.deleteMany({
           where: {
             CRMObjectId: crmObject.id,
@@ -475,11 +489,29 @@ async function cleanUpDeletedEnteries(models: any) {
 
         for (const crmField of existingCrmFields) {
           if (!modelFieldsSet.has(crmField.name)) {
-            await prisma.cRMField.delete({
+            await prisma.cRMFieldPermission.deleteMany({
+              where: {
+                CRMFieldId: crmField.id,
+              },
+            });
+
+            const deteledField = await prisma.cRMField.delete({
               where: {
                 id: crmField.id,
               },
             });
+
+            if (deteledField.name === crmObject.labelFieldName) {
+              await prisma.cRMObject.update({
+                where: { id: crmObject.id },
+                data: { labelFieldName: crmObject.primaryKeyName },
+              });
+
+              console.log(
+                `The Deleted Field ${crmField.name} from CRMObject: ${crmObject.name} is also a LabelFieldNaem defaulting to ID`,
+              );
+            }
+
             console.log(
               `Deleted CRMField: ${crmField.name} from CRMObject: ${crmObject.name}`,
             );
@@ -500,26 +532,26 @@ export async function insertData(models: any) {
 
   await insertSchemaData(models)
     .then(() => {
-      console.log("Objects and Fields Inserted Successfully");
+      console.log("Objects and Fields Inserted Successfully 🚀 ");
     })
     .catch((error) => {
-      console.error("Error inserting data:", error);
+      console.error("🥲 Error inserting data:", error);
     });
 
   await insertRelations(models)
     .then(() => {
-      console.log("Object Relations Inserted Successfully");
+      console.log("Object Relations Inserted Successfully 🚀");
     })
     .catch((error) => {
-      console.error("Error inserting Relations:", error);
+      console.error("🥲 Error inserting Relations:", error);
     });
 
   await cleanUpDeletedEnteries(models)
     .then(() => {
-      console.log("CleanUp Successful");
+      console.log("CleanUp Successful 🧹 ");
     })
     .catch((error) => {
-      console.error("Error Cleaning Up:", error);
+      console.error("🥲 Error Cleaning Up:", error);
     });
 }
 
