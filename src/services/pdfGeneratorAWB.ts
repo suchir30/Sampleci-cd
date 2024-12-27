@@ -2,359 +2,208 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import vfsFonts from 'pdfmake/build/vfs_fonts';
 import fs from 'fs';
 import path from 'path';
-import {handleFileUpload, uploadPDF, UploadResult} from "./fileService";
-import {MulterFile} from "../types/multerTypes";
-
 import QRCode from 'qrcode';
-
-type VfsFonts = {
-    pdfMake: {
-        vfs: any;
-    };
-};
 
 (pdfMake as any).vfs = vfsFonts.pdfMake.vfs;
 
- const generateQRCode = async (data: string) => {
-    try {
-        const qrCodeDataUrl = await QRCode.toDataURL(data, {
-            errorCorrectionLevel: 'H',
-            margin: 0,
-        }); // generate base64 QR code
-        return qrCodeDataUrl;
-    } catch (error) {
-        console.error('Error generating QR Code:', error);
-    }
-}
+const generateQRCode = async (data: string) => {
+  try {
+    const qrCodeDataUrl = await QRCode.toDataURL(data, {
+      errorCorrectionLevel: 'H',
+      margin: 0,
+    });
+    return qrCodeDataUrl;
+  } catch (error) {
+    console.error('Error generating QR Code:', error);
+    throw error;
+  }
+};
 
 export const AWBPdfGenerator = async (pdfData: any): Promise<Buffer> => {
+  try {
     const logoPath = path.join(__dirname, '../assests/logo.jpg');
     const logoBase64 = fs.readFileSync(logoPath, { encoding: 'base64' });
+    const qrCodeImage = await generateQRCode(pdfData.AWBCode);
 
-    const docDefinition = {
-        content: [
-            {
+    console.log(pdfData);
 
-                image: await generateQRCode(pdfData.AWBCode),
-                width: 70,
-                absolutePosition: { x: 475, y: 30 },
-                border: [true, true, true, true],
-                borderColor: 'black',
-                borderWidth: 1,
-            },
-            {
+    const lineItems = (pdfData:any) => pdfData.AWBLineItems?.length
+      ? pdfData.AWBLineItems.map((item: any) => [
+        { text: item.numOfArticles || '', style: 'textSmallTable' },
+        { text: item.lineItemDescription || '', style: 'textSmallTable' },
+        { text: pdfData.invoiceValue || '', style: 'textSmallTable' },
+        { text: item.AWBWeight || '', style: 'textSmallTable' },
+        { text: pdfData.AWBChargedWeight || '', style: 'textSmallTable' },
+        { text: pdfData.ratePerKg || '', style: 'textSmallTable' },
+        { text: '', style: 'textSmallTable' },
+        { text: '', style: 'textSmallTable' },
+      ])
+      : [[
+        { text: '', style: 'textSmallTable' },
+        { text: '', style: 'textSmallTable' },
+        { text: '', style: 'textSmallTable' },
+        { text: '', style: 'textSmallTable' },
+        { text: '', style: 'textSmallTable' },
+        { text: '', style: 'textSmallTable' },
+        { text: '', style: 'textSmallTable' },
+        { text: '', style: 'textSmallTable' },
+      ]];
 
-                table: {
-                    widths: ['*', '*', '*'],
-                    body: [
-                        [
-                            {
-                                image: 'data:image/png;base64,' + logoBase64,
-                                width: 140
-                            },
-                            {
-                                margin: [0, 0, 20, 0],
-                                stack: [
-                                    {
-                                        text: [
-                                            {text: `Date: ${pdfData.createdOn.toISOString().split('T')[0]}`, style: 'textSmall' },
-                                            {text: '\n\nDocket No.: ', style: 'textSmall'},
-                                            {text: `${pdfData.AWBCode}\n`, style: 'subHeader'},
-                                        ],
-                                    }
-                                ],
-                            },
-                            {
-                                stack: [
-                                    {
-
-                                    }
-                                ],
-                            },
-                        ],
-                        [
-                            {
-                                stack: [
-                                    { text: 'NAVATA SUPPLY CHAIN SOLUTIONS PRIVATE LIMITED', style: 'subHeader' },
-                                ],
-                                margin: [0, 0, 20, 0],
-                            },
-                            {
-                                margin: [0, 0, 20, 0],
-                                stack: [
-                                    { text: 'Consignor Details', style: 'subHeader' },
-                                ],
-                            },
-                            {
-                                stack: [
-                                    { text: 'Consignee Details', style: 'subHeader' },
-                                ],
-                            },
-                        ],
-                        [
-                            {
-                                stack: [
-                                    {
-                                        text: [
-                                            { text: 'Regd Office: ', style: 'textBold' },
-                                            { text: 'Plot No. 1, Block No. 1, Autonagar, Hyderabad, Telangana - 300070\n\n', style: 'textSmall' },
-                                        ],
-                                    },
-                                    {
-                                        text: [
-                                            { text: 'E-Mail: ', style: 'textBold' },
-                                            { text: 'support@navatascs.com\n\n', style: 'textSmall' },
-                                        ],
-                                    },
-                                ],
-                                margin: [0, 0, 20, 0],
-                            },
-                            {
-                                margin: [0, 0, 20, 0],
-                                stack: [
-                                    {
-                                        text: [
-                                            { text: 'Name: ', style: 'textBold' },
-                                            { text: `${pdfData.consignor.legalName}\n\n`, style: 'textSmall' },
-                                        ],
-                                    },
-                                ],
-                            },
-                            {
-                                stack: [
-                                    {
-                                        text: [
-                                            { text: 'Name: ', style: 'textBold' },
-                                            { text: `${pdfData.consignee.consigneeName}\n\n`, style: 'textSmall' },
-                                        ],
-                                    },
-                                ],
-                            },
-                        ],
-                        [
-                            {
-                                stack: [
-                                    {
-                                        text: [
-                                            { text: 'GSTIN: ', style: 'textBold' },
-                                            { text: '36AAGCN9247F127\n', style: 'textSmall' },
-                                        ],
-                                    },
-                                    {
-                                        text: [
-                                            { text: 'TAN: ', style: 'textBold' },
-                                            { text: 'HYDN09618A\n', style: 'textSmall' },
-                                        ],
-                                    },
-                                    {
-                                        text: [
-                                            { text: 'PAN: ', style: 'textBold' },
-                                            { text: 'HYDN09618A\n', style: 'textSmall' },
-                                        ],
-                                    },
-                                ],
-                                margin: [0, 0, 20, 0],
-                            },
-                            {
-                                margin: [0, 0, 20, 0],
-                                stack: [
-                                    {
-                                        text: [
-                                            { text: 'Address: ', style: 'textBold' },
-                                            { text: `${pdfData.consignor.address1}\n\n`, style: 'textSmall' },
-                                        ],
-                                    },
-                                ],
-                            },
-                            {
-                                stack: [
-                                    {
-                                        text: [
-                                            { text: 'Address: ', style: 'textBold' },
-                                            { text: `${pdfData.consignee.address1}\n\n`, style: 'textSmall' },
-                                        ],
-                                    },
-                                ],
-                            },
-                        ],
-                        [
-                            {
-                                stack: [
-
-                                ],
-                                margin: [0, 0, 20, 0],
-                            },
-                            {
-                                margin: [0, 0, 20, 0],
-                                stack: [
-                                    {
-                                        text: [
-                                            { text: 'Contact Number: ', style: 'textBold' },
-                                            { text: '000000000\n\n', style: 'textSmall' },
-                                        ],
-                                    },
-                                ],
-                            },
-                            {
-                                stack: [
-                                    {
-                                        text: [
-                                            { text: 'Contact Number: ', style: 'textBold' },
-                                            { text: `${pdfData.consignee.phone1}, ${pdfData.consignee.phone2}\n\n`, style: 'textSmall' },
-                                        ],
-                                    },
-                                ],
-                            },
-                        ],
-                        [
-                            {  width: '*',
-                                stack:[
-                                    {
-                                        text: [
-                                            { text: 'Invoice No.: ', style: 'textBold' },
-                                            {text: `${pdfData.invoiceNumber}\n\n`, style: 'textSmall' },
-                                            { text: 'Invocie Value: ', style: 'textBold' },
-                                            { text: `${pdfData.invoiceValue}\n\n`, style: 'textSmall' },
-                                        ],
-                                    },
-                                ],
-                                margin: [0, 0, 20, 0],
-                            },
-                            {
-                                margin: [0, 0, 20, 0],
-                                stack: [
-                                    {
-                                        text: [
-                                            { text: 'From Hub: ', style: 'textBold' },
-                                            { text: `${pdfData.fromBranch.branchCode}\n\n`, style: 'textSmall' },
-                                        ],
-                                    },
-                                ],
-                            },
-                            {
-                                stack: [
-                                    {
-                                        text: [
-                                            { text: 'To Hub: ', style: 'textBold' },
-                                            { text: `${pdfData.toBranch.branchCode}\n\n`, style: 'textSmall' },
-                                        ],
-                                    },
-                                ],
-                            },
-                        ],
-
-                    ]
-                },
-                layout: 'noBorders',
-                margin: [0, 20, 0, 20],
-            },
-            '\n',
-            {
-                style: 'table',
-                color: '#444',
-                table: {
-                    widths: [150, 35, 45, 45, 45, 45, 90],
-                    headerRows: 2,
-                    body: [
-                        [
-                            {
-                                text: 'Description\n(said to contain)',
-                                style: 'tableHeader',
-                                rowSpan: 2,
-                                alignment: 'center'
-                            },
-                            {text: 'No. of Articles', style: 'tableHeader', rowSpan: 2, alignment: 'center'},
-                            //{text: 'Value in Rs.', style: 'tableHeader', rowSpan: 2, alignment: 'center'},
-                            {text: 'Weight in Kgs.', style: 'tableHeader', colSpan: 2, alignment: 'center'},
-                            {},
-                            {text: 'Rate per Kg', style: 'tableHeader', rowSpan: 2, alignment: 'center'},
-                            {text: 'others', style: 'tableHeader', rowSpan: 2, alignment: 'center'},
-                            {text: 'Total', style: 'tableHeader', rowSpan: 2, alignment: 'center'},
-                        ],
-                        [
-                            {},
-                            {},
-                           // {},
-                            {text: 'Actual', style: 'tableHeader', alignment: 'center'},
-                            {text: 'Charged', style: 'tableHeader', alignment: 'center'},
-                            {},
-                            {},
-                            {},
-                        ],
-                        ...pdfData.AWBLineItems.map((item: any) => [
-                            // Dynamically add rows based on pdfData
-                            { text: item.lineItemDescription, style: 'textSmall' },
-                            { text: item.numOfArticles, style: 'textSmall' },
-                            //{ text: '500', style: 'textSmall' },
-                            { text: item.AWBWeight, style: 'textSmall' }, // Actual weight
-                            { text: item.AWBChargedWeight, style: 'textSmall' }, // Charged weight
-                            { text: pdfData.ratePerKg, style: 'textSmall' },
-                            { text: 'NULL', style: 'textSmall' },
-                            { text: 'Billed HO', style: 'textSmall' },
-                        ]),
-                        [{text: 'Grand Total:', style: 'textSmall'},
-                            {text: `${pdfData.numOfArticles}`, style: 'textSmall'},
-                            {text: 1, style: 'textSmall'},
-                            {text: 1, style: 'textSmall'}, {
-                            text: 1,
-                            style: 'textSmall'
-                        },
-                            {text: 1, style: 'textSmall'}, {text: 1, style: 'textSmall'}
-                        ],
-
-                    ]
-                },
-
-            },
-
-        ],
-        styles: {
-            header: {
-                fontSize: 18,
-                bold: true,
-                margin: [0, 0, 0, 10]
-            },
-            subHeader: {
-                fontSize: 8,
-                bold: true,
-                margin: [0, 10, 0, 5]
-            },
-            textBold: {
-                fontSize: 7,
-                color: 'black',
-                bold: true,
-            },
-            table: {
-                margin: [0, 5, 0, 15]
-            },
-            tableHeader: {
-                bold: true,
-                fontSize: 8,
-                color: 'black',
-                alignment: 'center',
-            },
-            textSmall: {
-                fontSize: 7,
-                color: 'black',
-            }
+      const documentComponent = (pdfData: any , yPosition : number) => [
+        {
+          image: qrCodeImage,
+          width: 50,
+          absolutePosition: { x: 500, y: yPosition },
         },
-        defaultStyle: {
-            // alignment: 'justify'
-        }
-
+        {
+          table: {
+            widths: ['*', '*', '*'],
+            body: [
+              [
+                {
+                  image: 'data:image/png;base64,' + logoBase64,
+                  width: 100,
+                  margin: [0, 0, 0, 0],
+                },
+                {
+                  margin: [0, 0, 0, 0],
+                  stack: [
+                    {
+                      text: [
+                        { text: 'Docket No.: ', style: 'textBold' },
+                        { text: pdfData.AWBCode, style: 'subHeader' },
+                        { text: '\nInvoice Number: ', style: 'textBold' },
+                        { text: pdfData.invoiceNumber, style: 'subHeader' },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  stack: [
+                    {
+                      text: [
+                        { text: `Date: ${pdfData.createdOn.toISOString().split('T')[0]}`, style: 'textBold' },
+                        { text: `\n\nDest. Hub:`, style: 'textBold' },
+                        { text: pdfData.finalDestinationCode, style: 'subHeader' },
+                      ]
+                    }
+                  ]
+                },
+              ],
+              [
+                {
+                  text: [
+                    { text: 'NAVATA SUPPLY CHAIN SOLUTIONS PRIVATE LIMITED\n', style: 'textBold', margin: [0, 0, 20, 0] },
+                    { text: 'Regd Office: ', style: 'textSmall' },
+                    { text: 'Plot No. 1, Block No. 1, Autonagar, Hyderabad, Telangana - 300070\n', style: 'textSmall' },
+                    { text: 'E-Mail: ', style: 'textBold' },
+                    { text: 'support@navatascs.com\n\n', style: 'textSmall' },
+                    { text: 'GSTIN: 36AAGCN9247F1Z7\n', style: 'textBold' },
+                    { text: 'Reverse Charge: \n\n', style: 'textBold' },
+                    { text: 'TAN: HYDN09618A\n', style: 'textBold' },
+                    { text: 'PAN: AAGCN9247F', style: 'textBold' },
+                    { text: '\n\n' },
+                  ],
+                },
+                {
+                  text: [
+                    { text: '\n\nFrom\n\n', style: 'textBold', margin: [0, 0, 30, 0] },
+                    { text: 'Consignor Name: ', style: 'textBold' },
+                    { text: `${pdfData.consignor.legalName || ''}\n\n`, style: 'textSmall' },
+                    { text: 'Consignor Address: ', style: 'textBold' },
+                    { text: `${pdfData.consignor.address1 || ''}\n\n`, style: 'textSmall' },
+                    { text: 'Contact Number: ', style: 'textBold' },
+                    { text: `${pdfData.consignor.phone1 || ''}\n`,style: 'textSmall'},
+                    { text: 'GSTIN: ', style: 'textBold' },
+                    { text: `${pdfData.consignor.gstNumber || ''}\n\n`},
+                  ],
+                },
+                {
+                  text: [
+                    { text: '\n\nTo ,\n\n', style: 'textBold', margin: [0, 0, 30, 0] },
+                    { text: 'Consignee Name: ', style: 'textBold' },
+                    { text: `${pdfData.consignee.consigneeName || ''}\n\n`, style: 'textSmall' },
+                    { text: 'Consignee Address: ', style: 'textBold' },
+                    { text: `${pdfData.consignee.address1 || ''}\n\n`, style: 'textSmall' },
+                    { text: 'Contact Number: ', style: 'textBold' },
+                    { text: `${pdfData.consignee.phone1 || ''}\n\n`,style: 'textSmall' },
+                  ],
+                },
+              ],
+            ],
+          },
+          layout: 'noBorders',
+        },
+        {
+          style: 'table',
+          table: {
+            widths: [30, 140, 50, 35, 35, 50, 50, 50],
+            headerRows: 2,
+            body: [
+              [
+                { text: 'No. of Articles', style: 'tableHeader', alignment: 'center', rowSpan: 2 },
+                { text: 'Description\n(said to contain)', style: 'tableHeader', alignment: 'center', rowSpan: 2 },
+                { text: 'Value in Rs.', style: 'tableHeader', alignment: 'center', rowSpan: 2 },
+                { text: 'Weight in Kgs.', style: 'tableHeader', colSpan: 2, alignment: 'center' },
+                {},
+                { text: 'Rate per Kg', style: 'tableHeader', alignment: 'center', rowSpan: 2 },
+                { text: 'Others', style: 'tableHeader', alignment: 'center', rowSpan: 2 },
+                { text: 'Total', style: 'tableHeader', alignment: 'center', rowSpan: 2 },
+              ],
+              [
+                {}, {}, {},
+                { text: 'Actual', style: 'tableHeader', alignment: 'center' },
+                { text: 'Charged', style: 'tableHeader', alignment: 'center' },
+                {}, {}, {},
+              ],
+              ...lineItems(pdfData),
+            ],
+          },
+        },
+        '\n',
+        {
+          text: 'Services rendered are subjected to terms and conditions mentioned over leaf.',
+          fontSize: 7,
+          italics: true,
+          alignment: 'left',
+          margin: [0, 0, 0, 0],
+        },
+        {
+          style: 'table',
+          table: {
+            widths: ['*', '*'],
+            body: [
+              [
+                { text: 'Remarks:', style: 'textSmall', alignment: 'left', margin: [0, 60, 0, 0], underline: true },
+                { text: 'Stamp and Signature:', style: 'textSmall', alignment: 'left', margin: [0, 60, 0, 0], underline: true },
+              ],
+            ],
+          },
+        },
+      ];
+      
+    const docDefinition = {
+      content: [       
+        documentComponent(pdfData,50),
+        '\n\n\n\n',
+        documentComponent(pdfData,445),     
+      ],
+      styles: {
+        subHeader: { fontSize: 10, bold: true },
+        textBold: { fontSize: 8, bold: true },
+        textSmall: { fontSize: 7, bold: true },
+        textSmallTable: { fontSize: 7, alignment: 'center', margin: [0, 25] },
+        tableHeader: { fontSize: 8, bold: true, alignment: 'center' },
+      },
     };
 
-    try {
-        const pdfDoc = (pdfMake as any).createPdf(docDefinition);
-        const buffer: Uint8Array = await new Promise((resolve, reject) => {
-            pdfDoc.getBuffer((buf: Uint8Array) => {
-                resolve(buf);
-            });
-        });
-        console.log("PDF generated");
-        return Buffer.from(buffer);
-    } catch (error) {
-        console.error("Error generating or uploading PDF:", error);
-        throw error;
-    }
+    const pdfDoc = (pdfMake as any).createPdf(docDefinition);
+    const buffer: Uint8Array = await new Promise((resolve, reject) => {
+      pdfDoc.getBuffer((buf: Uint8Array) => resolve(buf));
+    });
+    return Buffer.from(buffer);
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    throw error;
+  }
 };
