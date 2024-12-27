@@ -332,7 +332,6 @@ model AirWayBill {
   AWBChargedWeight            Float?            @db.Float
   AWBChargedWeightWithCeiling Float?            @db.Float
 }
-
 model AwbLineItem {
   id                       Int                        @id @default(autoincrement())
   AWBId                    Int
@@ -340,6 +339,7 @@ model AwbLineItem {
   lineItemDescription      String?                    @db.VarChar(255)
   numOfArticles            Int
   articleWeight            Float?                     @db.Float
+  lineItemWeight           Float?                     @db.Float
   AWBLineItemweight        Float?                     @db.Float
   AWBLineItemChargedWeight Float?                     @db.Float
   actualFactorWeight       Float?                     @db.Float
@@ -348,6 +348,7 @@ model AwbLineItem {
   breadthCms               Float?                     @db.Float
   heightCms                Float?                     @db.Float
   volume                   Float?                     @db.Float
+  lineItemVolume           Float?                     @db.Float
   SKUId                    Int?
   SKUCode                  String?
   boxType                  String?
