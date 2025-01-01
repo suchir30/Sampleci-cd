@@ -287,7 +287,7 @@ enum AWBStatus {
 
 model AirWayBill {
   id                          Int               @id @default(autoincrement())
-  AWBCode                     String            @db.VarChar(255)
+  AWBCode                     String            @unique @db.VarChar(255)
   consignorId                 Int
   consignor                   Consignor         @relation("AWBConsignor", fields: [consignorId], references: [consignorId])
   consigneeId                 Int?
@@ -332,6 +332,7 @@ model AirWayBill {
   AWBChargedWeight            Float?            @db.Float
   AWBChargedWeightWithCeiling Float?            @db.Float
 }
+
 model AwbLineItem {
   id                       Int                        @id @default(autoincrement())
   AWBId                    Int
