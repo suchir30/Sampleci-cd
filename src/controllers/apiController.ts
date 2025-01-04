@@ -491,9 +491,9 @@ export const updateAWBLineItem = async (req: Request, res: Response, next: NextF
     if (updateAWBLineItemResult == "Invalid AWB") {
       throwValidationError([{ message: "Invalid AWB" }]);
     }
-    if (updateAWBLineItemResult == "Invalid factors") {
-      throwValidationError([{ message: "Invalid Factor: Actual/volumetric Weight Factor is misssing" }]);
-    }
+    // if (updateAWBLineItemResult == "Invalid factors") {
+    //   throwValidationError([{ message: "Invalid Factor: Actual/volumetric Weight Factor is misssing" }]);
+    // }
     res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWB Line ITem Added Successfully"));
   } catch (err) {
     console.error('Error updateAWB', err);

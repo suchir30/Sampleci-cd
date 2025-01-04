@@ -331,6 +331,7 @@ model AirWayBill {
   AWBCDM                      Float?            @db.Float
   AWBChargedWeight            Float?            @db.Float
   AWBChargedWeightWithCeiling Float?            @db.Float
+  rollupPresentChargedWeight  Float?            @db.Float
 }
 
 model AwbLineItem {
@@ -341,19 +342,22 @@ model AwbLineItem {
   numOfArticles            Int
   articleWeight            Float?                     @db.Float
   lineItemWeight           Float?                     @db.Float
-  AWBLineItemweight        Float?                     @db.Float
-  AWBLineItemChargedWeight Float?                     @db.Float
-  actualFactorWeight       Float?                     @db.Float
-  volumetricFactorWeight   Float?                     @db.Float
+  articlePresetChargedWeight Float?                   @db.Float
+  articleWeightFactor      Float?                     @db.Float
+  articleVolumeFactor      Float?                     @db.Float
   lengthCms                Float?                     @db.Float
   breadthCms               Float?                     @db.Float
   heightCms                Float?                     @db.Float
-  volume                   Float?                     @db.Float
+  articleVolume            Float?                     @db.Float
   lineItemVolume           Float?                     @db.Float
   SKUId                    Int?
   SKUCode                  String?
   boxType                  String?
   ratePerBox               Float?                     @db.Float
+  lineItemPresetChargedWeight Float?                  @db.Float
+  lineItemChargedWeight    Float?                     @db.Float
+  minimumArticleWeight     Float?                     @db.Float
+  minimumArticleVolume     Float?                     @db.Float
   createdOn                DateTime?                  @default(now())
   modifiedOn               DateTime?                  @updatedAt
   internalInvocieLIAWBs    InternalInvoiceLineItems[] @relation("internalInvocieLIAWB")
@@ -687,6 +691,7 @@ model Contract {
   AWBCDMAccess                   accessList                 @default(None)
   AWBWeightAccess                accessList                 @default(None)
   AWBChargedWeightAccess         accessList                 @default(None)
+  lineItemChargedWeightCalculation Boolean                  @default(false)
   createdOn                      DateTime                   @default(now())
   modifiedOn                     DateTime?                  @updatedAt
   AWBContractTypes               AirWayBill[]               @relation("AWBContractType")
@@ -722,8 +727,13 @@ model SKU {
   widthCms      Float?     @db.Float
   heightCms     Float?     @db.Float
   CDM           Float?     @db.Float
-  chargedWeight Float?     @db.Float
+  articlePresetChargedWeight Float?     @db.Float
   articleWeight Float?     @db.Float
+  articleVolume Float?     @db.Float
+  articleWeightFactor Float?     @db.Float
+  articleVolumeFactor Float?     @db.Float
+  minimumArticleWeight Float?    @db.Float
+  minimumArticleVolume Float?    @db.Float
   createdOn     DateTime   @default(now())
   modifiedOn    DateTime?  @updatedAt
 }
