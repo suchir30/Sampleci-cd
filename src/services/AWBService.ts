@@ -556,105 +556,6 @@ export const getUpdateAWB = async (AWBId: number) => {
 
 };
 
-// export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem[]) => {
-//     try {
-//         const result = await prisma.$transaction(async (prisma) => {
-
-//             let AWBConsignorId=await prisma.airWayBill.findUnique({
-//                 where: {id:AWBId}
-//             });
-//             let factorRes=await prisma.contract.findFirst({
-//                 where: {consignorId:AWBConsignorId?.consignorId}
-//             });
-//             console.log(AWBConsignorId,factorRes,factorRes?.actualWeightFactor,factorRes?.volumetricWeightFactor)
-
-
-//                     await prisma.awbLineItem.deleteMany({
-//                         where: {AWBId:AWBId}
-
-//                     });
-
-//                     if(!factorRes?.actualWeightFactor || !factorRes?.volumetricWeightFactor){
-//                         return "f"
-//                     }
-
-//                     for (const item of awbLineItems) {
-//                         await prisma.awbLineItem.create({
-//                             data: {
-//                                 AWBId: AWBId,
-//                                 lineItemDescription: item.lineItemDescription,
-//                                 lengthCms: item.lengthCms ?? 0,
-//                                 breadthCms: item.breadthCms ?? 0,
-//                                 heightCms: item.heightCms ?? 0,
-//                                 numOfArticles: item.numOfArticles,
-//                                 articleWeightKg: item.articleWeightKg,
-//                                 weightKgs:(item.numOfArticles??0)*(item.articleWeightKg??0),
-//                                 volume: (item.lengthCms ?? 0) * (item.breadthCms ?? 0) * (item.heightCms ?? 0),
-//                                 actualFactorWeight:(item.numOfArticles??0)*(item.articleWeightKg??0)*(factorRes?.actualWeightFactor),
-//                                 volumetricFactorWeight:(item.numOfArticles??0)*(item.articleWeightKg??0)*(factorRes?.volumetricWeightFactor),
-//                                 SKUId:item.SKUId??0,
-//                                 SKUCode:item.SKUCode,
-//                                 SKUChargedWeight:item.SKUChargedWeight??0
-//                         }
-//                     });
-//             }
-//             const awbLineItemsList = await prisma.awbLineItem.findMany({
-//                 where: { AWBId: AWBId },
-//                 select: {
-//                     articleWeightKg: true,
-//                     numOfArticles: true,
-//                     volume: true,
-//                     SKUChargedWeight: true
-//                 }
-//             });
-
-//             // Calculate the total actual weight, total volume, and total SKUChargedWeight
-//             const totalActualWeight = awbLineItemsList.reduce((acc, item) => {
-//                 return acc + (item.articleWeightKg ?? 0) * item.numOfArticles;
-//             }, 0);
-
-//             const totalVolume = awbLineItemsList.reduce((acc, item) => {
-//                 return acc + (item.volume ?? 0) * item.numOfArticles;
-//             }, 0);
-
-//             const totalSKUChargedWeight = awbLineItemsList.reduce((acc, item) => {
-//                 return acc + (item.SKUChargedWeight ?? 0) * item.numOfArticles;
-//             }, 0);
-
-//             const aggregateResults = await prisma.awbLineItem.aggregate({
-//                 _sum: {
-//                     numOfArticles: true
-//                 },
-//                 where: {
-//                     AWBId: AWBId
-//                 }
-//             });
-//             const { numOfArticles } = aggregateResults._sum;
-
-
-//         const updatedAirWayBill = await prisma.airWayBill.update({
-//             where: {
-//                 id: AWBId
-//             },
-//             data: {
-//                 rollupArticleCnt: numOfArticles || 0,
-//                 rollupWeight: totalActualWeight || 0,
-//                 rollupVolume: totalVolume || 0,
-//                 rollupSKU:totalSKUChargedWeight || 0
-
-//             }
-//         });
-//         return true;
-//       });
-//     }
-//     catch (error) {
-//         console.error("Error in updateAWBLineItem", error);
-//         throw error;
-
-
-//   };
-// }
-
 export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem[]) => {
     try {
         const result = await prisma.$transaction(async (prisma) => {
@@ -693,12 +594,24 @@ export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem
             }
             else{
                 // console.log("in else actual volume")
-                if (factorRes?.actualWeightFactor == null || factorRes?.volumetricWeightFactor == null || factorRes?.chargedWeightCeilingFactor==null) {
-                    console.log("Invalid factors", factorRes);
-                    return "Invalid factors";
-                }
+
+                // if (factorRes?.actualWeightFactor == null || factorRes?.volumetricWeightFactor == null || factorRes?.chargedWeightCeilingFactor==null) {
+                //     console.log("Invalid factors", factorRes);
+                //     return "Invalid factors";
+                // }
 
                 const createPromises = awbLineItems.map(item => {
+                    const calculatedLineItemWeight = item.numOfArticles * Math.max(item.articleWeight || 0, item.minimumArticleWeight || 0);
+                    const computedVolume = (item.lengthCms || 0) * (item.breadthCms || 0) * (item.heightCms || 0);
+                    const calculatedLineItemVolume = item.numOfArticles * Math.max(item.articleVolume || 0, item.minimumArticleVolume || 0, computedVolume ||0);
+                    const calculatedLineItemPresetChargedWeight = item.numOfArticles * (item.articlePresetChargedWeight ||  0);
+                    let calculatedLineItemChargedWeight
+                    if(item.articlePresetChargedWeight!=0 || item.articlePresetChargedWeight!=null){
+                        calculatedLineItemChargedWeight=item.articlePresetChargedWeight
+                    }
+                    else{
+                        calculatedLineItemChargedWeight=Math.max(((item.lineItemWeight ||0) *(item.articleWeightFactor ||0)),((item.lineItemVolume || 0)*(item.articleVolumeFactor||0)))
+                    }
                     return prisma.awbLineItem.create({
                         data: {
                             AWBId: AWBId,
@@ -708,12 +621,22 @@ export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem
                             heightCms: item.heightCms ?? 0,
                             numOfArticles: item.numOfArticles,
                             articleWeight: item.articleWeight,
-                            AWBLineItemweight: (item.numOfArticles ?? 0) * (item.articleWeight ?? 0),
-                            volume: ((item.lengthCms ?? 0) * (item.breadthCms ?? 0) * (item.heightCms ?? 0)) * (item.numOfArticles ?? 0),
-                            actualFactorWeight: (item.numOfArticles ?? 0) * (item.articleWeight ?? 0) * (factorRes.actualWeightFactor!),
-                            volumetricFactorWeight: (item.numOfArticles ?? 0) * (item.articleWeight ?? 0) * (factorRes.volumetricWeightFactor!),
-                            SKUId: item.SKUId,
-                            SKUCode: item.SKUCode
+                            articleVolume:item.articleVolume,
+                            articlePresetChargedWeight:item.articlePresetChargedWeight,
+                            articleWeightFactor:item.articleWeightFactor,
+                            articleVolumeFactor:item.articleVolumeFactor,
+                            minimumArticleWeight:item.minimumArticleWeight,
+                            minimumArticleVolume:item.minimumArticleVolume,
+                            lineItemWeight:calculatedLineItemWeight,
+                            lineItemVolume:calculatedLineItemVolume,
+                            lineItemPresetChargedWeight:calculatedLineItemPresetChargedWeight,
+                            lineItemChargedWeight:calculatedLineItemChargedWeight,
+                             // lineItemWeight: (item.numOfArticles ?? 0) * (item.articleWeight ?? 0),
+                             //  articleVolume: ((item.lengthCms ?? 0) * (item.breadthCms ?? 0) * (item.heightCms ?? 0)) * (item.numOfArticles ?? 0),
+                             // articleWeightFactor: (item.numOfArticles ?? 0) * (item.articleWeight ?? 0) * (factorRes.actualWeightFactor!),
+                             // articleVolumeFactor: (item.numOfArticles ?? 0) * (item.articleWeight ?? 0) * (factorRes.volumetricWeightFactor!),
+                            // SKUId: item.SKUId,
+                            // SKUCode: item.SKUCode
                         }
                     });
                 });
@@ -724,24 +647,29 @@ export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem
             const aggregateResults = await prisma.awbLineItem.aggregate({
                 _sum: {
                     articleWeight: true,
+                    articleVolume: true,
                     numOfArticles: true,
-                    volume: true,
-                    AWBLineItemweight:true
+                    lineItemWeight:true,
+                    lineItemVolume:true,
+                    articleWeightFactor:true,
+                    articleVolumeFactor:true,
+                    lineItemPresetChargedWeight:true,
+                    lineItemChargedWeight:true,
                 },
                 where: {
                     AWBId: AWBId
                 }
             });
             // console.log(aggregateResults,"aggregateResults")
-            const { numOfArticles,articleWeight,volume,AWBLineItemweight} = aggregateResults._sum;
+            const { numOfArticles,articleWeight,articleVolume,lineItemWeight,lineItemVolume,lineItemPresetChargedWeight,lineItemChargedWeight,articleWeightFactor,articleVolumeFactor} = aggregateResults._sum;
 
-            const awbLineItemsList = await prisma.awbLineItem.findMany({
-                where: { AWBId: AWBId },
-                select: {
-                    actualFactorWeight: true,
-                    volumetricFactorWeight: true
-                }
-            });
+            // const awbLineItemsList = await prisma.awbLineItem.findMany({
+            //     where: { AWBId: AWBId },
+            //     select: {
+            //         articleWeightFactor: true,
+            //         articleVolumeFactor: true
+            //     }
+            // });
 
             // const AWBChargedWeight = awbLineItemsList.reduce((acc, item) => {
             //     const maxWeight = Math.max(item.actualFactorWeight ?? 0, item.volumetricFactorWeight ?? 0);
@@ -749,32 +677,57 @@ export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem
             // }, 0);
 
                // Sum of all actualFactorWeight values
-            const totalActualFactorWeight = awbLineItemsList.reduce((acc, item) => {
-                return acc + (item.actualFactorWeight ?? 0);
-            }, 0);
-            // Sum of all volumetricFactorWeight values
-            const totalVolumetricFactorWeight = awbLineItemsList.reduce((acc, item) => {
-                return acc + (item.volumetricFactorWeight ?? 0);
-            }, 0);
-            // Determine AWBChargedWeight as the maximum of the two sums
-            const AWBChargedWeight = Math.max(totalActualFactorWeight, totalVolumetricFactorWeight);
+            // const totalActualFactorWeight = awbLineItemsList.reduce((acc, item) => {
+            //     return acc + (item.articleWeightFactor ?? 0);
+            // }, 0);
+            // // Sum of all volumetricFactorWeight values
+            // const totalVolumetricFactorWeight = awbLineItemsList.reduce((acc, item) => {
+            //     return acc + (item.articleVolumeFactor ?? 0);
+            // }, 0);
+            // // Determine AWBChargedWeight as the maximum of the two sums
+            // const AWBChargedWeight = Math.max(totalActualFactorWeight, totalVolumetricFactorWeight);
+
+      
+            let CalAWBChargedWeight;
+            if(lineItemChargedWeight!=0 || lineItemChargedWeight!=null){
+                CalAWBChargedWeight=lineItemChargedWeight
+            }
+            else{
+                if(lineItemPresetChargedWeight!=0 || lineItemPresetChargedWeight!=null){
+                    CalAWBChargedWeight=lineItemChargedWeight
+                }
+                else{
+                    const calWeightFactor=(lineItemWeight || 0) * (articleWeightFactor || 0)
+                    const calVolumeFactor=(lineItemVolume||0) * (articleVolumeFactor || 0)
+                    CalAWBChargedWeight=Math.max(calWeightFactor,calVolumeFactor);
+
+ 
+                }
+            }
 
             // rollupChargedWtCeiling logic
-            const rollupChargedWtCeiling = Math.ceil(AWBChargedWeight / (factorRes?.chargedWeightCeilingFactor??0)) * (factorRes?.chargedWeightCeilingFactor??0);
-            console.log(`AWBChargedWeight: ${AWBChargedWeight}, rollupChargedWtCeiling: ${rollupChargedWtCeiling}`);
-
+            if(!CalAWBChargedWeight){
+                return
+            }
+            const rollupChargedWtCeiling = Math.ceil(CalAWBChargedWeight / (factorRes?.chargedWeightCeilingFactor??0)) * (factorRes?.chargedWeightCeilingFactor??0);
+                //   console.log(`AWBChargedWeight: ${AWBChargedWeight}, rollupChargedWtCeiling: ${rollupChargedWtCeiling}`);
+      
+      
             const updatedAirWayBill = await prisma.airWayBill.update({
                 where: {
                     id: AWBId
                 },
                 data: {
                     rollupArticleCnt: numOfArticles || 0,
-                    rollupWeight: AWBLineItemweight|| 0,
-                    AWBWeight:AWBLineItemweight || 0,
-                    rollupVolume: volume || 0,
-                    AWBCDM: (volume ?? 0) / 1000,
-                    AWBChargedWeight: AWBChargedWeight || 0,
-                    rollupChargedWeight:AWBChargedWeight || 0,
+                    rollupWeight: lineItemWeight|| 0,
+                    rollupVolume: lineItemVolume || 0,
+                    rollupPresentChargedWeight:lineItemPresetChargedWeight||0,
+                    AWBWeight:lineItemWeight || 0,
+                    AWBCDM: (lineItemVolume ?? 0) / 1000,
+                    AWBChargedWeight:CalAWBChargedWeight,
+                    rollupChargedWeight:CalAWBChargedWeight,
+                    // AWBChargedWeight: AWBChargedWeight || 0,
+                    // rollupChargedWeight:AWBChargedWeight || 0,
                     AWBChargedWeightWithCeiling: rollupChargedWtCeiling || 0
                 }
             });
@@ -955,7 +908,7 @@ export const getAwbPdfData = async (AWBId: number) => {
                     numOfArticles: true,
                     articleWeight: true,
                     // chargedWeight: true,
-                    volume: true
+                    articleVolume: true
                 }
             }
         }
@@ -978,7 +931,7 @@ export const getSKUs = async (consignorId: number) => {
         id: true,
         SKUCode: true,
         product: true,
-        chargedWeight:true,
+        articlePresetChargedWeight:true,
         lengthCms:true,
         widthCms:true,
         heightCms:true
