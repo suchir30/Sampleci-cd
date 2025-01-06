@@ -926,16 +926,7 @@ export const getSKUs = async (consignorId: number) => {
     const SKUDetails = await prisma.sKU.findMany({
       where: {
         consignorId: consignorId,
-      },
-      select: {
-        id: true,
-        SKUCode: true,
-        product: true,
-        articlePresetChargedWeight:true,
-        lengthCms:true,
-        widthCms:true,
-        heightCms:true
-      },
+      }
     });
     return SKUDetails;
 
