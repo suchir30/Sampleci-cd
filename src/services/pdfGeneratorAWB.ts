@@ -94,7 +94,7 @@ export const AWBPdfGenerator = async (pdfData: any): Promise<Buffer> => {
             [
               {
                 text: [
-                  { text: 'NAVATA SUPPLY CHAIN SOLUTIONS PRIVATE LIMITED\n', style: 'textBold', margin: [0, 0, 20, 0] },
+                  { text: 'NAVATA SUPPLY CHAIN SOLUTIONS Pvt. Ltd\n', style: 'textBold', margin: [0, 0, 20, 0] },
                   { text: 'Regd Office: ', style: 'textBold' },
                   { text: 'Plot No. 1, Block No. 1, Autonagar, Hyderabad, Telangana - 300070\n', style: 'textSmall' },
                   { text: 'E-Mail: ', style: 'textBold' },
@@ -102,7 +102,7 @@ export const AWBPdfGenerator = async (pdfData: any): Promise<Buffer> => {
                   { text: 'GSTIN: ', style: 'textBold' },
                   { text: '36AAGCN9247F1Z7\n', style: 'textSmall' },
                   { text: `Reverse Charge: `, style: 'textBold' },
-                  { text: `${pdfData?.reverseCharge || 'NO'} \n\n`, style: 'textSmall' },
+                  { text: `${pdfData?.reverseCharge || ''} \n\n`, style: 'textSmall' },
                   { text: 'TAN: ', style: 'textBold' },
                   { text: 'HYDN09618A\n', style: 'textSmall' },
                   { text: 'PAN: ', style: 'textBold' },
@@ -120,7 +120,7 @@ export const AWBPdfGenerator = async (pdfData: any): Promise<Buffer> => {
                   { text: 'Contact Number: ', style: 'textSmall' },
                   { text: `${pdfData.consignor.phone1 || ''}\n`, style: 'textBold' },
                   { text: 'GSTIN: ', style: 'textSmall' },
-                  { text: `${pdfData.consignor.gstNumber || ''}\n\n` },
+                  { text: `${pdfData.consignor.gstNumber || ''}\n\n`, style: 'textBold'},
                 ],
               },
               {
@@ -191,7 +191,7 @@ export const AWBPdfGenerator = async (pdfData: any): Promise<Buffer> => {
       content: [
         documentComponent(pdfData, 35),
         '\n\n\n\n',
-        documentComponent(pdfData, 425),
+        documentComponent(pdfData, 420),
       ],
       styles: {
         subHeader: { fontSize: 10, bold: true },

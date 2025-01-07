@@ -858,6 +858,7 @@ export const getAwbPdfData = async (AWBId: number) => {
             invoiceValue: true,
             createdOn: true,
             AWBChargedWeight:true,
+            AWBWeight:true,
             ewayBillNumber:true,
             ratePerKg:true,
             rollupVolume:true,
