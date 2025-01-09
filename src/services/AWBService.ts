@@ -635,8 +635,8 @@ export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem
                              //  articleVolume: ((item.lengthCms ?? 0) * (item.breadthCms ?? 0) * (item.heightCms ?? 0)) * (item.numOfArticles ?? 0),
                              // articleWeightFactor: (item.numOfArticles ?? 0) * (item.articleWeight ?? 0) * (factorRes.actualWeightFactor!),
                              // articleVolumeFactor: (item.numOfArticles ?? 0) * (item.articleWeight ?? 0) * (factorRes.volumetricWeightFactor!),
-                            // SKUId: item.SKUId,
-                            // SKUCode: item.SKUCode
+                            SKUId: item.SKUId,
+                            SKUCode: item.SKUCode
                         }
                     });
                 });
@@ -858,6 +858,7 @@ export const getAwbPdfData = async (AWBId: number) => {
             invoiceValue: true,
             createdOn: true,
             AWBChargedWeight:true,
+            AWBWeight:true,
             ewayBillNumber:true,
             ratePerKg:true,
             rollupVolume:true,

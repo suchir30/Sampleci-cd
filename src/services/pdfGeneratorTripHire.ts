@@ -8,13 +8,24 @@ import path from 'path';
 
 export const tripHirePdfGenerator = async (pdfData: any): Promise<Buffer> => {
     const tripHireDetails = pdfData[0];
+    console.log(tripHireDetails);
     const docDefinition = {
         content: [
 
             [
-                { text: `Trip Code:  ${tripHireDetails.tripCode || ''}`, style: 'textSmallRight', alignment: 'right', bold: true},
-                { text: `FTL:  ${tripHireDetails.FTLLocalNumber || ''}`, style: 'textSmallRight', alignment: 'right', bold: true,margin: [0, 0, 8, 0] },
-                { text: '\n' },
+                {
+                    text: [
+                        { text: `Trip Code: `, style: 'textSmallLabel', alignment: 'right', bold: true },
+                        { text: ` ${tripHireDetails?.tripCode || ''}`, style: 'textSmallValue', alignment: 'right' },
+
+                    ],
+                },
+                {
+                    text: [
+                        { text: `FTL: `, style: 'textSmallLabel', alignment: 'right', margin: [0, 0, 8, 0], bold: true },
+                        { text: ` ${tripHireDetails?.FTLLocalNumber || ''}`, style: 'textSmallValue', alignment: 'right' },
+                    ],
+                },
             ],
             {
                 text: 'Navata Supply Chain Solutions',
@@ -27,9 +38,33 @@ export const tripHirePdfGenerator = async (pdfData: any): Promise<Buffer> => {
                     {
                         width: '90%',
                         stack: [
-                            { text: `Vendor Office Name:  ${tripHireDetails.vendorName}`, style: 'textSmallLeft' },
-                            { text: `Address:  ${tripHireDetails.vendorAddress || ''}`, style: 'textSmallLeft' },
-                            { text: `Phone Number:  ${tripHireDetails.vendorPhone || ''}`, style: 'textSmallLeft' },
+                            {
+                                text: [
+                                    { text: `Vendor Office Name: `, style: 'textSmallLabel' },
+                                    { text: ` ${tripHireDetails?.vendorName}`, style: 'textSmallValue' },
+
+                                ],
+                            },
+                            {
+                                text: [
+                                    { text: `Vendor Code: `, style: 'textSmallLabel' },
+                                    { text: ` ${tripHireDetails?.vendorCode}`, style: 'textSmallValue' },
+
+                                ],
+                            },
+                            {
+                                text: [
+                                    { text: `Address: `, style: 'textSmallLabel' },
+                                    { text: ` ${tripHireDetails?.vendorAddress}`, style: 'textSmallValue' },
+
+                                ],
+                            },
+                            {
+                                text: [
+                                    { text: `Phone Number: `, style: 'textSmallLabel' },
+                                    { text: ` ${tripHireDetails?.vendorPhone}`, style: 'textSmallValue' },
+                                ],
+                            },
                         ]
                     },
                 ]
@@ -40,13 +75,24 @@ export const tripHirePdfGenerator = async (pdfData: any): Promise<Buffer> => {
                     {
                         width: '*',
                         stack: [
-                            { text: `Station:  ${tripHireDetails.originBrnachName} -  ${tripHireDetails.route}`, style: 'textSmallLeft' },
+                            {
+                                text: [
+                                    { text: `Station: `, style: 'textSmallLabel' },
+                                    { text: `  ${tripHireDetails?.originBrnachName} -  ${tripHireDetails?.route}`, style: 'textSmallValue' },
+
+                                ],
+                            },
                         ]
                     },
                     {
                         width: '*',
                         stack: [
-                            { text: `Date:  ${new Date().toLocaleDateString()}`, style: 'textSmallRight', alignment: 'right' },
+                            {
+                                text: [
+                                    { text: `Date: `, style: 'textSmallLabel', alignment: 'right' },
+                                    { text: ` ${new Date().toLocaleDateString() || ''}`, style: 'textSmallValue', alignment: 'right' },
+                                ],
+                            },
                         ]
                     },
                 ]
@@ -57,10 +103,9 @@ export const tripHirePdfGenerator = async (pdfData: any): Promise<Buffer> => {
                     {
                         width: '*',
                         stack: [
-                            { text: 'To,', style: 'textSmallLeft' },
-                            { text: '\n' },
-                            { text: 'The Manager', style: 'textSmallLeft' },
-                            { text: 'Navata Supply Chain Solutions', style: 'textSmallLeft' },
+                            { text: 'To,', style: 'textSmallLabel' },
+                            { text: 'The Manager', style: 'textSmallLabel' },
+                            { text: 'Navata Supply Chain Solutions', style: 'textSmallLabel' },
                         ]
                     },
                 ]
@@ -71,79 +116,223 @@ export const tripHirePdfGenerator = async (pdfData: any): Promise<Buffer> => {
                     {
                         width: '*',
                         stack: [
-                            { text: `Hire Amount:  ${tripHireDetails.hireAmount || ''} `, style: 'textSmallLeft'},
-                            { text: `TDS Amount:  ${tripHireDetails.TDSAmount || ''} `, style: 'textSmallLeft'},
-                            { text: `Advance Amount:  ${tripHireDetails.advanceAmount || ''} `, style: 'textSmallLeft'},
-                            { text: `Balance Amount:  ${tripHireDetails.balanceAmount || ''}`, style: 'textSmallLeft'},
+                            {
+                                text: [
+                                    { text: `Hire Amount: `, style: 'textSmallLabel' },
+                                    { text: ` ${tripHireDetails?.hireAmount || ''}`, style: 'textSmallValue' },
+                                ],
+                            },
+                            {
+                                text: [
+                                    { text: `TDS Amount: `, style: 'textSmallLabel' },
+                                    { text: `  ${tripHireDetails?.TDSAmount || ''} `, style: 'textSmallValue' },
+                                ],
+                            },
+                            {
+                                text: [
+                                    { text: `Advance Amount: `, style: 'textSmallLabel' },
+                                    { text: `  ${tripHireDetails?.advanceAmount || ''} `, style: 'textSmallValue' },
+
+                                ],
+                            },
+                            {
+                                text: [
+                                    { text: `Advance Amount: `, style: 'textSmallLabel' },
+                                    { text: `  ${tripHireDetails?.advanceAmount || ''} `, style: 'textSmallValue' },
+                                ],
+                            },
+                            {
+                                text: [
+                                    { text: `Loading/Unloading Charges: `, style: 'textSmallLabel' },
+                                    { text: `  ${tripHireDetails?.loadingUnloadingCharges || ''} `, style: 'textSmallValue' },
+                                ],
+                            },
                         ]
+                    },
+                    {
+                        width: '*',
+                        stack: [
+                            {
+                                text: [
+                                    { text: `\nBroker Name : `, style: 'textSmallLabel' },
+                                    { text: ` ${tripHireDetails?.brokerName || ''}`, style: 'textSmallValue' },
+                                ],
+                            },
+                            {
+                                text: [
+                                    { text: `\nBroker Phone : `, style: 'textSmallLabel' },
+                                    { text: `  ${tripHireDetails?.brokerPhone || ''}`, style: 'textSmallValue' },
+                                ],
+                            },
+                        ],
                     },
                 ]
             },
-            '\n\n',
+            '\n',
             {
                 columns: [
                     {
                         width: '*',
                         stack: [
-                            { text: `Lorry Number:  ${tripHireDetails.vehicleNum || ''}`, style: 'textSmallLeft' },
-                            { text: `Engaged From:  ${tripHireDetails.originBrnachName || ''}`, style: 'textSmallLeft' },
-                            { text: `Engaged To:  ${tripHireDetails.route || ''} `, style: 'textSmallLeft' },
+                            {
+                                text: [
+                                    { text: `Lorry Number : `, style: 'textSmallLabel' },
+                                    { text: ` ${tripHireDetails?.vehicleNumber || ''}`, style: 'textSmallValue' },
+
+                                ],
+                            },
+                            {
+                                text: [
+                                    { text: `Engaged From : `, style: 'textSmallLabel' },
+                                    { text: `  ${tripHireDetails?.originBrnachName || ''}`, style: 'textSmallValue' },
+
+                                ],
+                            },
+                            {
+                                text: [
+                                    { text: `Stops : `, style: 'textSmallLabel' },
+                                    { text: `  ${tripHireDetails?.stops || ''}`, style: 'textSmallValue' },
+
+                                ],
+                            },
+                            {
+                                text: [
+                                    { text: `Engaged To: `, style: 'textSmallLabel' },
+                                    { text: `  ${tripHireDetails?.route || ''} `, style: 'textSmallValue' },
+                                ],
+                            },
                         ]
                     },
                     {
                         width: '*',
                         stack: [
-                            { text: 'Total Number of AirWayBills:', style: 'textSmallRight' },
-                            { text: 'Total Number of Articles:', style: 'textSmallRight' },
-                            { text: 'Total Actual Weight (Kgs):', style: 'textSmallRight' },
-                            { text: 'Total Charged Weight (Kgs):', style: 'textSmallRight' },
-                            { text: `Lorry Hire Amount Rs:  ${tripHireDetails.hireAmount || ''} `, style: 'textSmallRight' },
+                            { text: 'CDM :', style: 'textSmallLabel' },
+                            { text: 'Total Number of AirWayBills :', style: 'textSmallLabel' },
+                            { text: 'Total Number of Articles :', style: 'textSmallLabel' },
+                            { text: 'Total Actual Weight (Kgs) :', style: 'textSmallLabel' },
+                            { text: 'Total Charged Weight (Kgs) :', style: 'textSmallLabel' },
+                            // {
+                            //     text:[
+                            //         { text: `Lorry Hire Amount Rs : `, style: 'textSmallLabel' },
+                            //         { text: `  ${tripHireDetails?.hireAmount || ''} `, style: 'textSmallValue' },        
+                            //     ],
+                            // },
                         ],
                         margin: [10, 0, 0, 0]
-                        
+
                     }
                 ]
             },
             '\n',
             {
                 text: [
-                    { text: 'Sir,', style: 'textSmallLeft' },
+                    { text: 'Sir,', style: 'textSmallLabel' },
                     { text: '\n' },
-                    { text: 'Subject: Private Lorry Hire Fixation -', style: 'textSmallLeft', alignment: 'center' },
+                    { text: 'Subject: Private Lorry Hire Fixation -', style: 'textSmallLabel', alignment: 'center' },
                     { text: '\n' },
-                    { text: `Please pay the Lorry Hire Amount of Rs:_____ ${tripHireDetails.hireAmount || ''}_____ after unloading the consignments which are in sound condition at your end and tallying with the particulars furnished below:`, style: 'textSmallLeft', alignment: 'left' },
+                    { text: `Please pay the Lorry Hire Amount of Rs:_____ ${tripHireDetails?.hireAmount || ''}_____ after unloading the consignments which are in sound condition at your end and tallying with the particulars furnished below:`, style: 'textSmallLabel', alignment: 'left' },
                 ]
             },
-            '\n\n',
+            '\n',
             {
                 columns: [
                     {
                         width: '50%',
                         stack: [
-                            { text: `Driver Name:  ${tripHireDetails.driverName || ''}`, style: 'textSmallLeft' },
-                            // { text: '\n' },
-                            { text: `Driver Address:  ${tripHireDetails.driverAddress || ''}`, style: 'textSmallLeft' },
+                            {
+                                text: [
+                                    { text: 'Driver Name: ', style: 'textSmallLabel' },
+                                    { text: `${tripHireDetails?.driverName || ''}`, style: 'textSmallValue' },
+                                ],
+                            },
+                            {
+                                text: [
+                                    { text: 'Driver Address: ', style: 'textSmallLabel' },
+                                    { text: `${tripHireDetails?.driverAddress || ''}`, style: 'textSmallValue' },
+                                ],
+                            },
+                            {
+                                text: [
+                                    { text: 'Driver Phone No.: ', style: 'textSmallLabel' },
+                                    { text: `${tripHireDetails?.driverPhone || ''}`, style: 'textSmallValue' },
+                                ],
+                            },
                             { text: '\n' },
-                            { text: `Owner Name:  ${tripHireDetails.vehicleOwnerName || ''}`, style: 'textSmallLeft' },
-                            // { text: '\n' },
-                            { text: `Owner Address:  ${tripHireDetails.vechicleOwnerAddress || ''}`, style: 'textSmallLeft' },
+                            {
+                                text: [
+                                    { text: 'Owner Name: ', style: 'textSmallLabel' },
+                                    { text: `${tripHireDetails?.vehicleOwnerName || ''}`, style: 'textSmallValue' },
+                                ],
+                            },
+                            {
+                                text: [
+                                    { text: 'Owner Address: ', style: 'textSmallLabel' },
+                                    { text: `${tripHireDetails?.vechicleOwnerAddress || ''}`, style: 'textSmallValue' },
+                                ],
+                            },
+                            {
+                                text: [
+                                    { text: 'Owner Phone No.: ', style: 'textSmallLabel' },
+                                    { text: `${tripHireDetails?.vechicleOwnerPhone || ''}`, style: 'textSmallValue' },
+                                ],
+                            },
                         ],
                     },
                     {
                         width: '*',
                         stack: [
-                            { text: `Driver License Number:  ${tripHireDetails.driverlicenseNumber || ''}`, style: 'textSmallRight' },
-                            { text: `Driver License Exp. Date:  ${tripHireDetails.driverlicenseExpiryDate.toISOString().substring(0, 10) || ''}`, style: 'textSmallRight' },
-                            { text: `Place of Issue:  ${tripHireDetails.placeOfIssueRTA || ''}`, style: 'textSmallRight' },
-                            { text: `Lorry Make & Model:  ${tripHireDetails.vehicleType || ''}`, style: 'textSmallRight' },
-                            { text: `Engine Number:  ${tripHireDetails.engineNumber || ''}`, style: 'textSmallRight' },
-                            { text: `Chassis Number:  ${tripHireDetails.chassisNumber || ''}`, style: 'textSmallRight' },
-                            { text: `Insurance Valid Date:  ${tripHireDetails.insuranceValidDate.toISOString().substring(0, 10) || ''}`, style: 'textSmallRight' },
-                            { text: `Owner PAN Card No:  ${tripHireDetails.vehicleOwnerPANCardNumber || ''}`, style: 'textSmallRight' },
+                            {
+                                text: [
+                                    { text: 'Driver License Number: ', style: 'textSmallLabel' },
+                                    { text: `${tripHireDetails?.driverlicenseNumber || ''}`, style: 'textSmallValue' },
+                                ],
+                            },
+                            {
+                                text: [
+                                    { text: 'Driver License Exp. Date: ', style: 'textSmallLabel' },
+                                    { text: `${tripHireDetails?.driverlicenseExpiryDate.toISOString().substring(0, 10) || ''}`, style: 'textSmallValue' },
+                                ],
+                            },
+                            {
+                                text: [
+                                    { text: 'Place of Issue: ', style: 'textSmallLabel' },
+                                    { text: `${tripHireDetails?.placeOfIssueRTA || ''}`, style: 'textSmallValue' },
+                                ],
+                            },
+                            {
+                                text: [
+                                    { text: 'Lorry Make & Model: ', style: 'textSmallLabel' },
+                                    { text: `${tripHireDetails?.vehicleType || ''}`, style: 'textSmallValue' },
+                                ],
+                            },
+                            {
+                                text: [
+                                    { text: 'Engine Number: ', style: 'textSmallLabel' },
+                                    { text: `${tripHireDetails?.engineNumber || ''}`, style: 'textSmallValue' },
+                                ],
+                            },
+                            {
+                                text: [
+                                    { text: 'Chassis Number: ', style: 'textSmallLabel' },
+                                    { text: `${tripHireDetails?.chassisNumber || ''}`, style: 'textSmallValue' },
+                                ],
+                            },
+                            {
+                                text: [
+                                    { text: 'Insurance Valid Date: ', style: 'textSmallLabel' },
+                                    { text: `${tripHireDetails?.insuranceValidDate.toISOString().substring(0, 10) || ''}`, style: 'textSmallValue' },
+                                ],
+                            },
+                            {
+                                text: [
+                                    { text: 'Owner PAN Card No: ', style: 'textSmallLabel' },
+                                    { text: `${tripHireDetails?.vehicleOwnerPANCardNumber || ''}`, style: 'textSmallValue' },
+                                ],
+                            },
                         ],
                         margin: [10, 0, 0, 0],
                     },
-                ]
+                ],
             },
             '\n\n',
             {
@@ -151,35 +340,59 @@ export const tripHirePdfGenerator = async (pdfData: any): Promise<Buffer> => {
                     {
                         width: '*',
                         stack: [
-                            { text: 'Meter reading : Opening :', style: 'textSmallLeft' },
-                            { text: '\n' },
-                            { text: 'Meter reading : Closing :', style: 'textSmallLeft'},
+                            { text: 'Opening :', style: 'textSmallValue' , margin: [80, 0, 0, 0] },
+                            { text: 'Meter reading -', style: 'textSmallLabel' },
+                            { text: 'Closing :', style: 'textSmallValue', margin: [80, 0, 0, 0] },
                         ],
 
                     },
                     {
                         width: '*',
                         stack: [
-                            { text: 'Departure :', style: 'textSmallRight' },
-                            { text: 'Expected Arrival Time :', style: 'textSmallRight' },
-                            { text: 'Actual Reaching Date & Time :', style: 'textSmallRight' },
-                            { text: 'Difference between Expected vs Actual :', style: 'textSmallRight' },
+                            { text: 'Departure :', style: 'textSmallLabel' },
+                            { text: 'Expected Arrival Time :', style: 'textSmallLabel' },
+                            { text: 'Actual Reaching Date & Time :', style: 'textSmallLabel' },
+                            { text: 'Difference between Expected vs Actual :', style: 'textSmallLabel' },
+                        ],
+                        margin: [10, 0, 0, 0],
+                    },
+                ]
+            },
+           ' \n',
+            {
+                columns: [
+                    {
+                        width: '*',
+                        stack: [
+                            { text: 'Signature of clerk who prepared this hire letter:', style: 'textSmallValue' },
+                            { text: '\nSignature of Loading clerk :', style: 'textSmallValue' },
+                            { text: '\nSignature of unloading clerk :', style: 'textSmallValue' },
+                        ],
+
+                    },
+                    {
+                        width: '*',
+                        stack: [
+                            { text: 'Signature of driver :', style: 'textSmallValue'  },
+                            { text: '\nSignature of cleaner :', style: 'textSmallValue' },
+                            { text: '\nSignature of verified after unloading :', style: 'textSmallValue' },
                         ],
                         margin: [10, 0, 0, 0],
                     },
                 ]
             }
+
         ],
         styles: {
             header: {
                 fontSize: 14,
                 bold: true,
             },
-            textSmallLeft: {
-                fontSize: 11,
+            textSmallValue: {
+                fontSize: 9,
                 color: 'black',
             },
-            textSmallRight: {
+            textSmallLabel: {
                 fontSize: 11,
                 color: 'black',
                 // margin: [0, 0, 10, 0],
