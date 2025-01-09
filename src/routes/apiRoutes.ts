@@ -16,7 +16,6 @@ router.get('/state', apiController.getStates);
 router.get('/pincode', apiController.getPincodes);
 
 // Model GET
-router.get('/branch', apiController.getBranches);
 router.get('/consignor', apiController.getConsignors);
 router.get('/gstList', apiController.getGstList);
 router.get('/getEmployees', apiController.getEmployees);
@@ -24,6 +23,7 @@ router.get('/getFile', apiController.getFile)
 
 
 // Model POST
+router.post('/branch', apiController.getBranches);
 router.post('/getConsignorBranches', apiController.getConsignorBranches);
 router.post('/addConsignorBranch', apiController.addConsignorBranch);
 router.post('/getConsignee', apiController.getConsignees);
