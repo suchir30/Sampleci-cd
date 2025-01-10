@@ -1,4 +1,4 @@
-import { CRMFieldType, PrismaClient } from "@prisma/client";
+import { CRMFieldType, PrismaClient, SystemFieldType } from "@prisma/client";
 import { getDMMF } from "@prisma/internals";
 import path from "path";
 
@@ -32,10 +32,13 @@ const groupMappings = {
     "StateMaster",
     "DistrictMaster",
     "PincodesMaster",
+    "Branch",
     "GSTMaster",
     "commodityMaster",
     "industryTypeMaster",
   ],
+  Role: ["Role", "CRMObjectPermission", "CRMFieldPermission"],
+  CRM: ["CRMObjectGroup", "CRMObject", "CRMField", "CRMObjectRelations"],
 };
 
 async function getDmmf() {
@@ -246,6 +249,11 @@ async function insertSchemaData(models: any) {
               isInDetailView: false,
               isInRelatedList: false,
               isSearchableField: false,
+              systemField:
+                (field.kind !== "enum" && field.hasDefaultValue == true) ||
+                field.isUpdatedAt == true
+                  ? SystemFieldType.DBGenerated
+                  : null,
               isRequired,
               relatedObjectId: relatedObject ? relatedObject.id : null,
               CRMObjectId: crmObject.id,
