@@ -89,6 +89,7 @@ import { CreateManyGeneral } from "./components/customResolvers/CreateManyGenera
 import { TripDetailsInterceptor } from "./components/middlewares/tripDetailsInterceptor";
 import { ENUMS } from "./components/customResolvers/ENUMS";
 import { ImportAwbLineItem } from "./components/customResolvers/ImportAwbLineItem";
+import { RoleWizard } from "./components/customResolvers/RoleWizard";
 
 const resolversEnhanceMap: ResolversEnhanceMap = {
   User: { _all: [Authorized()] },
@@ -263,4 +264,5 @@ export const customResolvers: NonEmptyArray<Function> = [
   CreateManyGeneral,
   ImportAwbLineItem,
   ENUMS,
+  RoleWizard,
 ];

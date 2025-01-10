@@ -95,6 +95,11 @@ enum CRMFieldType {
   url
 }
 
+enum SystemFieldType {
+  DBGenerated
+  CodeGenerated
+}
+
 model CRMField {
   id                  Int                  @id @default(autoincrement())
   name                String
@@ -103,6 +108,7 @@ model CRMField {
   isRelation          Boolean              @default(false)
   idFieldName         String?
   fieldType           CRMFieldType?
+  systemField         SystemFieldType?
   enumListName        String?
   isInSearchModal     Boolean              @default(false)
   isRequired          Boolean              @default(false)
@@ -335,32 +341,32 @@ model AirWayBill {
 }
 
 model AwbLineItem {
-  id                       Int                        @id @default(autoincrement())
-  AWBId                    Int
-  AWB                      AirWayBill                 @relation(fields: [AWBId], references: [id])
-  lineItemDescription      String?                    @db.VarChar(255)
-  numOfArticles            Int
-  articleWeight            Float?                     @db.Float
-  lineItemWeight           Float?                     @db.Float
-  articlePresetChargedWeight Float?                   @db.Float
-  articleWeightFactor      Float?                     @db.Float
-  articleVolumeFactor      Float?                     @db.Float
-  lengthCms                Float?                     @db.Float
-  breadthCms               Float?                     @db.Float
-  heightCms                Float?                     @db.Float
-  articleVolume            Float?                     @db.Float
-  lineItemVolume           Float?                     @db.Float
-  SKUId                    Int?
-  SKUCode                  String?
-  boxType                  String?
-  ratePerBox               Float?                     @db.Float
-  lineItemPresetChargedWeight Float?                  @db.Float
-  lineItemChargedWeight    Float?                     @db.Float
-  minimumArticleWeight     Float?                     @db.Float
-  minimumArticleVolume     Float?                     @db.Float
-  createdOn                DateTime?                  @default(now())
-  modifiedOn               DateTime?                  @updatedAt
-  internalInvocieLIAWBs    InternalInvoiceLineItems[] @relation("internalInvocieLIAWB")
+  id                          Int                        @id @default(autoincrement())
+  AWBId                       Int
+  AWB                         AirWayBill                 @relation(fields: [AWBId], references: [id])
+  lineItemDescription         String?                    @db.VarChar(255)
+  numOfArticles               Int
+  articleWeight               Float?                     @db.Float
+  lineItemWeight              Float?                     @db.Float
+  articlePresetChargedWeight  Float?                     @db.Float
+  articleWeightFactor         Float?                     @db.Float
+  articleVolumeFactor         Float?                     @db.Float
+  lengthCms                   Float?                     @db.Float
+  breadthCms                  Float?                     @db.Float
+  heightCms                   Float?                     @db.Float
+  articleVolume               Float?                     @db.Float
+  lineItemVolume              Float?                     @db.Float
+  SKUId                       Int?
+  SKUCode                     String?
+  boxType                     String?
+  ratePerBox                  Float?                     @db.Float
+  lineItemPresetChargedWeight Float?                     @db.Float
+  lineItemChargedWeight       Float?                     @db.Float
+  minimumArticleWeight        Float?                     @db.Float
+  minimumArticleVolume        Float?                     @db.Float
+  createdOn                   DateTime?                  @default(now())
+  modifiedOn                  DateTime?                  @updatedAt
+  internalInvocieLIAWBs       InternalInvoiceLineItems[] @relation("internalInvocieLIAWB")
 }
 
 enum ArticleStatus {
@@ -662,40 +668,40 @@ enum accessList {
 }
 
 model Contract {
-  id                             Int                        @id @default(autoincrement())
-  consignorId                    Int
-  consignor                      Consignor                  @relation("contractConsignorId", fields: [consignorId], references: [consignorId])
-  ContractType                   ContractType?
-  consignorPricingModel          consignorPricingModelType?
-  chargedWeightModel             chargedWeightModelType?
-  isActive                       Boolean?
-  startDate                      DateTime?
-  endDate                        DateTime?
-  PTlRateType                    PTlRateType?
-  monthlyMinCommitVolume         Int?
-  minimumAWBValue                Float?                     @db.Float
-  docketChargeValue              Float?                     @db.Float
-  fovOfCoustomersInvoiceValue    Float?
-  liabilityClause                String?
-  articleChargeMandatory         Float?                     @db.Float
-  articleChargeMinAmount         Float?                     @db.Float
-  articleChargeMaxAmount         Float?                     @db.Float
-  actualWeightFactor             Float?                     @db.Float
-  volumetricWeightFactor         Float?                     @db.Float
-  chargedWeightFactor            Float?                     @db.Float
-  chargedWeightCeilingFactor     Int?
-  ODAChargedWeightRange          Boolean                    @default(false)
-  baseChargeChargedWeightRange   Boolean                    @default(false)
-  AWBLineItemLBHAccess           accessList                 @default(None)
-  AWBLineItemArticleWeightAccess accessList                 @default(None)
-  AWBCDMAccess                   accessList                 @default(None)
-  AWBWeightAccess                accessList                 @default(None)
-  AWBChargedWeightAccess         accessList                 @default(None)
-  lineItemChargedWeightCalculation Boolean                  @default(false)
-  createdOn                      DateTime                   @default(now())
-  modifiedOn                     DateTime?                  @updatedAt
-  AWBContractTypes               AirWayBill[]               @relation("AWBContractType")
-  internalInvocieContracts       InternalInvoice[]          @relation("internalInvocieContract")
+  id                               Int                        @id @default(autoincrement())
+  consignorId                      Int
+  consignor                        Consignor                  @relation("contractConsignorId", fields: [consignorId], references: [consignorId])
+  ContractType                     ContractType?
+  consignorPricingModel            consignorPricingModelType?
+  chargedWeightModel               chargedWeightModelType?
+  isActive                         Boolean?
+  startDate                        DateTime?
+  endDate                          DateTime?
+  PTlRateType                      PTlRateType?
+  monthlyMinCommitVolume           Int?
+  minimumAWBValue                  Float?                     @db.Float
+  docketChargeValue                Float?                     @db.Float
+  fovOfCoustomersInvoiceValue      Float?
+  liabilityClause                  String?
+  articleChargeMandatory           Float?                     @db.Float
+  articleChargeMinAmount           Float?                     @db.Float
+  articleChargeMaxAmount           Float?                     @db.Float
+  actualWeightFactor               Float?                     @db.Float
+  volumetricWeightFactor           Float?                     @db.Float
+  chargedWeightFactor              Float?                     @db.Float
+  chargedWeightCeilingFactor       Int?
+  ODAChargedWeightRange            Boolean                    @default(false)
+  baseChargeChargedWeightRange     Boolean                    @default(false)
+  AWBLineItemLBHAccess             accessList                 @default(None)
+  AWBLineItemArticleWeightAccess   accessList                 @default(None)
+  AWBCDMAccess                     accessList                 @default(None)
+  AWBWeightAccess                  accessList                 @default(None)
+  AWBChargedWeightAccess           accessList                 @default(None)
+  lineItemChargedWeightCalculation Boolean                    @default(false)
+  createdOn                        DateTime                   @default(now())
+  modifiedOn                       DateTime?                  @updatedAt
+  AWBContractTypes                 AirWayBill[]               @relation("AWBContractType")
+  internalInvocieContracts         InternalInvoice[]          @relation("internalInvocieContract")
 }
 
 enum ArticleLogsScanType {
@@ -717,25 +723,25 @@ model AwbArticleTripLogs {
 }
 
 model SKU {
-  id            Int        @id @default(autoincrement())
-  consignorId   Int?
-  consignor     Consignor? @relation("SKUConsignorId", fields: [consignorId], references: [consignorId])
-  SKUCode       String     @db.VarChar(255)
-  product       String?    @db.VarChar(255)
-  packSize      String?    @db.VarChar(255)
-  lengthCms     Float?     @db.Float
-  widthCms      Float?     @db.Float
-  heightCms     Float?     @db.Float
-  CDM           Float?     @db.Float
+  id                         Int        @id @default(autoincrement())
+  consignorId                Int?
+  consignor                  Consignor? @relation("SKUConsignorId", fields: [consignorId], references: [consignorId])
+  SKUCode                    String     @db.VarChar(255)
+  product                    String?    @db.VarChar(255)
+  packSize                   String?    @db.VarChar(255)
+  lengthCms                  Float?     @db.Float
+  widthCms                   Float?     @db.Float
+  heightCms                  Float?     @db.Float
+  CDM                        Float?     @db.Float
   articlePresetChargedWeight Float?     @db.Float
-  articleWeight Float?     @db.Float
-  articleVolume Float?     @db.Float
-  articleWeightFactor Float?     @db.Float
-  articleVolumeFactor Float?     @db.Float
-  minimumArticleWeight Float?    @db.Float
-  minimumArticleVolume Float?    @db.Float
-  createdOn     DateTime   @default(now())
-  modifiedOn    DateTime?  @updatedAt
+  articleWeight              Float?     @db.Float
+  articleVolume              Float?     @db.Float
+  articleWeightFactor        Float?     @db.Float
+  articleVolumeFactor        Float?     @db.Float
+  minimumArticleWeight       Float?     @db.Float
+  minimumArticleVolume       Float?     @db.Float
+  createdOn                  DateTime   @default(now())
+  modifiedOn                 DateTime?  @updatedAt
 }
 
 model InternalInvoice {
