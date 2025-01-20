@@ -337,7 +337,7 @@ model AirWayBill {
   AWBCDM                      Float?            @db.Float
   AWBChargedWeight            Float?            @db.Float
   AWBChargedWeightWithCeiling Float?            @db.Float
-  rollupPresentChargedWeight  Float?            @db.Float
+  rollupPresetChargedWeight  Float?            @db.Float
 }
 
 model AwbLineItem {
@@ -422,49 +422,67 @@ enum TripStatus {
 }
 
 model TripDetails {
-  id                    Int                  @id @default(autoincrement())
-  tripCode              String               @unique @db.VarChar(255)
-  tripStatus            TripStatus           @default(Open)
-  latestCheckinType     tripCheckinType?
-  latestCheckinHubId    Int?
-  checkinBranch         Branch?              @relation("tripLatestCheckinHub", fields: [latestCheckinHubId], references: [id])
-  latestCheckinTime     DateTime?
-  route                 String?              @db.VarChar(255)
-  costPerKg             String?              @db.VarChar(255)
-  localTripNumber       String?              @db.VarChar(255)
-  vendorId              Int
-  vendor                VendorMaster         @relation("tripVendorCode", fields: [vendorId], references: [id])
-  vehicleId             Int
-  vehicle               VehicleMaster        @relation("tripVehicleId", fields: [vehicleId], references: [id])
-  driverId              Int
-  driver                DriverMaster         @relation("tripDriverId", fields: [driverId], references: [id])
-  FTLLocalNumber        String?              @db.VarChar(255)
-  originBranchId        Int?
-  originBranch          Branch?              @relation("tripBranchId", fields: [originBranchId], references: [id])
-  numberOfAwb           Int?
-  numberOfArticles      Int?
-  chargedWeight         Float?               @db.Float
-  hireAmount            Float?               @db.Float
-  advanceAmount         Float?               @db.Float
-  TDSAmount             Float?               @db.Float
-  balance               Float?               @db.Float
-  openingKms            Float?               @db.Float
-  closingKms            Float?               @db.Float
-  totalKms              Float?               @db.Float
-  tripClosingTime       DateTime?
-  documentStatus        String?              @db.VarChar(255)
-  invoiceStatus         String?              @db.VarChar(255)
-  remarks               String?              @db.VarChar(255)
-  paymentReqDate        DateTime?
-  UTRDetails            String?              @db.VarChar(255)
-  ePODsCleared          Boolean?
-  originalPODsReceived  Boolean?
-  createdOn             DateTime?            @default(now())
-  modifiedOn            DateTime?            @updatedAt
-  tripIdCheckins        TripCheckIn[]        @relation("tripIdCheckin")
-  tripIdTripLineItems   TripLineItem[]       @relation("tripIdTripLineItem")
-  depsTripRoutes        DEPS[]               @relation("depsTripRoute")
-  AWBArticleLogsTripIds AwbArticleTripLogs[] @relation("AWBArticleLogsTripId")
+  id                           Int                  @id @default(autoincrement())
+  tripCode                     String               @unique @db.VarChar(255)
+  tripStatus                   TripStatus           @default(Open)
+  latestCheckinType            tripCheckinType?
+  latestCheckinHubId           Int?
+  checkinBranch                Branch?              @relation("tripLatestCheckinHub", fields: [latestCheckinHubId], references: [id])
+  latestCheckinTime            DateTime?
+  route                        String?              @db.VarChar(255)
+  costPerKg                    String?              @db.VarChar(255)
+  localTripNumber              String?              @db.VarChar(255)
+  vendorId                     Int?                 @db.Int
+  vendor                       VendorMaster?         @relation("tripVendorCode", fields: [vendorId], references: [id])
+  vehicleId                    Int?
+  vehicle                      VehicleMaster?        @relation("tripVehicleId", fields: [vehicleId], references: [id])
+  driverId                     Int?
+  driver                       DriverMaster?         @relation("tripDriverId", fields: [driverId], references: [id])
+  FTLLocalNumber               String?              @db.VarChar(255)
+  originBranchId               Int?
+  originBranch                 Branch?              @relation("tripBranchId", fields: [originBranchId], references: [id])
+  numberOfAwb                  Int?
+  numberOfArticles             Int?
+  chargedWeight                Float?               @db.Float
+  hireAmount                   Float?               @db.Float
+  advanceAmount                Float?               @db.Float
+  TDSAmount                    Float?               @db.Float
+  balance                      Float?               @db.Float
+  openingKms                   Float?               @db.Float
+  closingKms                   Float?               @db.Float
+  totalKms                     Float?               @db.Float
+  tripClosingTime              DateTime?
+  documentStatus               String?              @db.VarChar(255)
+  invoiceStatus                String?              @db.VarChar(255)
+  remarks                      String?              @db.VarChar(255)
+  paymentReqDate               DateTime?
+  UTRDetails                   String?              @db.VarChar(255)
+  ePODsCleared                 Boolean?
+  originalPODsReceived         Boolean?
+  marketpeId                   String?
+  marketpeAutoIdentifier       String?
+  marketpeAutoIdentifierNumber Int?
+  marketpeIdentifier           String?
+  marketpeFromPlace            String?
+  marketpeToPlace              String?
+  marketpeStops                String?
+  marketpeRemarks              String?
+  marketpeStatus               String?
+  marketpeConsignorName        String?
+  marketpeConsigneeName        String?
+  marketpeConsignorGst         String?
+  marketpeConsigneeGst         String?
+  marketpeDistance             Int?
+  marketpeOdometerStartKm      Int?
+  marketpeOdometerEndKm        Int?
+  marketpeBookingFreight       Int?
+  marketpeCreatedTime          DateTime?
+  createdOn                    DateTime?            @default(now())
+  modifiedOn                   DateTime?            @updatedAt
+  tripIdCheckins               TripCheckIn[]        @relation("tripIdCheckin")
+  tripIdTripLineItems          TripLineItem[]       @relation("tripIdTripLineItem")
+  depsTripRoutes               DEPS[]               @relation("depsTripRoute")
+  AWBArticleLogsTripIds        AwbArticleTripLogs[] @relation("AWBArticleLogsTripId")
 }
 
 enum tripCheckinType {
@@ -790,6 +808,16 @@ model POD {
   createdOn           DateTime    @default(now())
 }
 
+  model ExternalRequestLog{
+      id                  Int         @id @default(autoincrement())
+      vendorName          String
+      requestType         String
+      requestBody         String      @db.LongText
+      status              String
+      errorMessage        String?     @db.VarChar(2048)
+      createdOn           DateTime    @default(now())
+  }
+
 //MASTER TABLES
 
 model IndustryTypeMaster {
@@ -862,78 +890,116 @@ model GstMaster {
 }
 
 model VendorMaster {
-  id                Int             @id @default(autoincrement())
-  vendorCode        String          @unique @db.VarChar(255)
-  publicName        String?         @db.VarChar(255)
-  vendorName        String?         @db.VarChar(255)
-  address1          String?         @db.VarChar(255)
+  id                Int          @id @default(autoincrement())
+  vendorCode        String?      @unique @db.VarChar(255)
+  publicName        String?      @db.VarChar(255)
+  vendorName        String?      @db.VarChar(255)
+  address1          String?      @db.VarChar(255)
   cityId            Int?
-  city              CityMaster?     @relation("vendorCity", fields: [cityId], references: [id])
+  city              CityMaster?  @relation("vendorCity", fields: [cityId], references: [id])
   stateId           Int?
-  state             StateMaster?    @relation("vendorState", fields: [stateId], references: [id])
-  Pincode           String?         @db.VarChar(255)
-  GSTNumber         String?         @db.VarChar(255)
-  PANNumber         String?         @db.VarChar(255)
-  contactPerson     String?         @db.VarChar(255)
-  phone1            String?         @db.VarChar(255)
-  phone2            String?         @db.VarChar(255)
-  email             String?         @db.VarChar(255)
-  accountHolderName String?         @db.VarChar(255)
-  bankName          String?         @db.VarChar(255)
-  branchName        String?         @db.VarChar(255)
-  bankAddress       String?         @db.VarChar(255)
+  state             StateMaster? @relation("vendorState", fields: [stateId], references: [id])
+  Pincode           String?      @db.VarChar(255)
+  GSTNumber         String?      @db.VarChar(255)
+  PANNumber         String?      @db.VarChar(255)
+  contactPerson     String?      @db.VarChar(255)
+  phone1            String?      @db.VarChar(255)
+  phone2            String?      @db.VarChar(255)
+  email             String?      @db.VarChar(255)
+  accountHolderName String?      @db.VarChar(255)
+  bankName          String?      @db.VarChar(255)
+  branchName        String?      @db.VarChar(255)
+  bankAddress       String?      @db.VarChar(255)
   branchPincode     Int?
   accountNumber     Int?
-  IFSCCode          String?         @db.VarChar(255)
-  TANNumber         String?         @db.VarChar(255)
-  servicesOffered   String?         @db.VarChar(255)
-  TDSPercentageSlab String?         @db.VarChar(255)
-  createdOn         DateTime        @default(now())
-  modifiedOn        DateTime?       @updatedAt
-  vendorIDs         VehicleMaster[] @relation("vendorID")
-  tripVendorCodes   TripDetails[]   @relation("tripVendorCode")
+  IFSCCode          String?      @db.VarChar(255)
+  TANNumber         String?      @db.VarChar(255)
+  servicesOffered   String?      @db.VarChar(255)
+  TDSPercentageSlab String?      @db.VarChar(255)
+  createdOn         DateTime     @default(now())
+  modifiedOn        DateTime?    @updatedAt
+
+  marketpeId                   String?
+  marketpeCreatedTime          DateTime?
+  marketpeAutoIdentifier       String?
+  marketpeAutoIdentifierNumber Int?
+  marketpeIdentifier           String?
+  marketpeName                 String?
+  marketpePhone                String?
+  marketpeType                 String?
+
+  vendorIDs       VehicleMaster[] @relation("vendorID")
+  tripVendorCodes TripDetails[]   @relation("tripVendorCode")
 }
 
 model VehicleMaster {
-  id                 Int           @id @default(autoincrement())
-  vehicleNum         String        @unique @db.VarChar(255)
-  vehicleType        String?       @db.VarChar(255)
-  vehicleCapacity    String?       @db.VarChar(255)
-  vehiclePermit      String?       @db.VarChar(255)
-  engineNumber       String?
-  chassisNumber      String?
-  insuranceValidDate DateTime?
-  ownerName          String?
-  ownerPANCardNumber String?
-  ownerAddress       String?
-  createdOn          DateTime      @default(now())
-  modifiedOn         DateTime?     @updatedAt
-  vendorId           Int?
-  vendor             VendorMaster? @relation("vendorID", fields: vendorId, references: [id])
-  tripVehicleIds     TripDetails[] @relation("tripVehicleId")
+  id                           Int           @id @default(autoincrement())
+  vehicleNum                   String?       @unique @db.VarChar(255)
+  vehicleType                  String?       @db.VarChar(255)
+  vehicleCapacity              String?       @db.VarChar(255)
+  vehiclePermit                String?       @db.VarChar(255)
+  engineNumber                 String?
+  chassisNumber                String?
+  insuranceValidDate           DateTime?
+  ownerName                    String?
+  ownerPANCardNumber           String?
+  ownerAddress                 String?
+  createdOn                    DateTime      @default(now())
+  modifiedOn                   DateTime?     @updatedAt
+  vendorId                     Int?
+  marketpeId                   String?
+  marketpeCreatedTime          DateTime?
+  marketpeAutoIdentifier       String?
+  marketpeAutoIdentifierNumber Int?
+  marketpeRegistrationNumber   String?
+  vendor                       VendorMaster? @relation("vendorID", fields: vendorId, references: [id])
+  tripVehicleIds               TripDetails[] @relation("tripVehicleId")
 }
 
 model DriverMaster {
-  id                Int             @id @default(autoincrement())
-  driverName        String          @db.VarChar(255)
-  phone1            String?         @db.VarChar(255)
-  licenseNumber     String?         @db.VarChar(255)
-  licenseExpiryDate DateTime?
-  placeOfIssueRTA   String?
-  PANNumber         String?         @db.VarChar(255)
-  aadharNumber      String?         @db.VarChar(255)
-  address1          String?         @db.VarChar(255)
-  cityId            Int?
-  city              CityMaster?     @relation("driverCity", fields: [cityId], references: [id])
-  stateId           Int?
-  state             StateMaster?    @relation("driverState", fields: [stateId], references: [id])
-  districtId        Int?
-  district          DistrictMaster? @relation("driverDistrict", fields: [districtId], references: [id])
-  Pincode           Int?
-  phone2            Int?
-  createdOn         DateTime?       @default(now())
-  modifiedOn        DateTime?       @updatedAt
-  tripDriverIds     TripDetails[]   @relation("tripDriverId")
+  id                           Int             @id @default(autoincrement())
+  driverName                   String?         @db.VarChar(255)
+  phone1                       String?         @db.VarChar(255)
+  licenseNumber                String?         @db.VarChar(255)
+  licenseExpiryDate            DateTime?
+  placeOfIssueRTA              String?
+  PANNumber                    String?         @db.VarChar(255)
+  aadharNumber                 String?         @db.VarChar(255)
+  address1                     String?         @db.VarChar(255)
+  cityId                       Int?
+  city                         CityMaster?     @relation("driverCity", fields: [cityId], references: [id])
+  stateId                      Int?
+  state                        StateMaster?    @relation("driverState", fields: [stateId], references: [id])
+  districtId                   Int?
+  district                     DistrictMaster? @relation("driverDistrict", fields: [districtId], references: [id])
+  Pincode                      Int?
+  phone2                       Int?
+  marketpeId                   String?
+  marketpeCreatedTime          DateTime?
+  marketpeAutoIdentifier       String?
+  marketpeAutoIdentifierNumber Int?
+  marketpeIdentifier           String?
+  marketpeName                 String?
+  marketpePhone                String?
+  marketpeType                 String?
+  createdOn                    DateTime?       @default(now())
+  modifiedOn                   DateTime?       @updatedAt
+  tripDriverIds                TripDetails[]   @relation("tripDriverId")
+}
+
+model VehicleOwner {
+  id                           Int       @id @default(autoincrement())
+  marketpeId                   String?
+  marketpeCreatedTime          DateTime?
+  marketpeAutoIdentifier       String?
+  marketpeAutoIdentifierNumber Int?
+  marketpeIdentifier           String?
+  marketpeName                 String?
+  marketpePhone                String?
+  marketpeType                 String?
+
+  createdOn  DateTime? @default(now())
+  modifiedOn DateTime? @updatedAt
 }
 
 //View Tables

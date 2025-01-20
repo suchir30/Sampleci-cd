@@ -11,6 +11,7 @@ import * as invoiceAWB from '../services/invoiceAWB';
 import { AWBCreateData } from '../types/awbTypes';
 import { HttpStatusCode } from '../types/apiTypes';
 import { MulterFile } from '../types/multerTypes';
+import { WebhookPayload } from '../types/webhookTypes'; 
 import { connectivityPlanData } from '../types/connectivityDataType';
 import { Inwarded, Outwarded } from '../types/outwardInwardTypes';
 import { buildNoContentResponse, buildObjectFetchResponse, throwValidationError } from '../utils/apiUtils';
@@ -31,6 +32,7 @@ import {
 import {UploadResult} from "../services/fileService.js";
 import {handleFileUpload, refreshSignedUrlIfNeeded, uploadPDF,triggerExternalService,fileUploadRes,podCreation} from "../services/fileService";
 import { float } from 'aws-sdk/clients/cloudfront';
+import { Datetime } from 'aws-sdk/clients/costoptimizationhub';
 
 export const getIndustryTypes = async (_req: Request, res: Response, next: NextFunction) => {
   try {
@@ -484,9 +486,9 @@ export const updateAWBLineItem = async (req: Request, res: Response, next: NextF
   try {
     const AWBId: number = req.body.AWBId
     const awbLineItems: AwbLineItem[] = req.body.awbLineItems;
-    if (!awbLineItems || awbLineItems.length == 0) {
-      throwValidationError([{ message: "Atleast One AWB Line Item Required" }]);
-    }
+    // if (!awbLineItems || awbLineItems.length == 0) {
+    //   throwValidationError([{ message: "Atleast One AWB Line Item Required" }]);
+    // }
     const updateAWBLineItemResult = await AWBService.updateAWBLineItem(AWBId, awbLineItems);
     if (updateAWBLineItemResult == "Invalid AWB") {
       throwValidationError([{ message: "Invalid AWB" }]);
@@ -1107,13 +1109,14 @@ export const updateTripLineItem = async (req: Request, res: Response, next: Next
     const tripLineItemId:number= req.body.tripLineItemId;
     const unloadLocationId:number=req.body.unloadLocationId
 
+    if (unloadLocationId === undefined || unloadLocationId === null) {
+      throwValidationError([{ message: "unloadLocationId is mandatory" }]);
+    }
+
     if (!tripLineItemId) {
       throwValidationError([{ message: "tripLineItemId is mandatory" }]);
     }
 
-    if (!unloadLocationId) {
-      throwValidationError([{ message: "unloadLocationId is mandatory" }]);
-    }
     const connectedDataRes = await tripService.updateTripLineItem(tripLineItemId,unloadLocationId);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(connectedDataRes));
   } catch (err) {
@@ -1229,5 +1232,53 @@ export const getShortArticles = async (req: Request, res: Response, next: NextFu
   } catch (err) {
     console.error('Error in getShortArticles', err);
     next(err);
+  }
+};
+
+export const handleWebhook = async (req: Request, res: Response) => {
+  const payload: WebhookPayload = req.body;
+  const err = payload.event;
+
+  try {
+    switch (payload.event) {
+      case 'trip/add':
+        // console.log(payload.data.trip)
+        await tripService.processTripAdd(payload.data.trip,payload.event,payload);
+        break;
+      case 'trip/update':
+        await tripService.processTripUpdate(payload.data.trip);
+        break;
+      case 'vendor/add':
+        await tripService.processVendorAdd(payload.data.vendor);
+        break;
+      case 'vendor/update':
+        await tripService.processVendorUpdate(payload.data.vendor);
+        break;
+      case 'vehicle/add':
+        await tripService.processVehicleAdd(payload.data.vehicle);
+        break;
+      case 'vehicle/update':
+        await tripService.processVehicleUpdate(payload.data.vehicle);
+        break;
+      default:
+        return res.status(400).json({
+          statusCode: 400,
+          message: `Invalid Event: ${err}`,
+        });
+    }
+
+    res.status(HttpStatusCode.OK).json(buildNoContentResponse(`Event ${payload.event} processed successfully`));
+  } catch (error: unknown) {
+    console.error('Error processing webhook:', error);
+    
+    // Check if the error is an instance of Error
+    if (error instanceof Error && error.message === 'Invalid vendor type') {
+      return res.status(400).json({
+        statusCode: 400,
+        message: `Invalid Vendor Type for ${err}: Please provide a valid vendor type.`,
+      });
+    }
+    
+    res.status(500).json({ error: 'Internal server error' });
   }
 };

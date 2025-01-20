@@ -1,6 +1,7 @@
 import { $Enums, DEPSStatus, } from '@prisma/client';
 import prisma from '../client';
 import moment from 'moment';
+import {incrementAlphanumericCode} from "../services/AWBService";
 import { ArticleLogsScanType,DEPSTypeList} from '@prisma/client'; // Importing enum from Prisma schema
 
 export const getTrips = async (tripStatus:any,latestCheckinHubId:number,latestCheckinType:string) => {
@@ -1004,6 +1005,7 @@ export const outwardAWBs = async (tripId: number, data: any, checkinHub: number)
     }
   }
   })
+  console.log(data,"Trip Outwarded Data ",tripId,"tripId")
   await tripLineItemScanCountReset(tripId)
   return result
 };
@@ -1062,7 +1064,7 @@ export const inwardAWBs = async (tripId: number, data: { AWBId: number, tripLine
       }));
     }
   });
-
+  console.log(data,"Trip Inwarded Data ",tripId,"tripId")
   await tripLineItemScanCountReset(tripId);
   return result;
 };
@@ -1149,6 +1151,8 @@ export const tripLineItemScanCountReset=async(tripId: number)=>{
 
 
 import { connectivityPlanData } from '../types/connectivityDataType';
+import { Datetime } from 'aws-sdk/clients/costoptimizationhub';
+
 async function fetchIds(connectivityPlan: connectivityPlanData) {
   const awb = await prisma.airWayBill.findFirst({ where: { AWBCode: connectivityPlan.AWBCode } });
   const trip = await prisma.tripDetails.findFirst({ where: { tripCode: connectivityPlan.tripCode } });
@@ -1173,6 +1177,42 @@ async function fetchIds(connectivityPlan: connectivityPlanData) {
     unloadLocationId: unloadLocation!.id,
   };
 }
+
+// async function fetchIds(connectivityPlan: connectivityPlanData) {
+//   const awb = await prisma.airWayBill.findFirst({ where: { AWBCode: connectivityPlan.AWBCode } });
+//   const trip = await prisma.tripDetails.findFirst({ where: { tripCode: connectivityPlan.tripCode } });
+//   const loadLocation = await prisma.branch.findFirst({ where: { branchCode: connectivityPlan.loadLocation } });
+  
+//   let unloadLocation
+//   if (connectivityPlan.unloadLocation === "Consignee") {
+//     console.log("into a consignee condition");
+//     unloadLocation = null;  // Set unloadLocation to null if Consignee
+//   } else {
+//     unloadLocation = await prisma.branch.findFirst({ where: { branchCode: connectivityPlan.unloadLocation } });
+//   }
+
+//   const errors: string[] = [];
+
+//   if (!awb) errors.push('Invalid AWBCode');
+//   if (!trip) errors.push('Invalid tripCode');
+//   if (!loadLocation) errors.push('Invalid loadLocation');
+  
+//   // Skip unloadLocation validation if it's "Consignee"
+//   if (connectivityPlan.unloadLocation !== "Consignee" && !unloadLocation) {
+//     errors.push('Invalid unloadLocation');
+//   }
+
+//   if (errors.length > 0) {
+//     return { errors };
+//   }
+
+//   return {
+//     AWBId: awb!.id,
+//     tripId: trip!.id,
+//     loadLocationId: loadLocation!.id,
+//     unloadLocationId: unloadLocation ? unloadLocation.id : null,  // Set unloadLocationId to null if Consignee
+//   };
+// }
 
 function removeDuplicates(connectivityPlans: connectivityPlanData[]) {
   const seen = new Set();
@@ -1380,3 +1420,485 @@ export const getShortArticles = async (
   console.log(articlesWithoutLogsAndDeps);
   return articlesWithoutLogsAndDeps;
 };
+
+// services/webhookService.ts
+import { TripObject, VendorObject, VehicleObject } from '../types/webhookTypes';
+
+export const processTripAdd = async (trip: TripObject,event:string,payload:object) => {
+  console.log('Processing trip add:', trip);
+
+  try {
+    // Fetch vendor, driver, vehicle, and vehicle owner data
+    const vendorRes = await prisma.vendorMaster.findFirst({
+      where: { marketpeId: trip?.broker?.id },
+      select: { id: true },
+    });
+    const driverMasterRes = await prisma.driverMaster.findFirst({
+      where: { marketpeId: trip?.driver?.id },
+      select: { id: true },
+    });
+    const vehicleMasterRes = await prisma.vehicleMaster.findFirst({
+      where: { marketpeId: trip?.vehicle?.id },
+      select: { id: true },
+    });
+    const vehicleOwnerRes = await prisma.vehicleOwner.findFirst({
+      where: { marketpeId: trip?.vehicleOwner?.id },
+      select: { id: true },
+    });
+
+    // Determine missing details
+    const missingDetails: string[] = [];
+    if (!vehicleMasterRes) missingDetails.push('vehicle');
+    if (!driverMasterRes) missingDetails.push('driver');
+    if (!vendorRes) missingDetails.push('vendor');
+    if (!vehicleOwnerRes) missingDetails.push('vehicle owner');
+
+    const remarks =
+      missingDetails.length > 0
+        ? `${missingDetails.join(', ')} details are missing`
+        : trip.comment;
+
+    // Generate trip code
+    const latestTrip = await prisma.tripDetails.findFirst({
+      orderBy: { id: 'desc' },
+      select: { id: true, tripCode: true },
+    });
+
+    let alphanumericPart = 'AAA';
+    let numericPart = 1;
+
+    if (latestTrip) {
+      const lastAlphaCode = latestTrip.tripCode.slice(-6, -3);
+      const lastNumCode = parseInt(latestTrip.tripCode.slice(-3));
+      alphanumericPart = lastAlphaCode;
+      numericPart = lastNumCode + 1;
+
+      if (numericPart >= 1000) {
+        alphanumericPart = incrementAlphanumericCode(alphanumericPart);
+        numericPart = 1;
+      }
+    }
+
+    const tripCodeGen = `${alphanumericPart}${String(numericPart).padStart(3, '0')}`;
+    console.log(tripCodeGen, "tripCodeGen");
+
+    // Create the trip
+    const newTrip = await prisma.tripDetails.create({
+      data: {
+        tripCode: "AAA006",
+        remarks: remarks,
+        vendorId: vendorRes?.id ?? null,
+        vehicleId: vehicleMasterRes?.id,
+        driverId: driverMasterRes?.id,
+        marketpeId: trip.id,
+        marketpeAutoIdentifier: trip.autoIdentifier,
+        marketpeCreatedTime: trip.createdTime,
+        marketpeAutoIdentifierNumber: trip.autoIdentifierNumber,
+        marketpeIdentifier: trip.identifier,
+        marketpeFromPlace: trip.fromPlace,
+        marketpeToPlace: trip.toPlace,
+        marketpeStops: trip.stops.join(','),
+        marketpeRemarks: trip.comment,
+        marketpeStatus: trip.tripStatus,
+        marketpeConsignorName: trip.consignorName,
+        marketpeConsigneeName: trip.consigneeName,
+        marketpeConsignorGst: trip.consignorGstin,
+        marketpeConsigneeGst: trip.consigneeGstin,
+        marketpeDistance: trip.distanceKm,
+        marketpeOdometerStartKm: trip.odometerStartKm,
+        marketpeOdometerEndKm: trip.odometerEndKm,
+        marketpeBookingFreight: trip.bookingFreight,
+      },
+    });
+
+    // Log success in ExternalRequestLog
+    await prisma.externalRequestLog.create({
+      data: {
+        vendorName: 'MarketPe',
+        requestType: event,
+        requestBody: JSON.stringify(payload),
+        status: 'Success',
+        errorMessage: null,
+        createdOn: new Date(),
+      },
+    });
+
+  } catch (error) {
+    console.error('Error processing trip:', error);
+
+    // Log the error in ExternalRequestLog
+    await prisma.externalRequestLog.create({
+      data: {
+        vendorName:"MarketPe",
+        requestType: event,
+        requestBody: JSON.stringify(payload),
+        status: 'Failure',
+        errorMessage: error instanceof Error ? error.message : 'Unknown error',
+        createdOn: new Date(),
+      },
+    });
+  }
+};
+
+// export const processTripAdd = async (trip: TripObject) => {
+//   console.log('Processing trip add:', trip);
+//   // Add trip logic here
+
+//   const vendorRes = await prisma.vendorMaster.findFirst({
+//     where: {
+//       marketpeId: trip?.broker?.id,
+//     },
+//     select:{
+//       id:true
+//     }
+//   });
+//   const driverMasterRes = await prisma.driverMaster.findFirst({
+//     where: {
+//       marketpeId: trip?.driver?.id,
+//     },
+//     select:{
+//       id:true
+//     }
+//   });
+//   const vehicleMasterRes = await prisma.vehicleMaster.findFirst({
+//     where: {
+//       marketpeId: trip?.vehicle?.id,
+//     },
+//     select:{
+//       id:true
+//     }
+//   });
+//   const vehicleOwnerRes = await prisma.vehicleOwner.findFirst({
+//     where: {
+//       marketpeId: trip?.vehicleOwner?.id,
+//     },
+//     select:{
+//       id:true
+//     }
+//   });
+//   const missingDetails: string[] = [];
+//   if (!vehicleMasterRes) missingDetails.push('vehicle');
+//   if (!driverMasterRes) missingDetails.push('driver');
+//   if (!vendorRes) missingDetails.push('vendor');
+//   if (!vehicleOwnerRes) missingDetails.push('vehicle owner');
+
+//   const remarks =
+//     missingDetails.length > 0
+//       ? `${missingDetails.join(', ')} details are missing`
+//       : trip.comment;
+
+//   const latestTrip = await prisma.tripDetails.findFirst({
+//     orderBy: { id: 'desc' },
+//     select: { id: true, tripCode: true }
+// });
+// console.log(latestTrip,"latestTripResponse")
+
+
+// // Set initial alphanumeric and numeric parts
+// let alphanumericPart = 'AAA';
+// let numericPart = 1;
+
+// if (latestTrip) {
+//     const lastAlphaCode = latestTrip.tripCode.slice(-6, -3); // Get the 'AAA' part
+//     const lastNumCode = parseInt(latestTrip.tripCode.slice(-3)); // Get the '000' part
+//     console.log(lastAlphaCode,"lastAlphaCode",lastNumCode,"lastAlphaCode")
+//     alphanumericPart = lastAlphaCode;
+//     numericPart = lastNumCode + 1;
+
+//     // If numeric part reaches 1000, reset it and increment alphanumeric part
+//     if (numericPart >= 1000) {
+//         alphanumericPart = incrementAlphanumericCode(alphanumericPart);
+//         numericPart = 1;
+//     }
+// }
+// const tripCodeGen = `${alphanumericPart}${String(numericPart).padStart(3, '0')}`;
+// console.log(tripCodeGen,"tripCodeGen");
+
+
+//   // Create the trip
+//   const newTrip = await prisma.tripDetails.create({
+//     data: {
+//       // tripCode: trip?.tripCode ?? "DefaultTripCode", // Ensure a unique code
+//       tripCode:tripCodeGen,
+//       remarks:remarks,
+//       vendorId: vendorRes?.id ?? null, // Use fetched vendor ID
+//       vehicleId: vehicleMasterRes?.id, // Use fetched vehicle ID
+//       driverId: driverMasterRes?.id, // Use fetched driver ID
+//       marketpeId:trip.id,
+//       marketpeAutoIdentifier:trip.autoIdentifier,
+//       marketpeCreatedTime:trip.createdTime,
+//       marketpeAutoIdentifierNumber:trip.autoIdentifierNumber,
+//       marketpeIdentifier:trip.identifier,
+//       marketpeFromPlace:trip.fromPlace,
+//       marketpeToPlace:trip.toPlace,
+//       marketpeStops:trip.stops.join(','),
+//       marketpeRemarks:trip.comment,
+//       marketpeStatus:trip.tripStatus,
+//       marketpeConsignorName:trip.consignorName,
+//       marketpeConsigneeName:trip.consigneeName,
+//       marketpeConsignorGst:trip.consignorGstin,
+//       marketpeConsigneeGst:trip.consigneeGstin,
+//       marketpeDistance:trip.distanceKm,
+//       marketpeOdometerStartKm:trip.odometerStartKm,
+//       marketpeOdometerEndKm:trip.odometerEndKm,
+//       marketpeBookingFreight:trip.bookingFreight,
+//     },
+//   });
+  
+
+
+// };
+
+
+export const processTripUpdate = async (trip: TripObject) => {
+  console.log('Processing trip update:', trip);
+
+  // Fetch related IDs
+  const vendorRes = await prisma.vendorMaster.findFirst({
+    where: {
+      marketpeId: trip?.broker?.id,
+    },
+    select: {
+      id: true,
+    },
+  });
+  const driverMasterRes = await prisma.driverMaster.findFirst({
+    where: {
+      marketpeId: trip?.driver?.id,
+    },
+    select: {
+      id: true,
+    },
+  });
+  const vehicleMasterRes = await prisma.vehicleMaster.findFirst({
+    where: {
+      marketpeId: trip?.vehicle?.id,
+    },
+    select: {
+      id: true,
+    },
+  });
+  const vehicleOwnerRes = await prisma.vehicleOwner.findFirst({
+    where: {
+      marketpeId: trip?.vehicleOwner?.id,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!vendorRes) console.error(`Broker with ID ${trip?.broker?.id} not found`);
+  if (!driverMasterRes) console.error(`Driver with ID ${trip?.driver?.id} not found`);
+  if (!vehicleMasterRes) console.error(`Vehicle Owner with ID ${trip?.vehicleOwner?.id} not found`);
+  if (!vehicleMasterRes) console.error(`Vehicle with ID ${trip?.vehicle?.id} not found`);
+
+  if (!vendorRes || !driverMasterRes || !vehicleMasterRes || !vehicleOwnerRes) {
+    console.error('One or more related records are missing.');
+    throw new Error('Required related records not found.');
+  }
+
+  // Update the trip
+ 
+  const updatedTrip = await prisma.tripDetails.updateMany({
+    where: {
+      marketpeId: trip.id, // Ensure trips are uniquely identified by marketpeId
+    },
+    data: {
+      tripCode: trip?.tripCode ?? "DefaultTripCode",
+      vendorId: vendorRes.id, // Update with fetched vendor ID
+      vehicleId: vehicleMasterRes.id, // Update with fetched vehicle ID
+      driverId: driverMasterRes.id, // Update with fetched driver ID
+      marketpeAutoIdentifier: trip.autoIdentifier,
+      marketpeCreatedTime: trip.createdTime,
+      marketpeAutoIdentifierNumber: trip.autoIdentifierNumber,
+      marketpeIdentifier: trip.identifier,
+      marketpeFromPlace: trip.fromPlace,
+      marketpeToPlace: trip.toPlace,
+      marketpeStops: trip.stops.join(','), // Ensure stops are stored as a string
+      marketpeRemarks: trip.comment,
+      marketpeStatus: trip.tripStatus,
+      marketpeConsignorName: trip.consignorName,
+      marketpeConsigneeName: trip.consigneeName,
+      marketpeConsignorGst: trip.consignorGstin,
+      marketpeConsigneeGst: trip.consigneeGstin,
+      marketpeDistance: trip.distanceKm,
+      marketpeOdometerStartKm: trip.odometerStartKm,
+      marketpeOdometerEndKm: trip.odometerEndKm,
+      marketpeBookingFreight: trip.bookingFreight,
+    },
+  });
+
+  console.log('Trip updated successfully:', updatedTrip);
+};
+
+export const processVendorAdd = async (vendor: VendorObject) => {
+  let savedVendor;
+  try {
+    
+    // Check the type of vendor and insert accordingly
+    if (vendor.type === 'BROKER' || vendor.type === 'VENDOR') {
+      console.log("in broker|vendor")
+      savedVendor = await prisma.vendorMaster.create({
+        data: {
+         
+          marketpeId: vendor.id,
+          marketpeCreatedTime: vendor.createdTime,
+          marketpeAutoIdentifier: vendor.autoIdentifier,
+          marketpeAutoIdentifierNumber: vendor.autoIdentifierNumber,
+          marketpeIdentifier: vendor.identifier,
+          marketpeName: vendor.name,
+          marketpePhone: vendor.phone,
+          marketpeType:vendor.type
+         
+        },
+      });
+    }
+     else if (vendor.type === 'DRIVER') {
+      // Insert into driverMaster for DRIVER type
+      console.log("in driver")
+      savedVendor = await prisma.driverMaster.create({
+        data: {
+        
+          marketpeId: vendor.id,
+          marketpeCreatedTime: vendor.createdTime,
+          marketpeAutoIdentifier: vendor.autoIdentifier,
+          marketpeAutoIdentifierNumber: vendor.autoIdentifierNumber,
+          marketpeIdentifier: vendor.identifier,
+          marketpeName: vendor.name,
+          marketpePhone: vendor.phone,
+          marketpeType:vendor.type
+        },
+      });
+    }
+    else if (vendor.type === 'VEHICLE_OWNER') {
+      // Insert into vehicleOwner for vehicleOwner type
+      console.log("in vehicle owner")
+      savedVendor = await prisma.vehicleOwner.create({
+        data: {
+        
+          marketpeId: vendor.id,
+          marketpeCreatedTime: vendor.createdTime,
+          marketpeAutoIdentifier: vendor.autoIdentifier,
+          marketpeAutoIdentifierNumber: vendor.autoIdentifierNumber,
+          marketpeIdentifier: vendor.identifier,
+          marketpeName: vendor.name,
+          marketpePhone: vendor.phone,
+          marketpeType:vendor.type
+        },
+      });
+    }
+    else {
+      throw new Error('Invalid vendor type');
+    }
+
+    return savedVendor;
+  } catch (error) {
+    throw error; // Re-throw the error for handling in the webhook handler
+  }
+};
+
+// // Vendor Master update logic
+ export const processVendorUpdate = async (vendor: VendorObject) => {
+  try {
+    let updatedVendor;
+
+    // Check the type of vendor and update accordingly
+    if (vendor.type === 'BROKER' || vendor.type === 'VENDOR') {
+      updatedVendor = await prisma.vendorMaster.updateMany({
+        where: { marketpeId: vendor.id },
+        data: {
+          marketpeCreatedTime: vendor.createdTime,
+          marketpeAutoIdentifier: vendor.autoIdentifier,
+          marketpeAutoIdentifierNumber: vendor.autoIdentifierNumber,
+          marketpeIdentifier: vendor.identifier,
+          marketpeName: vendor.name,
+          marketpePhone: vendor.phone,
+          marketpeType:vendor.type
+        },
+      });
+    }
+    else if (vendor.type === 'DRIVER') {
+      // Update the driverMaster for DRIVER type
+      updatedVendor = await prisma.driverMaster.updateMany({
+        where: { marketpeId: vendor.id },
+        data: {
+          marketpeCreatedTime: vendor.createdTime,
+          marketpeAutoIdentifier: vendor.autoIdentifier,
+          marketpeAutoIdentifierNumber: vendor.autoIdentifierNumber,
+          marketpeIdentifier: vendor.identifier,
+          marketpeName: vendor.name,
+          marketpePhone: vendor.phone,
+          marketpeType:vendor.type
+        },
+      });
+    }
+    else if (vendor.type === 'VEHICLE_OWNER') {
+      // Update the vehicleOwner for VEHICLE_OWNER type
+      updatedVendor = await prisma.vehicleOwner.updateMany({
+        where: { marketpeId: vendor.id },
+        data: {
+          marketpeCreatedTime: vendor.createdTime,
+          marketpeAutoIdentifier: vendor.autoIdentifier,
+          marketpeAutoIdentifierNumber: vendor.autoIdentifierNumber,
+          marketpeIdentifier: vendor.identifier,
+          marketpeName: vendor.name,
+          marketpePhone: vendor.phone,
+          marketpeType:vendor.type
+        },
+      });
+    }
+
+    return updatedVendor;
+  } catch (error) {
+    console.error('Error processing vendor update:', error);
+    throw new Error('Error updating vendor/driver: ' + (error instanceof Error ? error.message : 'Unknown error'));
+  }
+};
+
+
+export const processVehicleAdd = async (vehicle: VehicleObject) => {
+  try {
+      const newVehicle = {
+        marketpeRegistrationNumber: vehicle.registrationNumber,
+        marketpeId: vehicle.id,
+        marketpeCreatedTime: vehicle.createdTime,
+        marketpeAutoIdentifier: vehicle.autoIdentifier,
+        marketpeAutoIdentifierNumber: vehicle.autoIdentifierNumber,
+      };
+
+    const savedVehicle = await prisma.vehicleMaster.create({
+      data: newVehicle,
+    });
+
+    return savedVehicle;
+  } catch (error) {
+    console.error('Error processing vehicle addition:', error);
+    // Ensure error is handled properly since it could be 'unknown'
+    if (error instanceof Error) {
+      throw new Error(`Error adding vehicle: ${error.message}`);
+    } else {
+      throw new Error('Error adding vehicle: Unknown error occurred');
+    }
+  }
+};
+
+
+export const processVehicleUpdate = async (vehicle: VehicleObject) => {
+   console.log('Processing vehicle update in service:');
+
+  // Dynamically update the vehicle data based on what is provided in the input
+  const updateVehicle = await prisma.vehicleMaster.updateMany({
+    where: {
+      marketpeId: vehicle.id  // Use the vehicle's ID to find the existing vehicle
+    },
+    data: {
+      marketpeRegistrationNumber: vehicle.registrationNumber,  // Update the registration number
+      marketpeAutoIdentifier: vehicle.autoIdentifier,  // Update auto identifier
+      marketpeAutoIdentifierNumber: vehicle.autoIdentifierNumber, // Update auto identifier number
+      marketpeCreatedTime: vehicle.createdTime  // Update created time
+    }
+  });
+
+  return updateVehicle;
+};
+
