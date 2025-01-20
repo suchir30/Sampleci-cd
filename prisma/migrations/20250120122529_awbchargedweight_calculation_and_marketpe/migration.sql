@@ -102,7 +102,7 @@ CREATE TABLE `VehicleOwner` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `TripDetails` ADD CONSTRAINT `TripDetails_vendorId_fkey` FOREIGN KEY (`vendorId`) REFERENCES `V`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `TripDetails` ADD CONSTRAINT `TripDetails_vendorId_fkey` FOREIGN KEY (`vendorId`) REFERENCES `VendorMaster`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `TripDetails` ADD CONSTRAINT `TripDetails_vehicleId_fkey` FOREIGN KEY (`vehicleId`) REFERENCES `VehicleMaster`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
