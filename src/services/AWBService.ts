@@ -590,7 +590,8 @@ export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem
                       AWBCDM:null,
                       AWBChargedWeight:null,
                       rollupChargedWeight:null,
-                      AWBChargedWeightWithCeiling:null
+                      AWBChargedWeightWithCeiling:null,
+                      completeFlag:false
                     }
                 })
                 return
@@ -639,7 +640,8 @@ export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem
 
                     if(item.articlePresetChargedWeight!==undefined && item.articlePresetChargedWeight!==0 && item.articlePresetChargedWeight!==null){
                         console.log("calculatedLineItemChargedWeight - IF")
-                        calculatedLineItemChargedWeight=item.articlePresetChargedWeight
+                        calculatedLineItemChargedWeight=calculatedLineItemPresetChargedWeight
+                        // calculatedLineItemChargedWeight=item.articlePresetChargedWeight
                     }
                     else{
                         console.log("calculatedLineItemChargedWeight - else")
