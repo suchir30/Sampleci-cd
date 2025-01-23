@@ -6,5 +6,6 @@ export interface Inwarded {
 
   export interface Outwarded {
     AWBId: number;
-    unloadLocationId: any;
+    unloadLocationId:number;
+    unloadLocation:string;
   }

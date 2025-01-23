@@ -748,11 +748,11 @@ export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem
             }
 
             // rollupChargedWtCeiling logic
-            if(!CalAWBChargedWeight){
-                console.log("dongaaaaaaaaaaaaa")
-                return
-            }
-            const rollupChargedWtCeiling = Math.ceil(CalAWBChargedWeight / (factorRes?.chargedWeightCeilingFactor??0)) * (factorRes?.chargedWeightCeilingFactor??0);
+            // if(!CalAWBChargedWeight){
+            //     console.log("dongaaaaaaaaaaaaa")
+            //     return
+            // }
+            const rollupChargedWtCeiling = Math.ceil(CalAWBChargedWeight??0 / (factorRes?.chargedWeightCeilingFactor??0)) * (factorRes?.chargedWeightCeilingFactor??0);
                 //   console.log(`AWBChargedWeight: ${AWBChargedWeight}, rollupChargedWtCeiling: ${rollupChargedWtCeiling}`);
       
       
@@ -761,17 +761,17 @@ export const updateAWBLineItem = async (AWBId: number, awbLineItems: AwbLineItem
                     id: AWBId
                 },
                 data: {
-                    rollupArticleCnt: numOfArticles || 0,
-                    rollupWeight: lineItemWeight|| 0,
-                    rollupVolume: lineItemVolume || 0,
-                    rollupPresetChargedWeight:lineItemPresetChargedWeight||0,
-                    AWBWeight:lineItemWeight || 0,
+                    rollupArticleCnt: numOfArticles || null,
+                    rollupWeight: lineItemWeight|| null,
+                    rollupVolume: lineItemVolume || null,
+                    rollupPresetChargedWeight:lineItemPresetChargedWeight||null,
+                    AWBWeight:lineItemWeight || null,
                     AWBCDM: (lineItemVolume ?? 0) / 1000,
-                    AWBChargedWeight:CalAWBChargedWeight,
-                    rollupChargedWeight:CalAWBChargedWeight,
+                    AWBChargedWeight:CalAWBChargedWeight||null,
+                    rollupChargedWeight:CalAWBChargedWeight||null,
                     // AWBChargedWeight: AWBChargedWeight || 0,
                     // rollupChargedWeight:AWBChargedWeight || 0,
-                    AWBChargedWeightWithCeiling: rollupChargedWtCeiling || 0
+                    AWBChargedWeightWithCeiling: rollupChargedWtCeiling || null
                 }
             });
 

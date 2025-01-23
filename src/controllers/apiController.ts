@@ -785,9 +785,13 @@ export const getScannedArticles = async (req: Request, res: Response, next: Next
 export const outwardAWBs = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { tripId, data, checkinHub }: { tripId: number, data: Outwarded[], checkinHub: number } = req.body;
-    if (!data) {
+
+    // console.log('Request Body:', req.body);
+
+    if (!Array.isArray(data) || data.length === 0) {
       throwValidationError([{ message: "Data is mandatory" }]);
     }
+    
     if (!tripId) {
       throwValidationError([{ message: "tripId is mandatory" }]);
     }
@@ -806,9 +810,11 @@ export const inwardAWBs = async (req: Request, res: Response, next: NextFunction
   try {
     const { tripId, data, checkinHub }: { tripId: number, data: { AWBId: number, tripLineItemId: number }[], checkinHub: any } = req.body;
 
-    if (!data || data.length === 0) {
-      throwValidationError([{ message: "AWB data is mandatory" }]);
+   
+    if (!Array.isArray(data) || data.length === 0) {
+      throwValidationError([{ message: "Data is mandatory" }]);
     }
+    
     if (!tripId) {
       throwValidationError([{ message: "tripId is mandatory" }]);
     }
