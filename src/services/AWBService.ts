@@ -525,15 +525,11 @@ export const getUpdateAWB = async (AWBId: number) => {
               contractConsignorIds:{
                 select:{
                     consignorPricingModel:true,
-                    chargedWeightModel:true,
                     AWBLineItemLBHAccess:true,
                     AWBLineItemArticleWeightAccess:true,
                     AWBChargedWeightAccess:true,
                     AWBCDMAccess:true,
                     AWBWeightAccess:true,
-                    ContractType:true,
-                    actualWeightFactor:true,
-                    volumetricWeightFactor:true,
                     chargedWeightCeilingFactor:true
                 }
               }
