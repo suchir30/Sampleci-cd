@@ -901,7 +901,7 @@ export const outwardAWBs = async (tripId: number, data: any, checkinHub: number)
   const result = await prisma.$transaction(async (prisma) => {
   // Loop through each item in the data array
   for (const item of data) {
-    if (item.unloadLocationId === "CONSIGNEE") {  // unloadLocationId is "CONSIGNEE"
+    if (item.unloadLocation === "CONSIGNEE") {  // unloadLocationId is "CONSIGNEE"
       await prisma.tripLineItem.updateMany({
         where: {
           AWBId: item.AWBId,
@@ -1012,27 +1012,29 @@ export const outwardAWBs = async (tripId: number, data: any, checkinHub: number)
 
 export const inwardAWBs = async (tripId: number, data: { AWBId: number, tripLineItemId: number }[], checkinHub: any) => {
   const result = await prisma.$transaction(async (prisma) => {
-    if (checkinHub === "CONSIGNEE") {
-      await Promise.all(data.map(async (item) => {
-        await prisma.tripLineItem.update({
-          where: {
-            id: item.tripLineItemId,
-          },
-          data: {
-            status: "Closed"
-          }
-        });
+    // if (checkinHub === "CONSIGNEE") {
+    //   await Promise.all(data.map(async (item) => {
+    //     await prisma.tripLineItem.update({
+    //       where: {
+    //         id: item.tripLineItemId,
+    //       },
+    //       data: {
+    //         status: "Closed"
+    //       }
+    //     });
 
-        await prisma.airWayBill.update({
-          where: {
-            id: item.AWBId,
-          },
-          data: {
-            AWBStatus: "Delivered"
-          }
-        });
-      }));
-    } else {
+    //     await prisma.airWayBill.update({
+    //       where: {
+    //         id: item.AWBId,
+    //       },
+    //       data: {
+    //         AWBStatus: "Delivered"
+    //       }
+    //     });
+    //   }));
+    // } 
+    // else {
+    
       await Promise.all(data.map(async (item) => {
         await prisma.tripLineItem.update({
           where: {
@@ -1062,7 +1064,7 @@ export const inwardAWBs = async (tripId: number, data: { AWBId: number, tripLine
           }
         });
       }));
-    }
+//    }
   });
   console.log(data,"Trip Inwarded Data ",tripId,"tripId")
   await tripLineItemScanCountReset(tripId);

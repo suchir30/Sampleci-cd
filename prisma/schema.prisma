@@ -207,7 +207,7 @@ model Branch {
 
 model Consignor {
   consignorId               Int                  @id @default(autoincrement())
-  consignorCode             String?              @db.VarChar(255)
+  consignorCode             String               @db.VarChar(255)
   publicName                String               @db.VarChar(255)
   legalName                 String               @db.VarChar(255)
   industryTypeId            Int?
@@ -652,31 +652,9 @@ enum ContractConsignorType {
   SKU
 }
 
-enum chargedWeightModelType {
-  Actual
-  Volumetric
-  ActualVsVolumnetric
-  SKU
-}
-
 enum consignorPricingModelType {
   ChargedWeight
   BoxRate
-}
-
-enum ContractType {
-  FTL
-  PTL
-}
-
-enum PTlRateType {
-  RatePerKG
-  RatePerBox
-}
-
-enum chargeType {
-  withChargedWeightRange
-  withoutChargedWeightRange
 }
 
 enum accessList {
@@ -689,13 +667,10 @@ model Contract {
   id                               Int                        @id @default(autoincrement())
   consignorId                      Int
   consignor                        Consignor                  @relation("contractConsignorId", fields: [consignorId], references: [consignorId])
-  ContractType                     ContractType?
   consignorPricingModel            consignorPricingModelType?
-  chargedWeightModel               chargedWeightModelType?
   isActive                         Boolean?
   startDate                        DateTime?
   endDate                          DateTime?
-  PTlRateType                      PTlRateType?
   monthlyMinCommitVolume           Int?
   minimumAWBValue                  Float?                     @db.Float
   docketChargeValue                Float?                     @db.Float
@@ -704,8 +679,6 @@ model Contract {
   articleChargeMandatory           Float?                     @db.Float
   articleChargeMinAmount           Float?                     @db.Float
   articleChargeMaxAmount           Float?                     @db.Float
-  actualWeightFactor               Float?                     @db.Float
-  volumetricWeightFactor           Float?                     @db.Float
   chargedWeightFactor              Float?                     @db.Float
   chargedWeightCeilingFactor       Int?
   ODAChargedWeightRange            Boolean                    @default(false)
