@@ -936,6 +936,12 @@ export const getAwbPdfData = async (AWBId: number) => {
                     gstNumber: true,
                     address1: true,
                     address2: true,
+                    commodity:{
+                        select:{
+                            id:true,
+                            value:true
+                        }
+                    }
                 }
             },
             consignee: {
