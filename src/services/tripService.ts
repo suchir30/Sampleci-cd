@@ -1299,6 +1299,7 @@ export async function insertConnectivityPlan(connectivityPlans: connectivityPlan
 
 
 export const updateTripLineItem=async(tripLineItemId:number,unloadLocationId:number)=>{
+  
   await prisma.tripLineItem.update({
     where: {
       id: tripLineItemId},
@@ -1422,6 +1423,67 @@ export const getShortArticles = async (
   console.log(articlesWithoutLogsAndDeps);
   return articlesWithoutLogsAndDeps;
 };
+
+export const closeDeps = async (depsId: number) => {
+  // Fetch the DEPs details from the database
+  const checkDeps = await prisma.dEPS.findUnique({
+    where: {
+      id: depsId,
+    },
+  });
+  
+  // If DEPs does not exist, return an error message
+  if (!checkDeps) {
+    return "InvalidDeps";
+  }
+
+  // If DEPs are already closed, return "AlreadyClosed"
+  if (checkDeps.depsStatus === "Closed") {
+    return "AlreadyClosed";
+  }
+
+  // Define a mapping of DEPSType to corresponding Airway Bill field
+  const countFieldMap: { [key: string]: string } = {
+    "Excess": "rollupExcessCount",
+    "Shorts": "rollupShortCount",
+    "Damage": "rollupDamageCount",
+    "Pilferage":"rollupPilferageCount"
+  };
+
+  const countField = countFieldMap[checkDeps.DEPSType];
+
+  // If the DEPSType is not in the map, return an error
+  if (!countField) {
+    return "InvalidDEPSType";
+  }
+
+  // Decrement the corresponding count in the Airway Bill
+  await prisma.airWayBill.update({
+    where: {
+      id: checkDeps.AWBId,
+    },
+    data: {
+      [countField]: {
+        decrement: 1,
+      },
+    },
+  });
+
+  // Update DEPs status to "Closed"
+  await prisma.dEPS.update({
+    where: {
+      id: depsId,
+    },
+    data: {
+      depsStatus: "Closed",
+    },
+  });
+};
+
+
+
+
+
 
 // services/webhookService.ts
 import { TripObject, VendorObject, VehicleObject } from '../types/webhookTypes';

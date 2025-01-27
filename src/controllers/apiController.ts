@@ -1241,6 +1241,36 @@ export const getShortArticles = async (req: Request, res: Response, next: NextFu
   }
 };
 
+export const closeDeps = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const depsId: number = req.body.depsId;
+  
+    if (!depsId) {
+      throwValidationError([{ message: "depsId is mandatory" }]);
+    }
+    // Call the service function
+    const closeDepsResponse = await tripService.closeDeps(depsId);
+    // Build and send the response
+    if(closeDepsResponse=="InvalidDeps"){
+      res.status(HttpStatusCode.OK).json(buildNoContentResponse(`Invalid DEPS`));
+      return
+    }
+    else if(closeDepsResponse=="AlreadyClosed"){
+      res.status(HttpStatusCode.OK).json(buildNoContentResponse(`DEPS Already Closed`));
+      return
+    }
+    else if(closeDepsResponse=="InvalidDEPSType"){
+      res.status(HttpStatusCode.OK).json(buildNoContentResponse(`Invalid DEPSType`));
+      return
+    }
+    res.status(HttpStatusCode.OK).json(buildNoContentResponse(`DEPS Closed Successfully`));
+    
+  } catch (err) {
+    console.error('Error in closeDeps', err);
+    next(err);
+  }
+};
+
 export const handleWebhook = async (req: Request, res: Response) => {
   const payload: WebhookPayload = req.body;
   const err = payload.event;

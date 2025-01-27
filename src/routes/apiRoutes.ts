@@ -66,6 +66,8 @@ router.post('/deliverAWBCheck', apiController.deliverAWBCheck)
 router.post('/calculateShippingCosts', apiController.calculateShippingCosts)
 router.post('/getExcessDeps', apiController.getExcessDeps)
 router.post('/getShortArticles', apiController.getShortArticles)
+router.post('/closeDeps', apiController.closeDeps)
+
 
 router.post('/webhook',apiController.handleWebhook)
 
