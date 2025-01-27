@@ -516,7 +516,17 @@ export const getUpdateAWB = async (AWBId: number) => {
                 SKUCode:true,
                 boxType:true,
                 SKUId:true,
-                ratePerBox:true
+                ratePerBox:true,
+                lineItemVolume:true,
+                lineItemWeight:true,
+                articlePresetChargedWeight:true,
+                articleVolume:true,
+                articleVolumeFactor:true,
+                articleWeightFactor:true,
+                lineItemChargedWeight:true,
+                lineItemPresetChargedWeight:true,
+                minimumArticleVolume:true,
+                minimumArticleWeight:true
             }
           },
           consignor: {
