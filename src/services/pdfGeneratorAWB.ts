@@ -27,28 +27,6 @@ export const AWBPdfGenerator = async (pdfData: any): Promise<Buffer> => {
 
     console.log(pdfData);
 
-    const lineItems = (pdfData: any) => pdfData.AWBLineItems?.length
-      ? pdfData.AWBLineItems.map((item: any) => [
-        { text: item.numOfArticles || '', style: 'textSmallTable' },
-        { text: item.lineItemDescription || '', style: 'textSmallTable' },
-        { text: pdfData.invoiceValue || '', style: 'textSmallTable' },
-        { text: item.AWBWeight || '', style: 'textSmallTable' },
-        { text: pdfData.AWBChargedWeight || '', style: 'textSmallTable' },
-        { text: pdfData.ratePerKg || '', style: 'textSmallTable' },
-        { text: '', style: 'textSmallTable' },
-        { text: '', style: 'textSmallTable' },
-      ])
-      : [[
-        { text: '', style: 'textSmallTable' },
-        { text: '', style: 'textSmallTable' },
-        { text: '', style: 'textSmallTable' },
-        { text: '', style: 'textSmallTable' },
-        { text: '', style: 'textSmallTable' },
-        { text: '', style: 'textSmallTable' },
-        { text: '', style: 'textSmallTable' },
-        { text: '', style: 'textSmallTable' },
-      ]];
-
     const documentComponent = (pdfData: any, yPosition: number) => [
       {
         image: qrCodeImage,
@@ -116,7 +94,7 @@ export const AWBPdfGenerator = async (pdfData: any): Promise<Buffer> => {
                   { text: 'Consignor Name: ', style: 'textSmall' },
                   { text: `${pdfData.consignor.legalName || ''}\n\n`, style: 'textBold' },
                   { text: 'Consignor Address: ', style: 'textSmall' },
-                  { text: `${pdfData.consignor.address1 || ''}\n\n`, style: 'textBold' },
+                  { text: `${pdfData.consignor.address1.split(' ').slice(0, 10).join(' ') || ''}\n\n`, style: 'textBold' },
                   { text: 'Contact Number: ', style: 'textSmall' },
                   { text: `${pdfData.consignor.phone1 || ''}\n`, style: 'textBold' },
                   { text: 'GSTIN: ', style: 'textSmall' },
@@ -129,7 +107,7 @@ export const AWBPdfGenerator = async (pdfData: any): Promise<Buffer> => {
                   { text: 'Consignee Name: ', style: 'textSmall' },
                   { text: `${pdfData.consignee.consigneeName || ''}\n\n`, style: 'textBold' },
                   { text: 'Consignee Address: ', style: 'textSmall' },
-                  { text: `${pdfData.consignee.address1 || ''}\n\n`, style: 'textBold' },
+                  { text: `${pdfData.consignee.address1.split(' ').slice(0, 10).join(' ') || ''}\n\n`, style: 'textBold' },
                   { text: 'Contact Number: ', style: 'textSmall' },
                   { text: `${pdfData.consignee.phone1 || ''}\n\n`, style: 'textBold' },
                 ],
@@ -161,7 +139,16 @@ export const AWBPdfGenerator = async (pdfData: any): Promise<Buffer> => {
               { text: 'Charged', style: 'tableHeader', alignment: 'center' },
               {}, {}, {},
             ],
-            ...lineItems(pdfData),
+            [
+              { text: pdfData.numOfArticles || '', style: 'textSmallTable' },
+              { text: pdfData.consignor?.commodity?.value || '', style: 'textSmall' },
+              { text: pdfData.invoiceValue || '', style: 'textSmallTable' },
+              { text: pdfData.AWBWeight || '', style: 'textSmallTable' },
+              { text: pdfData.AWBChargedWeight || '', style: 'textSmallTable' },
+              { text: pdfData.ratePerKg || '', style: 'textSmallTable' },
+              { text: '', style: 'textSmallTable' },
+              { text: '', style: 'textSmallTable' },
+            ],
           ],
         },
       },
