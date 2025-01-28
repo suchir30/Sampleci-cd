@@ -150,7 +150,7 @@ async function createRecordsInModel(
     }
   }
 
-  const upsertPromises = upsertData.map(async (record, index) => {
+  /*const upsertPromises = upsertData.map(async (record, index) => {
     try {
       const upsertedRecord = await model.upsert({
         where: { [primaryKeyField]: record[primaryKeyField] },
@@ -188,8 +188,48 @@ async function createRecordsInModel(
       results.errorCount++;
     }
   });
+    await Promise.all(upsertPromises);
+*/
+  const updatePromises = upsertData.map(async (record, index) => {
+    try {
+      const updatedRecord = await model.update({
+        where: { [primaryKeyField]: record[primaryKeyField] },
+        data: record,
+      });
+  
+      const now = new Date();
+      const updatedAt = updatedRecord.updatedOn || updatedRecord.updatedAt; // Adjust field names as necessary
+      const updatedToday = updatedAt.toDateString() === now.toDateString();
+      const timeDiff = Math.abs(now.getTime() - updatedAt.getTime()) < 120000;
+      const message =
+        updatedToday && timeDiff ? `SUCCESS - Updated recently` : `SUCCESS - Updated`;
+  
+      results.records.push({
+        index,
+        data: {
+          ...record,
+          message: message,
+        },
+      });
+  
+      results.count++;
+    } catch (error: any) {
+      const errorLines = error.message.split("\n");
+      const lastLine = errorLines[errorLines.length - 1].trim();
+  
+      results.records.push({
+        index,
+        data: {
+          ...record,
+          message: `ERROR: ${lastLine || "An unknown error occurred"}`,
+        },
+      });
+      results.errorCount++;
+    }
+  });
+  
+  await Promise.all(updatePromises);
 
-  await Promise.all(upsertPromises);
 
   return results;
 }
