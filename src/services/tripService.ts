@@ -1299,6 +1299,7 @@ export async function insertConnectivityPlan(connectivityPlans: connectivityPlan
 
 
 export const updateTripLineItem=async(tripLineItemId:number,unloadLocationId:number)=>{
+  
   await prisma.tripLineItem.update({
     where: {
       id: tripLineItemId},
@@ -1422,6 +1423,122 @@ export const getShortArticles = async (
   console.log(articlesWithoutLogsAndDeps);
   return articlesWithoutLogsAndDeps;
 };
+
+// export const closeDeps = async (depsId: number) => {
+//   // Fetch the DEPs details from the database
+//   const checkDeps = await prisma.dEPS.findUnique({
+//     where: {
+//       id: depsId,
+//     },
+//   });
+  
+//   // If DEPs does not exist, return an error message
+//   if (!checkDeps) {
+//     return "InvalidDeps";
+//   }
+
+//   // If DEPs are already closed, return "AlreadyClosed"
+//   if (checkDeps.depsStatus === "Closed") {
+//     return "AlreadyClosed";
+//   }
+
+//   // Define a mapping of DEPSType to corresponding Airway Bill field
+//   const countFieldMap: { [key: string]: string } = {
+//     "Excess": "rollupExcessCount",
+//     "Shorts": "rollupShortCount",
+//     "Damage": "rollupDamageCount",
+//     "Pilferage":"rollupPilferageCount"
+//   };
+
+//   const countField = countFieldMap[checkDeps.DEPSType];
+
+//   // If the DEPSType is not in the map, return an error
+//   if (!countField) {
+//     return "InvalidDEPSType";
+//   }
+
+//   // Decrement the corresponding count in the Airway Bill
+//   await prisma.airWayBill.update({
+//     where: {
+//       id: checkDeps.AWBId,
+//     },
+//     data: {
+//       [countField]: {
+//         decrement: 1,
+//       },
+//     },
+//   });
+
+//   // Update DEPs status to "Closed"
+//   await prisma.dEPS.update({
+//     where: {
+//       id: depsId,
+//     },
+//     data: {
+//       depsStatus: "Closed",
+//     },
+//   });
+// };
+
+
+export const closeDeps = async (depsIds: number[]) => {
+  const results: Array<{ depsId: number; status: string }> = [];
+
+  for (const depsId of depsIds) {
+    try {
+      const checkDeps = await prisma.dEPS.findUnique({ where: { id: depsId } });
+
+      if (!checkDeps) {
+        results.push({ depsId, status: "InvalidDeps" });
+        continue;
+      }
+
+      if (checkDeps.depsStatus === "Closed") {
+        results.push({ depsId, status: "AlreadyClosed" });
+        continue;
+      }
+
+      // Map DEPSType to AirWayBill field
+      const countFieldMap: { [key: string]: string } = {
+        "Excess": "rollupExcessCount",
+        "Shorts": "rollupShortCount",
+        "Damage": "rollupDamageCount",
+        "Pilferage": "rollupPilferageCount",
+      };
+
+      const countField = countFieldMap[checkDeps.DEPSType];
+
+      if (!countField) {
+        results.push({ depsId, status: "InvalidDEPSType" });
+        continue;
+      }
+
+      // Update the Airway Bill count
+      await prisma.airWayBill.update({
+        where: { id: checkDeps.AWBId },
+        data: { [countField]: { decrement: 1 } },
+      });
+
+      // Close the DEPs
+      await prisma.dEPS.update({
+        where: { id: depsId },
+        data: { depsStatus: "Closed" },
+      });
+
+      results.push({ depsId, status: "Closed Successfully" });
+    } catch (error) {
+      console.error(`Error processing depsId ${depsId}:`, error);
+      results.push({ depsId, status: "Error Closing DEPS" });
+    }
+  }
+
+  return results;
+};
+
+
+
+
+
 
 // services/webhookService.ts
 import { TripObject, VendorObject, VehicleObject } from '../types/webhookTypes';

@@ -1241,6 +1241,25 @@ export const getShortArticles = async (req: Request, res: Response, next: NextFu
   }
 };
 
+export const closeDeps = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const depsIds: number[] = req.body.depsIds;
+
+    if (!depsIds || !depsIds.length) {
+      throwValidationError([{ message: "depsIds array is mandatory" }]);
+    }
+
+    const closeDepsResponse = await tripService.closeDeps(depsIds);
+
+    res.status(HttpStatusCode.OK).json(
+      buildObjectFetchResponse(closeDepsResponse, "Operation Completed"));
+  } catch (err) {
+    console.error("Error in closeDeps", err);
+    next(err);
+  }
+};
+
+
 export const handleWebhook = async (req: Request, res: Response) => {
   const payload: WebhookPayload = req.body;
   const err = payload.event;
