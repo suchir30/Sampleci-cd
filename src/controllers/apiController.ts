@@ -503,6 +503,19 @@ export const addAWBLineItems = async (req: Request, res: Response, next: NextFun
   }
 }
 
+export const calculateChargedWeight = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const AWBId: number = req.body.AWBId
+ 
+    const updateAWBLineItemResult = await AWBService.calculateChargedWeight(AWBId);
+   
+    res.status(HttpStatusCode.OK).json(buildNoContentResponse("Charged Weight Calculated Successfully"));
+  } catch (err) {
+    console.error('Error updateAWB', err);
+    next(err)
+  }
+}
+
 export const getTrips = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const tripStatus: string = req.body.tripStatus;

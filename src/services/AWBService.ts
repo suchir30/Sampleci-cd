@@ -689,11 +689,12 @@ export const addAWBLineItems = async (AWBId: number, awbLineItems: AwbLineItem[]
 
             await Promise.all(createPromises);    
         }
-
         });
-         // Calculate Charged Weight and Update AirWayBill
-        await calculateChargedWeight(AWBId);
-        await checkAWBComplete(AWBId)
+
+        if (awbLineItems.length > 0) {
+            await calculateChargedWeight(AWBId);
+           
+        }
         return result;
     } catch (error) {
         console.error("Error in updateAWBLineItem", error);
@@ -757,7 +758,9 @@ export const calculateChargedWeight = async (AWBId: number) => {
             AWBChargedWeightWithCeiling: rollupChargedWtCeiling || null
         }
     });
+    await checkAWBComplete(AWBId);
 };
+
 export const updateAWB = async (AWBId: number,consigneeId: number, appointmentDate: Date | undefined,invoiceNumber: string,invoiceValue: number,ewayBillNumber: string,AWBCDM:any,AWBChargedWeight:float,AWBWeight:float): Promise<string | boolean> => {
     try {
       const result = await prisma.$transaction(async (prisma) => {
@@ -798,6 +801,7 @@ export const updateAWB = async (AWBId: number,consigneeId: number, appointmentDa
 };
 
 export const checkAWBComplete = async (AWBId: number) => {
+    // console.log("enters intocheckAWBComplete")
     const AWBDetails = await prisma.airWayBill.findFirst({
         where: {
             id: AWBId,
@@ -845,7 +849,6 @@ export const checkAWBComplete = async (AWBId: number) => {
             isComplete = true;
         }
     }
-console.log(isComplete,"iscomplete")
     if (isComplete) {
         await prisma.airWayBill.update({
             where: { id: AWBId },
