@@ -482,14 +482,14 @@ export const updateAWB = async (req: Request, res: Response, next: NextFunction)
 
 
 
-export const updateAWBLineItem = async (req: Request, res: Response, next: NextFunction) => {
+export const addAWBLineItems = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const AWBId: number = req.body.AWBId
     const awbLineItems: AwbLineItem[] = req.body.awbLineItems;
     // if (!awbLineItems || awbLineItems.length == 0) {
     //   throwValidationError([{ message: "Atleast One AWB Line Item Required" }]);
     // }
-    const updateAWBLineItemResult = await AWBService.updateAWBLineItem(AWBId, awbLineItems);
+    const updateAWBLineItemResult = await AWBService.addAWBLineItems(AWBId, awbLineItems);
     if (updateAWBLineItemResult == "Invalid AWB") {
       throwValidationError([{ message: "Invalid AWB" }]);
     }

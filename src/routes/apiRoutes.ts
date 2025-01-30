@@ -40,7 +40,7 @@ router.post('/AWB/markAWBArticleAsDeleted', apiController.markAWBArticleAsDelete
 router.post('/AWB/addTripLineItems',apiController.assignedTriptoAWB)
 router.post('/AWB/getAWBDetails',apiController.getUpdateAWB)
 router.post('/AWB/updateAWB',apiController.updateAWB)
-router.post('/AWB/addAWBLineItems',apiController.updateAWBLineItem)
+router.post('/AWB/addAWBLineItems',apiController.addAWBLineItems)
 router.post('/getTrips',apiController.getTrips)
 router.post('/addTripCheckin',apiController.addTripCheckin)
 router.post('/getTripCheckin',apiController.getTripCheckin)
