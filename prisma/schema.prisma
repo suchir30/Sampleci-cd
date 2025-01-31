@@ -203,6 +203,7 @@ model Branch {
   consignorwareHouseIds    Consignor[]          @relation("consignorwareHouseId")
   loadLocationCodes        TripLineItem[]       @relation("loadLocationCode")
   depsLoadingHubIds        DEPS[]               @relation("depsLoadingHubId")
+  depsUnloadLocationIds      DEPS[]             @relation("depsUnloadLocationId")
 }
 
 model Consignor {
@@ -591,6 +592,8 @@ model DEPS {
   AwbArticle       AwbArticle          @relation("depsArticleId", fields: [articleId], references: [id])
   hubId            Int?
   loadingHubBranch Branch?             @relation("depsLoadingHubId", fields: [hubId], references: [id])
+  unloadLocationId Int?
+  unloadLocation   Branch?             @relation("depsUnloadLocationId", fields: [unloadLocationId], references: [id])             
   tripId           Int?
   trip             TripDetails?        @relation("depsTripRoute", fields: [tripId], references: [id])
   userId           Int?
@@ -777,7 +780,7 @@ model POD {
   signature           String?
   remarks             String?
   PODInvoiceNumber    String?
-  response            String?
+  response            String?     @db.VarChar(255)
   createdOn           DateTime    @default(now())
 }
 

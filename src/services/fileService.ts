@@ -337,7 +337,7 @@ export const podCreation = async (
         remarks: parsedData.Remarks || null,
         PODInvoiceNumber: parsedData.Invoice_Number,
         fileId: fileResult.fileId, // Include fileId here
-        response:"success"
+        response: JSON.stringify(parsedData)
       };
   
       return await prisma.pOD.create({
