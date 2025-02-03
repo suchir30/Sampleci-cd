@@ -5,3 +5,4 @@ logs
 uploads
 .adminjs
 .idea
+.DS_Store
