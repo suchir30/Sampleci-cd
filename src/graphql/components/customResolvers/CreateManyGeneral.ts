@@ -196,27 +196,20 @@ async function createRecordsInModel(
         where: { [primaryKeyField]: record[primaryKeyField] },
         data: record,
       });
-  
-      const now = new Date();
-      const updatedAt = updatedRecord.updatedOn || updatedRecord.updatedAt; // Adjust field names as necessary
-      const updatedToday = updatedAt.toDateString() === now.toDateString();
-      const timeDiff = Math.abs(now.getTime() - updatedAt.getTime()) < 120000;
-      const message =
-        updatedToday && timeDiff ? `SUCCESS - Updated recently` : `SUCCESS - Updated`;
-  
+
       results.records.push({
         index,
         data: {
           ...record,
-          message: message,
+          message: `SUCCESS - Updated`,
         },
       });
-  
+
       results.count++;
     } catch (error: any) {
       const errorLines = error.message.split("\n");
       const lastLine = errorLines[errorLines.length - 1].trim();
-  
+
       results.records.push({
         index,
         data: {
@@ -227,9 +220,8 @@ async function createRecordsInModel(
       results.errorCount++;
     }
   });
-  
-  await Promise.all(updatePromises);
 
+  await Promise.all(updatePromises);
 
   return results;
 }
