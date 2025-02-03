@@ -1324,52 +1324,71 @@ export const deliverAWBCheck=async(AWBCode:string)=>{
   }
 }
 
-export const getExcessDeps=async(tripId:number,checkinHub:number,scanTypeEnum:ArticleLogsScanType)=>{
-  let DEPSResponse=await prisma.dEPS.findMany({
-   where :{
-     tripId:tripId,
-     hubId:checkinHub,
-     scanType:scanTypeEnum,
-     DEPSType:"Excess",
-     depsStatus:"Open"
-   },
-   select:{
-    id:true,
-    DEPSType:true,
-    scanType:true,
-    AWBId:true,
-    depsStatus:true,
-    createdOn:true,
-    loadUser:{
-      select:{
-        id:true,
-        employeeId:true,
-        firstName:true,
-        lastName:true
-      }
+export const getExcessDeps = async (tripId: number, checkinHub: number, scanTypeEnum: ArticleLogsScanType) => {
+  // Build the where clause based on scanTypeEnum
+  const whereClause: any = {
+    DEPSType: "Excess",
+    depsStatus: "Open",
+  };
+
+  // Check if scanTypeEnum is 'Unload'
+  if (scanTypeEnum === 'Unload') {
+    whereClause.OR = [
+      { tripId: tripId, unloadLocationId: checkinHub },  // Condition for unloadLocationId
+      { tripId: tripId, hubId: checkinHub, scanType: scanTypeEnum },  // Condition for hubId and scanType="Unload"
+    ];
+  } else {
+    // Default where clause for other scanTypeEnum values
+    whereClause.tripId = tripId;
+    whereClause.hubId = checkinHub;
+    whereClause.scanType = scanTypeEnum;
+  }
+
+  // Execute the query with the constructed where clause
+  const DEPSResponse = await prisma.dEPS.findMany({
+    where: whereClause,
+    select: {
+      id: true,
+      DEPSType: true,
+      scanType: true,
+      AWBId: true,
+      depsStatus: true,
+      createdOn: true,
+      loadUser: {
+        select: {
+          id: true,
+          employeeId: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
+      loadingHubBranch: {
+        select: {
+          id: true,
+          branchCode: true,
+        },
+      },
+      unloadLocation: {
+        select: {
+          id: true,
+          branchCode: true,
+        },
+      },
+      AirWayBill: {
+        select: {
+          AWBCode: true,
+        },
+      },
+      AwbArticle: {
+        select: {
+          articleCode: true,
+        },
+      },
     },
-    loadingHubBranch:{
-      select:{
-        id:true,
-        branchCode:true
-      }
-    },
-    AirWayBill:{
-      select:{
-        AWBCode:true,
-      }
-     
-    },
-    AwbArticle:{
-      select:{
-        articleCode:true
-      }
-     
-    }
-   }
-  })
- return DEPSResponse
-}
+  });
+
+  return DEPSResponse;
+};
 
 export const getShortArticles = async (
   AWBIds: number[],
