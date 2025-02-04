@@ -8,6 +8,8 @@ import GraphQLJSON from "graphql-type-json";
 import { authorizeTableMutation, authorizeTableMutationData } from "../../auth";
 import { GraphQLError } from "graphql";
 import { CreateManyGeneralOutput } from "./CreateManyGeneral";
+import { AirWayBill } from "@prisma/client";
+import { calculateChargedWeight } from "../../../services/AWBService";
 
 @Resolver()
 export class ImportAwbLineItem {
@@ -57,10 +59,20 @@ async function createRecordsInModel(
   };
 
   let lastAWBCode: string | null = null;
+  const awbCodes: string[] = [];
+
+  for (const record of data) {
+    if (record.AWBCode) {
+      awbCodes.push(record.AWBCode);
+    }
+  }
+
+  const awbIdMap = await getAWBIDsFromCodes(awbCodes, prisma);
+  const awbIds = [...new Set([...awbIdMap.values()])];
 
   for (const [index, originalRecord] of data.entries()) {
     let { LBH, AWBCode, numOfArticles, ...otherFields } = originalRecord;
-    console.log(originalRecord);
+    //console.log(originalRecord);
 
     if (AWBCode) {
       lastAWBCode = AWBCode; // Update the last seen AWBCode
@@ -132,5 +144,57 @@ async function createRecordsInModel(
     }
   }
 
+  await processAWBIDs(awbIds);
+
   return results;
+}
+
+async function getAWBIDsFromCodes(
+  AWBCodes: string[],
+  prisma: any,
+): Promise<Map<string, number>> {
+  try {
+    const uniqueAWBCodes = [...new Set(AWBCodes)];
+
+    const awbRecords: Pick<AirWayBill, "id" | "AWBCode">[] =
+      await prisma.airWayBill.findMany({
+        where: {
+          AWBCode: {
+            in: uniqueAWBCodes,
+          },
+        },
+        select: {
+          id: true,
+          AWBCode: true,
+        },
+      });
+
+    const awbMap = new Map<string, number>();
+    awbRecords.forEach((record) => {
+      awbMap.set(record.AWBCode, record.id);
+    });
+
+    return awbMap;
+  } catch (error) {
+    console.error("Error fetching AWBIDs:", error);
+    throw new GraphQLError("Failed to fetch AWBIDs from AWBCodes");
+  }
+}
+
+async function processAWBIDs(awbIds: number[]): Promise<void> {
+  try {
+    console.log("Processing AWBIDs:", awbIds);
+
+    await Promise.all(
+      awbIds.map(async (awbId) => {
+        console.log("Processing AWBID:", awbId);
+        await calculateChargedWeight(awbId);
+      }),
+    );
+
+    console.log("All AWBIDs processed successfully.");
+  } catch (error) {
+    console.error("Error processing AWBIDs:", error);
+    throw new Error("Failed to process AWBIDs");
+  }
 }
