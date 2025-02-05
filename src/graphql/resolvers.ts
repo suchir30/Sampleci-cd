@@ -1,6 +1,10 @@
 import {
   // Crud Resolvers
   UserCrudResolver,
+  ApplicationCrudResolver,
+  ServiceCrudResolver,
+  ApplicationServiceLinkCrudResolver,
+  UserApplicationLinkCrudResolver,
   RoleCrudResolver,
   CRMObjectCrudResolver,
   CRMFieldCrudResolver,
@@ -42,6 +46,10 @@ import {
   ViewHubLoadFactorCrudResolver,
   // Relation resolvers
   UserRelationsResolver,
+  ApplicationRelationsResolver,
+  ServiceRelationsResolver,
+  ApplicationServiceLinkRelationsResolver,
+  UserApplicationLinkRelationsResolver,
   RoleRelationsResolver,
   CRMObjectRelationsResolver,
   CRMFieldRelationsResolver,
@@ -95,6 +103,10 @@ import { RoleWizard } from "./components/customResolvers/RoleWizard";
 
 const resolversEnhanceMap: ResolversEnhanceMap = {
   User: { _all: [Authorized()] },
+  Application: { _all: [Authorized()] },
+  Service: { _all: [Authorized()] },
+  ApplicationServiceLink: { _all: [Authorized()] },
+  UserApplicationLink: { _all: [Authorized()] },
   Role: { _all: [Authorized()] },
   Branch: { _all: [Authorized()] },
   CRMObject: { _all: [Authorized()] },
@@ -141,6 +153,10 @@ applyResolversEnhanceMap(resolversEnhanceMap);
 
 const modelsEnhanceMap: ModelsEnhanceMap = {
   User: { fields: { _all: [Authorized()] } },
+  Application: { fields: { _all: [Authorized()] } },
+  Service: { fields: { _all: [Authorized()] } },
+  ApplicationServiceLink: { fields: { _all: [Authorized()] } },
+  UserApplicationLink: { fields: { _all: [Authorized()] } },
   Role: { fields: { _all: [Authorized()] } },
   Branch: { fields: { _all: [Authorized()] } },
   CRMObject: { fields: { _all: [Authorized()] } },
@@ -184,6 +200,10 @@ applyModelsEnhanceMap(modelsEnhanceMap);
 
 export const generatedCrudResolvers: NonEmptyArray<Function> = [
   UserCrudResolver,
+  ApplicationCrudResolver,
+  ServiceCrudResolver,
+  ApplicationServiceLinkCrudResolver,
+  UserApplicationLinkCrudResolver,
   RoleCrudResolver,
   BranchCrudResolver,
   CRMObjectCrudResolver,
@@ -227,6 +247,10 @@ export const generatedCrudResolvers: NonEmptyArray<Function> = [
 
 export const generatedRelationResolvers: NonEmptyArray<Function> = [
   UserRelationsResolver,
+  ApplicationRelationsResolver,
+  ServiceRelationsResolver,
+  ApplicationServiceLinkRelationsResolver,
+  UserApplicationLinkRelationsResolver,
   RoleRelationsResolver,
   BranchRelationsResolver,
   CRMObjectRelationsResolver,
