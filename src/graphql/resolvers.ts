@@ -1,8 +1,8 @@
 import {
   // Crud Resolvers
   UserCrudResolver,
-  ApplicationCrudResolver,
-  ServiceCrudResolver,
+  AuthApplicationCrudResolver,
+  AuthServiceCrudResolver,
   ApplicationServiceLinkCrudResolver,
   UserApplicationLinkCrudResolver,
   RoleCrudResolver,
@@ -46,8 +46,8 @@ import {
   ViewHubLoadFactorCrudResolver,
   // Relation resolvers
   UserRelationsResolver,
-  ApplicationRelationsResolver,
-  ServiceRelationsResolver,
+  AuthApplicationRelationsResolver,
+  AuthServiceRelationsResolver,
   ApplicationServiceLinkRelationsResolver,
   UserApplicationLinkRelationsResolver,
   RoleRelationsResolver,
@@ -103,8 +103,8 @@ import { RoleWizard } from "./components/customResolvers/RoleWizard";
 
 const resolversEnhanceMap: ResolversEnhanceMap = {
   User: { _all: [Authorized()] },
-  Application: { _all: [Authorized()] },
-  Service: { _all: [Authorized()] },
+  AuthApplication: { _all: [Authorized()] },
+  AuthService: { _all: [Authorized()] },
   ApplicationServiceLink: { _all: [Authorized()] },
   UserApplicationLink: { _all: [Authorized()] },
   Role: { _all: [Authorized()] },
@@ -153,8 +153,8 @@ applyResolversEnhanceMap(resolversEnhanceMap);
 
 const modelsEnhanceMap: ModelsEnhanceMap = {
   User: { fields: { _all: [Authorized()] } },
-  Application: { fields: { _all: [Authorized()] } },
-  Service: { fields: { _all: [Authorized()] } },
+  AuthApplication: { fields: { _all: [Authorized()] } },
+  AuthService: { fields: { _all: [Authorized()] } },
   ApplicationServiceLink: { fields: { _all: [Authorized()] } },
   UserApplicationLink: { fields: { _all: [Authorized()] } },
   Role: { fields: { _all: [Authorized()] } },
@@ -200,8 +200,8 @@ applyModelsEnhanceMap(modelsEnhanceMap);
 
 export const generatedCrudResolvers: NonEmptyArray<Function> = [
   UserCrudResolver,
-  ApplicationCrudResolver,
-  ServiceCrudResolver,
+  AuthApplicationCrudResolver,
+  AuthServiceCrudResolver,
   ApplicationServiceLinkCrudResolver,
   UserApplicationLinkCrudResolver,
   RoleCrudResolver,
@@ -247,8 +247,8 @@ export const generatedCrudResolvers: NonEmptyArray<Function> = [
 
 export const generatedRelationResolvers: NonEmptyArray<Function> = [
   UserRelationsResolver,
-  ApplicationRelationsResolver,
-  ServiceRelationsResolver,
+  AuthApplicationRelationsResolver,
+  AuthServiceRelationsResolver,
   ApplicationServiceLinkRelationsResolver,
   UserApplicationLinkRelationsResolver,
   RoleRelationsResolver,

@@ -45,7 +45,7 @@ model User {
   ApplicationAccessList UserApplicationLink[] @relation("UserApplicationLink")
 }
 
-model Application {
+model AuthApplication {
   id              Int                      @id @default(autoincrement())
   applicationId   String                   @unique
   name            String
@@ -55,7 +55,7 @@ model Application {
   usersWithAccess UserApplicationLink[]    @relation("UserApplicationLink")
 }
 
-model Service {
+model AuthService {
   id                 Int                      @id @default(autoincrement())
   serviceId          String                   @unique
   endpoint           String
@@ -65,25 +65,25 @@ model Service {
 }
 
 model ApplicationServiceLink {
-  id            Int         @id @default(autoincrement())
+  id            Int             @id @default(autoincrement())
   applicationId Int
-  application   Application @relation("ApplicationServiceLink", fields: [applicationId], references: [id])
+  application   AuthApplication @relation("ApplicationServiceLink", fields: [applicationId], references: [id])
   serviceId     Int
-  service       Service     @relation("ApplicationServiceLink", fields: [serviceId], references: [id])
-  createdOn     DateTime    @default(now())
-  modifiedOn    DateTime?   @updatedAt
+  service       AuthService     @relation("ApplicationServiceLink", fields: [serviceId], references: [id])
+  createdOn     DateTime        @default(now())
+  modifiedOn    DateTime?       @updatedAt
 
   @@unique([applicationId, serviceId])
 }
 
 model UserApplicationLink {
-  id            Int         @id @default(autoincrement())
+  id            Int             @id @default(autoincrement())
   userId        Int
-  user          User        @relation("UserApplicationLink", fields: [userId], references: [id])
+  user          User            @relation("UserApplicationLink", fields: [userId], references: [id])
   applicationId Int
-  application   Application @relation("UserApplicationLink", fields: [applicationId], references: [id])
-  createdOn     DateTime    @default(now())
-  modifiedOn    DateTime?   @updatedAt
+  application   AuthApplication @relation("UserApplicationLink", fields: [applicationId], references: [id])
+  createdOn     DateTime        @default(now())
+  modifiedOn    DateTime?       @updatedAt
 
   @@unique([userId, applicationId])
 }

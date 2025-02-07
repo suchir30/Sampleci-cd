@@ -66,7 +66,7 @@ export const validateServiceAccess = async (
       ? await getEndpointsForUser(user.userId)
       : await getEndpointsForApplication(user.applicationId!);
 
-    // Log for debugging (consider using a proper logger)
+    // Log for debugging
     console.log({
       allowedEndpoints,
       requestedUrl: url,

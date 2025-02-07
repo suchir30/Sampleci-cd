@@ -1,24 +1,24 @@
 -- CreateTable
-CREATE TABLE `Application` (
+CREATE TABLE `AuthApplication` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `applicationId` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
     `description` VARCHAR(191) NULL,
     `createdOn` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
-    UNIQUE INDEX `Application_applicationId_key`(`applicationId`),
+    UNIQUE INDEX `AuthApplication_applicationId_key`(`applicationId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Service` (
+CREATE TABLE `AuthService` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `serviceId` VARCHAR(191) NOT NULL,
     `endpoint` VARCHAR(191) NOT NULL,
     `description` VARCHAR(191) NULL,
     `createdOn` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
-    UNIQUE INDEX `Service_serviceId_key`(`serviceId`),
+    UNIQUE INDEX `AuthService_serviceId_key`(`serviceId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -47,13 +47,13 @@ CREATE TABLE `UserApplicationLink` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `ApplicationServiceLink` ADD CONSTRAINT `ApplicationServiceLink_applicationId_fkey` FOREIGN KEY (`applicationId`) REFERENCES `Application`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `ApplicationServiceLink` ADD CONSTRAINT `ApplicationServiceLink_applicationId_fkey` FOREIGN KEY (`applicationId`) REFERENCES `AuthApplication`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `ApplicationServiceLink` ADD CONSTRAINT `ApplicationServiceLink_serviceId_fkey` FOREIGN KEY (`serviceId`) REFERENCES `Service`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `ApplicationServiceLink` ADD CONSTRAINT `ApplicationServiceLink_serviceId_fkey` FOREIGN KEY (`serviceId`) REFERENCES `AuthService`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `UserApplicationLink` ADD CONSTRAINT `UserApplicationLink_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `UserApplicationLink` ADD CONSTRAINT `UserApplicationLink_applicationId_fkey` FOREIGN KEY (`applicationId`) REFERENCES `Application`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `UserApplicationLink` ADD CONSTRAINT `UserApplicationLink_applicationId_fkey` FOREIGN KEY (`applicationId`) REFERENCES `AuthApplication`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
