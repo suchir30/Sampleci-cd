@@ -20,28 +20,72 @@ datasource db {
 }
 
 model User {
-  id                 Int             @id @default(autoincrement())
-  employeeId         String          @unique @db.VarChar(255)
-  hashedPassword     String          @db.VarChar(255)
-  firstName          String?         @db.VarChar(255)
-  lastName           String?         @db.VarChar(255)
-  email              String?         @db.VarChar(255)
-  phone1             String?         @db.VarChar(255)
-  phone2             String?         @db.VarChar(255)
-  title              String?         @db.VarChar(255)
-  roleId             Int?
-  role               Role?           @relation("userRole", fields: [roleId], references: [id])
-  isActiveUser       Boolean         @default(true)
-  address1           String?         @db.VarChar(255)
-  address2           String?         @db.VarChar(255)
-  cityId             Int?
-  city               CityMaster?     @relation("userCity", fields: [cityId], references: [id])
-  districtId         Int?
-  district           DistrictMaster? @relation("userDistrict", fields: [districtId], references: [id])
-  stateId            Int?
-  state              StateMaster?    @relation("userState", fields: [stateId], references: [id])
-  createdOn          DateTime        @default(now())
-  depsLoadingUserIds DEPS[]          @relation("depsLoadingUserId")
+  id                    Int                   @id @default(autoincrement())
+  employeeId            String                @unique @db.VarChar(255)
+  hashedPassword        String                @db.VarChar(255)
+  firstName             String?               @db.VarChar(255)
+  lastName              String?               @db.VarChar(255)
+  email                 String?               @db.VarChar(255)
+  phone1                String?               @db.VarChar(255)
+  phone2                String?               @db.VarChar(255)
+  title                 String?               @db.VarChar(255)
+  roleId                Int?
+  role                  Role?                 @relation("userRole", fields: [roleId], references: [id])
+  isActiveUser          Boolean               @default(true)
+  address1              String?               @db.VarChar(255)
+  address2              String?               @db.VarChar(255)
+  cityId                Int?
+  city                  CityMaster?           @relation("userCity", fields: [cityId], references: [id])
+  districtId            Int?
+  district              DistrictMaster?       @relation("userDistrict", fields: [districtId], references: [id])
+  stateId               Int?
+  state                 StateMaster?          @relation("userState", fields: [stateId], references: [id])
+  createdOn             DateTime              @default(now())
+  depsLoadingUserIds    DEPS[]                @relation("depsLoadingUserId")
+  ApplicationAccessList UserApplicationLink[] @relation("UserApplicationLink")
+}
+
+model AuthApplication {
+  id              Int                      @id @default(autoincrement())
+  applicationId   String                   @unique
+  name            String
+  description     String?
+  createdOn       DateTime                 @default(now())
+  services        ApplicationServiceLink[] @relation("ApplicationServiceLink")
+  usersWithAccess UserApplicationLink[]    @relation("UserApplicationLink")
+}
+
+model AuthService {
+  id                 Int                      @id @default(autoincrement())
+  serviceId          String                   @unique
+  endpoint           String
+  description        String?
+  createdOn          DateTime                 @default(now())
+  linkedApplications ApplicationServiceLink[] @relation("ApplicationServiceLink")
+}
+
+model ApplicationServiceLink {
+  id            Int             @id @default(autoincrement())
+  applicationId Int
+  application   AuthApplication @relation("ApplicationServiceLink", fields: [applicationId], references: [id])
+  serviceId     Int
+  service       AuthService     @relation("ApplicationServiceLink", fields: [serviceId], references: [id])
+  createdOn     DateTime        @default(now())
+  modifiedOn    DateTime?       @updatedAt
+
+  @@unique([applicationId, serviceId])
+}
+
+model UserApplicationLink {
+  id            Int             @id @default(autoincrement())
+  userId        Int
+  user          User            @relation("UserApplicationLink", fields: [userId], references: [id])
+  applicationId Int
+  application   AuthApplication @relation("UserApplicationLink", fields: [applicationId], references: [id])
+  createdOn     DateTime        @default(now())
+  modifiedOn    DateTime?       @updatedAt
+
+  @@unique([userId, applicationId])
 }
 
 model Role {
@@ -203,7 +247,7 @@ model Branch {
   consignorwareHouseIds    Consignor[]          @relation("consignorwareHouseId")
   loadLocationCodes        TripLineItem[]       @relation("loadLocationCode")
   depsLoadingHubIds        DEPS[]               @relation("depsLoadingHubId")
-  depsUnloadLocationIds      DEPS[]             @relation("depsUnloadLocationId")
+  depsUnloadLocationIds    DEPS[]               @relation("depsUnloadLocationId")
 }
 
 model Consignor {
@@ -338,7 +382,7 @@ model AirWayBill {
   AWBCDM                      Float?            @db.Float
   AWBChargedWeight            Float?            @db.Float
   AWBChargedWeightWithCeiling Float?            @db.Float
-  rollupPresetChargedWeight  Float?            @db.Float
+  rollupPresetChargedWeight   Float?            @db.Float
 }
 
 model AwbLineItem {
@@ -434,11 +478,11 @@ model TripDetails {
   costPerKg                    String?              @db.VarChar(255)
   localTripNumber              String?              @db.VarChar(255)
   vendorId                     Int?                 @db.Int
-  vendor                       VendorMaster?         @relation("tripVendorCode", fields: [vendorId], references: [id])
+  vendor                       VendorMaster?        @relation("tripVendorCode", fields: [vendorId], references: [id])
   vehicleId                    Int?
-  vehicle                      VehicleMaster?        @relation("tripVehicleId", fields: [vehicleId], references: [id])
+  vehicle                      VehicleMaster?       @relation("tripVehicleId", fields: [vehicleId], references: [id])
   driverId                     Int?
-  driver                       DriverMaster?         @relation("tripDriverId", fields: [driverId], references: [id])
+  driver                       DriverMaster?        @relation("tripDriverId", fields: [driverId], references: [id])
   FTLLocalNumber               String?              @db.VarChar(255)
   originBranchId               Int?
   originBranch                 Branch?              @relation("tripBranchId", fields: [originBranchId], references: [id])
@@ -593,7 +637,7 @@ model DEPS {
   hubId            Int?
   loadingHubBranch Branch?             @relation("depsLoadingHubId", fields: [hubId], references: [id])
   unloadLocationId Int?
-  unloadLocation   Branch?             @relation("depsUnloadLocationId", fields: [unloadLocationId], references: [id])             
+  unloadLocation   Branch?             @relation("depsUnloadLocationId", fields: [unloadLocationId], references: [id])
   tripId           Int?
   trip             TripDetails?        @relation("depsTripRoute", fields: [tripId], references: [id])
   userId           Int?
@@ -784,15 +828,15 @@ model POD {
   createdOn           DateTime    @default(now())
 }
 
-  model ExternalRequestLog{
-      id                  Int         @id @default(autoincrement())
-      vendorName          String
-      requestType         String
-      requestBody         String      @db.LongText
-      status              String
-      errorMessage        String?     @db.VarChar(2048)
-      createdOn           DateTime    @default(now())
-  }
+model ExternalRequestLog {
+  id           Int      @id @default(autoincrement())
+  vendorName   String
+  requestType  String
+  requestBody  String   @db.LongText
+  status       String
+  errorMessage String?  @db.VarChar(2048)
+  createdOn    DateTime @default(now())
+}
 
 //MASTER TABLES
 

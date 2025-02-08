@@ -1,38 +1,79 @@
-import { Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
-import { AuthRequest } from '../types/authTypes';
+import { Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
+import { AuthUserDetails, AuthRequest } from "../types/authTypes";
+import { validateServiceAccess } from "../services/authenticationService";
 
-const tokenAuth = (req: AuthRequest, res: Response, next: NextFunction): void => {
-    if (process.env.USE_TOKEN_AUTH === '0' || req.originalUrl.includes('/graphql')) {
-        next();
-        return;
+const tokenAuth = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void | Response> => {
+  try {
+    // Skip token auth if disabled or GraphQL endpoint
+    if (
+      process.env.USE_TOKEN_AUTH === "0" ||
+      req.originalUrl.includes("/graphql")
+    ) {
+      next();
+      return;
     }
-    let bearerHeader = req.headers['authorization'];
-    if (req.url.includes('/getFile')) {
-        const queryBearerHeader = req.query.token;
-        if (typeof queryBearerHeader === 'string') {
-            bearerHeader = queryBearerHeader;
+
+    // Get bearer token from header or query param
+    let bearerHeader = req.headers["authorization"];
+    if (req.url.includes("/getFile")) {
+      const queryBearerHeader = req.query.token;
+      if (typeof queryBearerHeader === "string") {
+        bearerHeader = queryBearerHeader;
+      }
+    }
+
+    if (!bearerHeader) {
+      return res.status(403).json({ status: 403, message: "Token Missing" });
+    }
+
+    // Extract token
+    const token = bearerHeader.startsWith("Bearer ")
+      ? bearerHeader.split(" ")[1]
+      : bearerHeader;
+
+    // Verify JWT token
+    const user = await new Promise((resolve, reject) => {
+      jwt.verify(token, process.env.JWT_SECRET as string, (err, decoded) => {
+        if (err) {
+          if (err.message === "jwt expired") {
+            reject({ status: 403, message: "Token Expired" });
+          } else {
+            reject({ status: 403, message: "Invalid Token" });
+          }
         }
-    }
-    if (typeof bearerHeader !== 'undefined') {
-        const [_, token] = bearerHeader.split(' ');
-        jwt.verify(token, process.env.JWT_SECRET as string, (err: any, user: any) => {
-            if (err) {
-                if (err.message == 'jwt expired') {
-                    return res.send({ Status: 403, message: "Token Expired" });
-                }
-                else {
-                    return res.send({ Status: 403, message: "Invalid Token" });
-                }
-            }
-            req.user = user; // Attach the decoded user to the request object
-            next(); // Call the next middleware
-        });
-    }
-    else {
-        res.send({ Status: 403, message: "Token Missing" });
+        resolve(decoded);
+      });
+    });
+
+    console.log(user, " ---userData");
+
+    // Validate service access
+    const hasAccess = await validateServiceAccess(
+      req.originalUrl,
+      user as AuthUserDetails,
+    );
+    if (!hasAccess) {
+      return res.status(403).json({
+        status: 403,
+        message: "Access Denied",
+      });
     }
 
+    // Attach user to request and continue
+    req.user = user as AuthUserDetails;
+    next();
+  } catch (error: any) {
+    console.error("Auth middleware error:", error);
+    return res.status(error.status || 500).json({
+      status: error.status || 500,
+      message: error.message || "Internal Server Error",
+    });
+  }
 };
 
-export {tokenAuth};
+export { tokenAuth };
