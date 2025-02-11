@@ -321,6 +321,9 @@ model Consignee {
   odaType                   String?           @db.VarChar(255)
   tatNumber                 Int?
   PINCodeId                 Int?
+
+  modernTradeConsignee      Boolean?  
+
   createdOn                 DateTime?         @default(now())
   modifiedOn                DateTime?         @updatedAt
   AWBs                      AirWayBill[]      @relation("AWBConsignee")
@@ -369,6 +372,9 @@ model AirWayBill {
   rollupDamageCount           Int?              @default(0)
   rollupPilferageCount        Int?              @default(0)
   rollupDepsCount             Int?
+
+  setDetentionCharges         Boolean           @default(false)
+
   createdOn                   DateTime?         @default(now())
   modifiedOn                  DateTime?         @updatedAt
   AWBLineItems                AwbLineItem[]
@@ -736,6 +742,19 @@ model Contract {
   AWBWeightAccess                  accessList                 @default(None)
   AWBChargedWeightAccess           accessList                 @default(None)
   lineItemChargedWeightCalculation Boolean                    @default(false)
+
+  docketCharge                     Float?                     @db.Float
+  FOVFixedValue                    Float?                     @db.Float
+  FOVPercentage                    Float?                     @db.Float
+  articleCharge                    Float?                     @db.Float
+  doorBookingCharge                Float?                     @db.Float
+  doorBookingWeight                Float?                     @db.Float
+  modernTradeFixedValue            Float?                     @db.Float
+  modernTradeRatePerKg             Float?                     @db.Float
+  loadUnloadCharge                 Float?                     @db.Float
+  detentionCharge                  Float?                     @db.Float
+  fuelSurchargePercentage          Float?                     @db.Float
+
   createdOn                        DateTime                   @default(now())
   modifiedOn                       DateTime?                  @updatedAt
   AWBContractTypes                 AirWayBill[]               @relation("AWBContractType")
@@ -786,14 +805,24 @@ model InternalInvoice {
   id                                Int                        @id @default(autoincrement())
   AWBId                             Int
   AirWayBill                        AirWayBill                 @relation("internalInvocieAWB", fields: [AWBId], references: [id])
-  consignorId                       Int
-  consignor                         Consignor                  @relation("internalInvocieConsignor", fields: [consignorId], references: [consignorId])
-  consigneeId                       Int
-  consignee                         Consignee                  @relation("internalInvocieConsignee", fields: [consigneeId], references: [consigneeId])
-  contractId                        Int
-  contract                          Contract                   @relation("internalInvocieContract", fields: [contractId], references: [id])
-  ODACharge                         Float                      @db.Float
-  baseCharge                        Float                      @db.Float
+  consignorId                       Int?
+  consignor                         Consignor?                  @relation("internalInvocieConsignor", fields: [consignorId], references: [consignorId])
+  consigneeId                       Int?
+  consignee                         Consignee?                  @relation("internalInvocieConsignee", fields: [consigneeId], references: [consigneeId])
+  contractId                        Int?
+  contract                          Contract?                   @relation("internalInvocieContract", fields: [contractId], references: [id])
+  ODACharge                         Float?                      @db.Float
+  baseCharge                        Float?                      @db.Float
+  
+  docketCharge                      Float?                     @db.Float
+  FOV                               Float?                     @db.Float
+  articleCharge                     Float?                     @db.Float
+  doorBookingCharge                 Float?                     @db.Float
+  modernTradeCharge                 Float?                     @db.Float
+  loadUnloadCharge                  Float?                     @db.Float
+  detentionCharge                   Float?                     @db.Float
+  fuelSurcharge                     Float?                     @db.Float
+  
   createdOn                         DateTime                   @default(now())
   modifiedOn                        DateTime?                  @updatedAt
   internalInvocieLIInternalInvoices InternalInvoiceLineItems[] @relation("internalInvocieLIInternalInvoice")

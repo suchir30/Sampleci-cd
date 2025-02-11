@@ -11,6 +11,7 @@ import { handleErrors } from './middleware/errorHandler';
 import logger from './scripts/logger'; // Ensure logger import
 import { buildGraphQLServer } from './graphql/server';
 import { GraphQLContext, buildGraphQLContext } from './graphql/context';
+import { startAllTasks } from './services/taskScheduler'; // Import the scheduler function
 
 const app = express();
 
@@ -32,6 +33,9 @@ app.use(logResponses); // Log responses
 // REST endpoints
 app.use('/auth', authRoutes, handleErrors);
 app.use('/api', tokenAuth, apiRoutes, handleErrors);
+
+// Start task schedulers
+startAllTasks();
 
 // GraphQL
 buildGraphQLServer()

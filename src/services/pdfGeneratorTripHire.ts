@@ -290,7 +290,8 @@ export const tripHirePdfGenerator = async (pdfData: any): Promise<Buffer> => {
                             {
                                 text: [
                                     { text: 'Driver License Exp. Date: ', style: 'textSmallLabel' },
-                                    { text: `${tripHireDetails?.driverlicenseExpiryDate.toISOString().substring(0, 10) || ''}`, style: 'textSmallValue' },
+                                    { text: `${tripHireDetails?.driverlicenseExpiryDate?.toISOString()?.substring(0, 10) || ''}`, style: 'textSmallValue' },
+
                                 ],
                             },
                             {
@@ -320,7 +321,7 @@ export const tripHirePdfGenerator = async (pdfData: any): Promise<Buffer> => {
                             {
                                 text: [
                                     { text: 'Insurance Valid Date: ', style: 'textSmallLabel' },
-                                    { text: `${tripHireDetails?.insuranceValidDate.toISOString().substring(0, 10) || ''}`, style: 'textSmallValue' },
+                                    { text: `${tripHireDetails?.insuranceValidDate?.toISOString()?.substring(0, 10) || ''}`, style: 'textSmallValue' },
                                 ],
                             },
                             {
