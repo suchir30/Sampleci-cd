@@ -248,6 +248,7 @@ model Branch {
   loadLocationCodes        TripLineItem[]       @relation("loadLocationCode")
   depsLoadingHubIds        DEPS[]               @relation("depsLoadingHubId")
   depsUnloadLocationIds    DEPS[]               @relation("depsUnloadLocationId")
+  AWBArticleTripLogsHubIds AwbArticleTripLogs[] @relation("AWBArticleTripLogsHubId")
 }
 
 model Consignor {
@@ -776,6 +777,8 @@ model AwbArticleTripLogs {
   tripLineItemId Int?
   TripLineItem   TripLineItem?       @relation("AwbArticleTripLogsTLIId", fields: [tripLineItemId], references: [id])
   scanType       ArticleLogsScanType
+  checkinHubId   Int?
+  checkinHub     Branch?             @relation("AWBArticleTripLogsHubId",fields:[checkinHubId],references:[id])
   createdOn      DateTime            @default(now())
 }
 
