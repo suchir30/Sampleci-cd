@@ -743,7 +743,8 @@ export const addAWBArticleLogs = async (
     const AWBArticleCode: string = req.body.AWBArticleCode;
     const scanType: string = req.body.scanType;
     const tripId: number = req.body.tripId;
-    const tripLineItemId: number = req.body.tripLineItemId;
+    const checkinHubId: number = req.body.checkinHubId;
+
 
     if (!scanType) {
       throwValidationError([{ message: "scanType is mandatory" }]);
@@ -754,7 +755,7 @@ export const addAWBArticleLogs = async (
     if (!AWBArticleCode) {
       throwValidationError([{ message: "AWBArticleCode is mandatory" }]);
     }
-    const addAWBArticleLogsRes = await tripService.addAWBArticleLogs(AWBArticleCode, scanType, tripId);
+    const addAWBArticleLogsRes = await tripService.addAWBArticleLogs(AWBArticleCode, scanType, tripId,checkinHubId);
     console.log(addAWBArticleLogsRes, "Service Response");
 
     if (addAWBArticleLogsRes === 'Duplicate') {

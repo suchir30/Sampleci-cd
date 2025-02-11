@@ -340,10 +340,25 @@ export const podCreation = async (
         fileId: fileResult.fileId, // Include fileId here
         response: JSON.stringify(parsedData)
       };
+      try {
+        const createdPod = await prisma.pOD.create({
+          data: pod,
+        });
   
-      return await prisma.pOD.create({
-        data: pod,
-      });
+        // Update ePOD column in AirWayBill model
+        if (AWBId?.id) {
+            console.log("triplineitemepod received updated")
+          await prisma.tripLineItem.updateMany({
+            where: { AWBId: AWBId.id },
+            data: { ePODReceived: true }, // Assuming ePOD stores the POD record ID
+          });
+          console.log(`Updated AirWayBill ePOD with POD ID: ${createdPod.id}`);
+        }
+  
+        return createdPod;
+      } catch (error) {
+        console.error("Error inserting POD or updating AirWayBill:", error);
+      }
     });
   
     try {
@@ -352,6 +367,22 @@ export const podCreation = async (
     } catch (error) {
       console.error("Error inserting PODs:", error);
     }
-  };
+};
+  
+  
+//       return await prisma.pOD.create({
+//         data: pod,
+//       });
+//     });
+  
+//     try {
+//       const insertedPods = await Promise.all(podData);
+      
+
+//       console.log("PODs successfully created:", insertedPods);
+//     } catch (error) {
+//       console.error("Error inserting PODs:", error);
+//     }
+// };
   
 

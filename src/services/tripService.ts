@@ -627,7 +627,7 @@ if (unloadLocationId) {
 };
 
 
-export const addAWBArticleLogs = async (AWBArticleCode: any, scanType: any, tripId: number): Promise<string | void> => {
+export const addAWBArticleLogs = async (AWBArticleCode: any, scanType: any, tripId: number,checkinHubId:number): Promise<string | void> => {
   const today = moment().toISOString();
   const result = await prisma.$transaction(async prisma => {
     const AWBArticleRes = await prisma.awbArticle.findFirst({
@@ -655,7 +655,8 @@ export const addAWBArticleLogs = async (AWBArticleCode: any, scanType: any, trip
           AWBArticleId: AWBArticleRes?.id,
           tripId: tripId,
           scanType: scanType,
-          tripLineItemId: tripLineItemRes?.id
+          tripLineItemId: tripLineItemRes?.id,
+          checkinHubId:checkinHubId
         }
       });
       console.log(AWBArticleTripLogsRes.id);
@@ -754,7 +755,8 @@ export const addDeps = async (DEPSData: any[]) => {
           await prisma.dEPS.updateMany({
             where: {
               articleId: awbArticle.id,
-              depsStatus: "Open" // Only update records that are currently "Open"
+              DEPSType:"Excess",
+              depsStatus: "Open"// Only update records that are currently "Open"
             },
             data: {
               depsStatus: "Closed"
