@@ -6,154 +6,6 @@ interface AWBLineItem {
     boxType: string | null;
     numOfArticles: number;
   }
-// export const calculateShippingCosts = async (AWBId: number) => {
-//   try {
-//     const AWB = await prisma.airWayBill.findUnique({
-//       where: { id: AWBId },
-//       select: {
-//         consignorId: true,
-//         consigneeId: true,
-//         AWBChargedWeight: true,
-//         toBranchId: true,
-//         AWBChargedWeightWithCeiling: true,
-//       },
-//     });
-//     console.log(AWB, "@@@@@@@@@@@@@@@@@@@@@@ AWB DATA");
-//     if (!AWB) return "NoAWB";
-//     if (!AWB.consigneeId) return "AWBInvalidConsigneeId"
-//      if (!AWB.AWBChargedWeightWithCeiling) return "AWBInvalidCeilingCW"
-//     const contractRes = await prisma.contract.findFirst({
-//       where: { consignorId: AWB.consignorId },
-//       select: {
-//         id: true,
-//         consignorPricingModel: true,
-//         baseChargeChargedWeightRange: true,
-//         ODAChargedWeightRange: true,
-//       },
-//     });
-//     if (!contractRes || !contractRes.baseChargeChargedWeightRange || !contractRes.ODAChargedWeightRange) return 'NoContract';
-//     const { baseChargeChargedWeightRange, consignorPricingModel, ODAChargedWeightRange } = contractRes;
-//     if (consignorPricingModel === "BoxRate") {
-     
-//       console.log("innnnnnnn box type");
-//       const awbLineItemRes = await prisma.awbLineItem.findMany({
-//         where: { AWBId },
-//         select: {
-//           id: true,
-//           numOfArticles: true,
-//           boxType: true,
-//           ratePerBox: true,
-//         },
-//       });
-//       if (awbLineItemRes.length === 0 || !AWB.AWBChargedWeightWithCeiling) return "noAWBLineItem";
-//       const baseChargeCalcRes = await baseChargeCalculation(AWBId, AWB.consignorId, AWB.toBranchId, AWB.AWBChargedWeightWithCeiling, baseChargeChargedWeightRange, awbLineItemRes, consignorPricingModel);
-//       if(typeof baseChargeCalcRes === 'object' && baseChargeCalcRes !== null){
-//         const { internalInvoiceData, totalBaseCharge } = baseChargeCalcRes;
-//         const ODACharges = await Promise.all(
-//             awbLineItemRes.map(async (lineItem) => {
-//               return {
-//                 AWBLineItemId: lineItem.id,
-//                 ODACharge: await odaChargeCalculation(AWBId, AWB.consignorId, AWB.consigneeId??0, AWB.AWBChargedWeightWithCeiling??0, ODAChargedWeightRange, [lineItem], consignorPricingModel)
-//               };
-//             })
-//           );
-//           console.log(ODACharges, "Individual ODA Charges");
-          
-//       // Perform delete and create in a single transaction
-//       await prisma.$transaction(async (tx) => {
-//         // Step 1: Delete related records in InternalInvoiceLineItems
-//         await tx.internalInvoiceLineItems.deleteMany({
-//           where: {
-//             internalInvoiceId: {
-//               in: (await tx.internalInvoice.findMany({
-//                 where: { AWBId },
-//                 select: { id: true },
-//               })).map(inv => inv.id),
-//             },
-//           },
-//         });
-//         // Step 2: Delete InternalInvoice(s)
-//         await tx.internalInvoice.deleteMany({
-//           where: { AWBId },
-//         });
-//         // Create a new internal invoice
-//         if(totalBaseCharge !== undefined && ODACharges !== undefined){
-//             const internalInvoice = await tx.internalInvoice.create({
-//                 data: {
-//                   AWBId,
-//                   baseCharge: totalBaseCharge,
-//                   consignorId: AWB.consignorId,
-//                   consigneeId: AWB.consigneeId??0,
-//                   contractId: contractRes.id,
-//                   ODACharge: ODACharges.reduce((sum, item) => sum + (item.ODACharge ?? 0), 0), // Total ODA Charge
-//                 },
-//               });
-//               console.log(internalInvoice.id, "primary key of internal invoice",ODACharges.reduce((sum, item) => sum + (item.ODACharge ?? 0), 0),);
-//               await tx.internalInvoiceLineItems.createMany({
-//                 data: internalInvoiceData.map(item => {
-//                   const ODAChargeItem = ODACharges.find(oda => oda.AWBLineItemId === item.AWBLineItemId);
-//                   return {
-//                     AWBLineItemId: item.AWBLineItemId,
-//                     internalInvoiceId: internalInvoice.id,
-//                     baseCharge: item.baseCharge,
-//                     ODACharge: ODAChargeItem ? ODAChargeItem.ODACharge?? 0:0, // Use calculated ODA Charge
-//                   };
-//                 }),
-//               });
-//         }
-      
-//       });
-
-//       }
-//     //   const { internalInvoiceData, totalBaseCharge } = await baseChargeCalculation(AWBId, AWB.consignorId, AWB.toBranchId, AWB.AWBchargedWeightWithCeiling, baseChargeChargedWeightRange, awbLineItemRes, consignorPricingModel);
-//       // Calculate ODA charges per line item
-     
-     
-//       return;
-//     } else {
-//       // Handle non-box rate calculations
-//       const baseChargeRes = await baseChargeCalculation(AWBId, AWB.consignorId, AWB.toBranchId, AWB.AWBChargedWeightWithCeiling, baseChargeChargedWeightRange, [], consignorPricingModel?? "");
-//       const ODAChargeRes = await odaChargeCalculation(AWBId, AWB.consignorId, AWB.consigneeId, AWB.AWBChargedWeightWithCeiling, ODAChargedWeightRange, [], consignorPricingModel??"");
-//       // Perform delete and create in a single transaction
-//       if(typeof baseChargeRes === 'number' && baseChargeRes !== null && baseChargeRes !== undefined && ODAChargeRes !== undefined){
-//         await prisma.$transaction(async (tx) => {
-//             // Step 1: Delete related records in InternalInvoiceLineItems
-//             await tx.internalInvoiceLineItems.deleteMany({
-//               where: {
-//                 internalInvoiceId: {
-//                   in: (await tx.internalInvoice.findMany({
-//                     where: { AWBId },
-//                     select: { id: true },
-//                   })).map(inv => inv.id),
-//                 },
-//               },
-//             });
-//             // Step 2: Delete InternalInvoice(s)
-//             await tx.internalInvoice.deleteMany({
-//               where: { AWBId },
-//             });
-//             // Create a new internal invoice
-//             const internalInvoice = await tx.internalInvoice.create({
-//               data: {
-//                 baseCharge: baseChargeRes,
-//                 ODACharge: ODAChargeRes,
-//                 AirWayBill: { connect: { id: AWBId } },
-//                 consignor: { connect: { consignorId: AWB.consignorId } },
-//                 consignee: { connect: { consigneeId: AWB.consigneeId??0} },
-//                 contract: { connect: { id: contractRes.id } },
-//               },
-//             });
-//             console.log(internalInvoice.id, "primary key of internal invoice", baseChargeRes, "baseChargeRes*********");
-//           });
-//       }
-     
-//       return;
-//     }
-//   } catch (error) {
-//     console.error("Error calculating shipping costs:", error);
-//     throw new Error("Failed to calculate shipping costs");
-//   }
-// };
 
 export const calculateShippingCosts = async (AWBIds: number[]) => {
   try {
@@ -168,6 +20,15 @@ export const calculateShippingCosts = async (AWBIds: number[]) => {
         AWBChargedWeight: true,
         toBranchId: true,
         AWBChargedWeightWithCeiling: true,
+        invoiceValue:true,
+        numOfArticles:true,
+        setDetentionCharges:true,
+        consignee:{
+          select:{
+            consigneeId:true,
+            modernTradeConsignee:true
+          }
+        }
       },
     });
     console.log(AWBs, "@@@@@@@@@@@@@@@@@@@@@@ AWB DATA");
@@ -182,8 +43,8 @@ export const calculateShippingCosts = async (AWBIds: number[]) => {
     
     // Loop through each AWB
     for (const AWB of AWBs) {
-      if (!AWB.consigneeId) return "AWBInvalidConsigneeId";
-      if (!AWB.AWBChargedWeightWithCeiling) return "AWBInvalidCeilingCW";
+      // if (!AWB.consigneeId) return "AWBInvalidConsigneeId";
+      // if (!AWB.AWBChargedWeightWithCeiling) return "AWBInvalidCeilingCW";
 
       const contractRes = await prisma.contract.findFirst({
         where: { consignorId: AWB.consignorId },
@@ -192,13 +53,37 @@ export const calculateShippingCosts = async (AWBIds: number[]) => {
           consignorPricingModel: true,
           baseChargeChargedWeightRange: true,
           ODAChargedWeightRange: true,
+          docketCharge:true,
+          FOVFixedValue:true,
+          FOVPercentage:true,
+          articleCharge:true,
+          doorBookingCharge:true,
+          doorBookingWeight:true,
+          modernTradeFixedValue:true,
+          modernTradeRatePerKg:true,
+          loadUnloadCharge:true,
+          detentionCharge:true,
+          fuelSurchargePercentage:true,
         },
       });
 
-      if (!contractRes || !contractRes.baseChargeChargedWeightRange || !contractRes.ODAChargedWeightRange) return 'NoContract';
+      // if (!contractRes || !contractRes.baseChargeChargedWeightRange || !contractRes.ODAChargedWeightRange) return 'NoContract';
 
-      const { baseChargeChargedWeightRange, consignorPricingModel, ODAChargedWeightRange } = contractRes;
+      const { baseChargeChargedWeightRange, consignorPricingModel, ODAChargedWeightRange,docketCharge,FOVFixedValue,FOVPercentage,articleCharge,modernTradeFixedValue,
+        modernTradeRatePerKg,loadUnloadCharge,detentionCharge,fuelSurchargePercentage
+       } = contractRes|| {};
+
       console.log(consignorPricingModel,"1pppppppppppppppppppppppppppppppp")
+      const FOVCalculation = Math.max(FOVFixedValue??0, (FOVPercentage??0 * (AWB.invoiceValue??0)));
+      
+      let modernTradeChargeCalculation: number | null = null;
+      if(AWB.consignee?.modernTradeConsignee==true){
+        modernTradeChargeCalculation=Math.max(modernTradeFixedValue??0, (modernTradeRatePerKg??0 * (AWB?.AWBChargedWeightWithCeiling??0)))
+      }      
+      let detentionChargeCalculation: number | null = null;
+      if(AWB.setDetentionCharges==true){
+        detentionChargeCalculation=detentionCharge??0
+      }
 
       if (consignorPricingModel === "BoxRate") {
         console.log("innnnnnnn box type");
@@ -213,9 +98,9 @@ export const calculateShippingCosts = async (AWBIds: number[]) => {
           },
         });
 
-        if (awbLineItemRes.length === 0 || !AWB.AWBChargedWeightWithCeiling) return "noAWBLineItem";
+        // if (awbLineItemRes.length === 0 || !AWB.AWBChargedWeightWithCeiling) return "noAWBLineItem";
 
-        const baseChargeCalcRes = await baseChargeCalculation(AWB.id, AWB.consignorId, AWB.toBranchId, AWB.AWBChargedWeightWithCeiling, baseChargeChargedWeightRange, awbLineItemRes, consignorPricingModel);
+        const baseChargeCalcRes = await baseChargeCalculation(AWB.id, AWB.consignorId, AWB.toBranchId, AWB.AWBChargedWeightWithCeiling??0, baseChargeChargedWeightRange??false, awbLineItemRes, consignorPricingModel);
         
         if (typeof baseChargeCalcRes === 'object' && baseChargeCalcRes !== null) {
           const { internalInvoiceData, totalBaseCharge } = baseChargeCalcRes;
@@ -224,7 +109,7 @@ export const calculateShippingCosts = async (AWBIds: number[]) => {
             awbLineItemRes.map(async (lineItem) => {
               return {
                 AWBLineItemId: lineItem.id,
-                ODACharge: await odaChargeCalculation(AWB.id, AWB.consignorId, AWB.consigneeId ?? 0, AWB.AWBChargedWeightWithCeiling ?? 0, ODAChargedWeightRange, [lineItem], consignorPricingModel),
+                ODACharge: await odaChargeCalculation(AWB.id, AWB.consignorId, AWB.consigneeId ?? 0, AWB.AWBChargedWeightWithCeiling ?? 0, ODAChargedWeightRange??false, [lineItem], consignorPricingModel),
               };
             })
           );
@@ -244,47 +129,84 @@ export const calculateShippingCosts = async (AWBIds: number[]) => {
               },
             });
 
-            // Step 2: Delete InternalInvoice(s)
-            await tx.internalInvoice.deleteMany({
-              where: { AWBId: AWB.id },
-            });
+            // // Step 2: Delete InternalInvoice(s)
+            // await tx.internalInvoice.deleteMany({
+            //   where: { AWBId: AWB.id },
+            // });
 
             // Create a new internal invoice
             console.log(totalBaseCharge,ODACharges,"PPPPPPPPPPPPPPPPPPPPPPPPPPPPPP")
             if (totalBaseCharge !== undefined && ODACharges !== undefined) {
-              const internalInvoice = await tx.internalInvoice.create({
-                data: {
-                  AWBId: AWB.id,
-                  baseCharge: totalBaseCharge,
-                  consignorId: AWB.consignorId,
-                  consigneeId: AWB.consigneeId ?? 0,
-                  contractId: contractRes.id,
-                  // ODACharge: typeof(item.ODACharge) === "string" ? parseFloat(item.ODACharge) : item.ODACharge,
-                  ODACharge: ODACharges.reduce((sum, item) => sum + (item.ODACharge ?? 0), 0), // Total ODA Charge
-                },
-              });
+                // Step 2: Check if an internal invoice exists
+                const existingInvoice = await tx.internalInvoice.findFirst({
+                  where: { AWBId: AWB.id },
+                });
 
-              // console.log(internalInvoice.id, "primary key of internal invoice", ODACharges.reduce((sum, item) => sum + (parseFloat(item.ODACharge ?? 0)), 0));
-
-              await tx.internalInvoiceLineItems.createMany({
-                data: internalInvoiceData.map(item => {
-                  const ODAChargeItem = ODACharges.find(oda => oda.AWBLineItemId === item.AWBLineItemId);
-                  return {
-                    AWBLineItemId: item.AWBLineItemId,
-                    internalInvoiceId: internalInvoice.id,
-                    baseCharge: item.baseCharge,
-                    ODACharge: ODAChargeItem ? ODAChargeItem.ODACharge ?? 0 : 0, // Use calculated ODA Charge
-                  };
-                }),
-              });
-            }
-          });
+                let internalInvoice:any;
+                if (existingInvoice) {
+                  // Update the existing internal invoice
+                  internalInvoice = await tx.internalInvoice.update({
+                    where: { id: existingInvoice.id },
+                    data: {
+                      baseCharge: totalBaseCharge,
+                      consignorId: AWB.consignorId,
+                      consigneeId: AWB.consigneeId ?? 0,
+                      contractId: contractRes?.id ?? null,
+                      ODACharge: ODACharges.reduce((sum, item) => sum + (item.ODACharge ?? 0), 0),
+                      docketCharge: docketCharge ?? null,
+                      FOV: FOVCalculation ?? null,
+                      articleCharge: AWB?.numOfArticles ?? null,
+                      modernTradeCharge: modernTradeChargeCalculation ?? null,
+                      loadUnloadCharge: AWB.numOfArticles * (loadUnloadCharge ?? 0),
+                      detentionCharge: detentionChargeCalculation ?? null,
+                      fuelSurcharge: (totalBaseCharge + ODACharges.reduce((sum, item) => sum + (item.ODACharge ?? 0), 0)) * (fuelSurchargePercentage ?? 0),
+                    },
+                  });
+            
+                  console.log(`Updated existing internal invoice with ID: ${internalInvoice.id}`);
+                } else {
+                  // Create a new internal invoice
+                  internalInvoice = await tx.internalInvoice.create({
+                    data: {
+                      AWBId: AWB.id,
+                      baseCharge: totalBaseCharge,
+                      consignorId: AWB.consignorId,
+                      consigneeId: AWB.consigneeId ?? 0,
+                      contractId: contractRes?.id ?? null,
+                      ODACharge: ODACharges.reduce((sum, item) => sum + (item.ODACharge ?? 0), 0),
+                      docketCharge: docketCharge ?? null,
+                      FOV: FOVCalculation ?? null,
+                      articleCharge: AWB?.numOfArticles ?? null,
+                      modernTradeCharge: modernTradeChargeCalculation ?? null,
+                      loadUnloadCharge: AWB.numOfArticles * (loadUnloadCharge ?? 0),
+                      detentionCharge: detentionChargeCalculation ?? null,
+                      fuelSurcharge: (totalBaseCharge + ODACharges.reduce((sum, item) => sum + (item.ODACharge ?? 0), 0)) * (fuelSurchargePercentage ?? 0),
+                    },
+                  });
+            
+                  console.log(`Created new internal invoice with ID: ${internalInvoice.id}`);
+                }
+            
+                // Create new InternalInvoiceLineItems
+                await tx.internalInvoiceLineItems.createMany({
+                  data: internalInvoiceData.map(item => {
+                    const ODAChargeItem = ODACharges.find(oda => oda.AWBLineItemId === item.AWBLineItemId);
+                    return {
+                      AWBLineItemId: item.AWBLineItemId,
+                      internalInvoiceId: internalInvoice.id,
+                      baseCharge: item.baseCharge,
+                      ODACharge: ODAChargeItem ? ODAChargeItem.ODACharge ?? 0 : 0,
+                    };
+                  }),
+                });
+              }
+            });
         }
       } 
       else {
         // Handle non-box rate calculations
-        const baseChargeRes = await baseChargeCalculation(AWB.id, AWB.consignorId, AWB.toBranchId, AWB.AWBChargedWeightWithCeiling, baseChargeChargedWeightRange, [], consignorPricingModel ?? "");
-        const ODAChargeRes = await odaChargeCalculation(AWB.id, AWB.consignorId, AWB.consigneeId, AWB.AWBChargedWeightWithCeiling, ODAChargedWeightRange, [], consignorPricingModel ?? "");
+        const baseChargeRes = await baseChargeCalculation(AWB.id, AWB.consignorId, AWB.toBranchId, AWB.AWBChargedWeightWithCeiling??0, baseChargeChargedWeightRange??false, [], consignorPricingModel ?? "");
+        const ODAChargeRes = await odaChargeCalculation(AWB.id, AWB.consignorId, AWB.consigneeId??0, AWB.AWBChargedWeightWithCeiling??0, ODAChargedWeightRange??false, [], consignorPricingModel ?? "");
 
         // Perform delete and create in a single transaction
         if (typeof baseChargeRes === 'number' && baseChargeRes !== null && baseChargeRes !== undefined && ODAChargeRes !== undefined) {
@@ -301,24 +223,57 @@ export const calculateShippingCosts = async (AWBIds: number[]) => {
               },
             });
 
-            // Step 2: Delete InternalInvoice(s)
-            await tx.internalInvoice.deleteMany({
+            // // Step 2: Delete InternalInvoice(s)
+            // await tx.internalInvoice.deleteMany({
+            //   where: { AWBId: AWB.id },
+            // });
+            const existingInvoice = await tx.internalInvoice.findFirst({
               where: { AWBId: AWB.id },
             });
-
-            // Create a new internal invoice
-            const internalInvoice = await tx.internalInvoice.create({
-              data: {
-                baseCharge: baseChargeRes,
-                ODACharge: ODAChargeRes,
-                AirWayBill: { connect: { id: AWB.id } },
-                consignor: { connect: { consignorId: AWB.consignorId } },
-                consignee: { connect: { consigneeId: AWB.consigneeId ?? 0 } },
-                contract: { connect: { id: contractRes.id } },
-              },
-            });
-
-            console.log(internalInvoice.id, "primary key of internal invoice", baseChargeRes, "baseChargeRes*********");
+        
+            if (existingInvoice) {
+              // Update the existing internal invoice
+              await tx.internalInvoice.update({
+                where: { id: existingInvoice.id },
+                data: {
+                  baseCharge: baseChargeRes,
+                  ODACharge: ODAChargeRes,
+                  consignor: AWB.consignorId ? { connect: { consignorId: AWB.consignorId } } : undefined,
+                  consignee: AWB.consigneeId ? { connect: { consigneeId: AWB.consigneeId } } : undefined,
+                  contract: contractRes?.id ? { connect: { id: contractRes.id } } : undefined,
+                  docketCharge: docketCharge ?? null,
+                  FOV: FOVCalculation ?? null,
+                  articleCharge: AWB?.numOfArticles ?? null,
+                  modernTradeCharge: modernTradeChargeCalculation ?? null,
+                  loadUnloadCharge: AWB.numOfArticles * (loadUnloadCharge ?? 0),
+                  detentionCharge: detentionChargeCalculation ?? null,
+                  fuelSurcharge: ((baseChargeRes ?? 0) + (ODAChargeRes ?? 0)) * (fuelSurchargePercentage ?? 0),
+                },
+              });
+        
+              console.log(`Updated existing internal invoice with ID: ${existingInvoice.id}`);
+            } else {
+              // Create a new internal invoice
+              const internalInvoice = await tx.internalInvoice.create({
+                data: {
+                  baseCharge: baseChargeRes,
+                  ODACharge: ODAChargeRes,
+                  AirWayBill: { connect: { id: AWB.id } },
+                  consignor: AWB.consignorId ? { connect: { consignorId: AWB.consignorId } } : undefined,
+                  consignee: AWB.consigneeId ? { connect: { consigneeId: AWB.consigneeId } } : undefined,
+                  contract: contractRes?.id ? { connect: { id: contractRes.id } } : undefined,
+                  docketCharge: docketCharge ?? null,
+                  FOV: FOVCalculation ?? null,
+                  articleCharge: AWB?.numOfArticles ?? null,
+                  modernTradeCharge: modernTradeChargeCalculation ?? null,
+                  loadUnloadCharge: AWB.numOfArticles * (loadUnloadCharge ?? 0),
+                  detentionCharge: detentionChargeCalculation ?? null,
+                  fuelSurcharge: ((baseChargeRes ?? 0) + (ODAChargeRes ?? 0)) * (fuelSurchargePercentage ?? 0),
+                },
+              });
+        
+              console.log(`Created new internal invoice with ID: ${internalInvoice.id}`);
+            }
           });
         }
       }
@@ -347,9 +302,10 @@ export const baseChargeCalculation = async (AWBId: number, consignorId: number, 
       chargedWeightLower: true,
     },
   });
-  if(consignorRateTableRes.length>0){
-    console.log(consignorRateTableRes, "consignorRateTableRes",consignorPricingModel,baseChargeChargedWeightRange);
+  // if(consignorRateTableRes.length>0){
+    // console.log(consignorRateTableRes, "consignorRateTableRes",consignorPricingModel,baseChargeChargedWeightRange);
   if (consignorPricingModel === "BoxRate") {
+
     // if (baseChargeChargedWeightRange === true) {
       console.log(awbLineItemRes, "awblineitems");
       let totalBaseCharge = 0;
@@ -365,6 +321,7 @@ export const baseChargeCalculation = async (AWBId: number, consignorId: number, 
       return { internalInvoiceData, totalBaseCharge };
     // }
   } else {
+    console.log("innnnnnnnnnnnnnnnnnnnnnnnn other than boxrate");
     if (baseChargeChargedWeightRange === true) {
       console.log("in withCharge otherthanboxRate:- baseCharge", consignorRateTableRes);
       applicableRange = consignorRateTableRes.find((range) => {
@@ -379,24 +336,30 @@ export const baseChargeCalculation = async (AWBId: number, consignorId: number, 
         return baseCharge;
       }
       else{
-        throw new Error('No applicable range found for the charged weight.');
+        return null;
+        // throw new Error('No applicable range found for the charged weight.');
       }
     }
     if (baseChargeChargedWeightRange === false) {
-        if(consignorRateTableRes[0].ratePerKg){
-            console.log("in withoutCharge otherthanboxRate:- baseCharge", AWBChargedWeightWithCeiling, consignorRateTableRes[0].ratePerKg);
-            baseCharge = AWBChargedWeightWithCeiling * consignorRateTableRes[0].ratePerKg;
+      console.log("innnnnnnnnnnnnnnnnnnnnnnnn false   basechargee");
+      // console.log(consignorRateTableRes[0].ratePerKg,"***************")
+      //   if(consignorRateTableRes[0].ratePerKg){
+          
+            // console.log("in withoutCharge otherthanboxRate:- baseCharge", AWBChargedWeightWithCeiling, consignorRateTableRes[0].ratePerKg);
+            baseCharge = AWBChargedWeightWithCeiling * (consignorRateTableRes[0]?.ratePerKg || 0);
+            console.log("innnnnnnnnnnnnnnnnnnnnnnnn false   ifcondition basecahrge ",baseCharge);
             return baseCharge;
-        }
-        else{
-            throw new Error('RatePerKg is missing in Consignor Model.');
-        }
+        // }
+        // else{
+        //   return null;
+        //     // throw new Error('RatePerKg is missing in Consignor Model.');
+        // }
     }
   }
-  }
-  else{
-    throw new Error('No consignorRateTable response.');
-  }
+  // }
+  // else{
+  //   throw new Error('No consignorRateTable response.');
+  // }
   
 };
 
@@ -416,12 +379,12 @@ export const odaChargeCalculation=async(AWBId: number, consignorId: number,consi
       distanceToBranchKms: true,
     },
   });
-  if(!consigneeResponse?.distanceToBranchKms)
-    {
-        throw new Error('DistanceToBranchKms in consignee not exists.');
-    }
-    let distance=consigneeResponse?.distanceToBranchKms
-    if (consignorPricingModel === "BoxRate") {
+  // if(!consigneeResponse?.distanceToBranchKms)
+  //   {
+  //       throw new Error('DistanceToBranchKms in consignee not exists.');
+  //   }
+    let distance=consigneeResponse?.distanceToBranchKms ?? 0
+    if (consignorPricingModel === "BoxRate") { 
     console.log(consignorPricingModel, "oda charge type boxtype innnn");
     // Log the distance for verification
     console.log("Distance to Branch (km):", distance);
@@ -440,15 +403,15 @@ export const odaChargeCalculation=async(AWBId: number, consignorId: number,consi
         
           const odaBoxRate = odaResponse.find((oda) => oda.ODABoxType === boxType);
     
-        if (odaBoxRate) {
+        // if (odaBoxRate) {
           // Check if the distance falls within the km range of the found ODA rate
-          const isDistanceApplicable = distance >= (odaBoxRate.kmStartingRange??0) && distance <= (odaBoxRate.kmEndingRange??0);
+          const isDistanceApplicable = distance >= (odaBoxRate?.kmStartingRange??0) && distance <= (odaBoxRate?.kmEndingRange??0);
       
-          if (isDistanceApplicable) {
+          // if (isDistanceApplicable) {
             console.log("Found applicable ODA Box Rate:", odaBoxRate);
       
-            const ratePerBox = odaBoxRate.ODARatePerBox ?? 0;
-            const minimumCharge = odaBoxRate.minimumCharge ?? 0;
+            const ratePerBox = odaBoxRate?.ODARatePerBox ?? 0;
+            const minimumCharge = odaBoxRate?.minimumCharge ?? 0;
       
             // Calculate charge for the current box type
             const chargeForBox = Math.max(minimumCharge, ratePerBox * numOfArticles);
@@ -456,12 +419,12 @@ export const odaChargeCalculation=async(AWBId: number, consignorId: number,consi
       
             // Log charge for the current box type
             console.log(`Charge for ${numOfArticles} articles of box type ${boxType}:`, chargeForBox);
-          } else {
-            console.log(`Box type ${boxType} is not applicable due to distance. Skipping charge calculation.`);
-          }
-        } else {
-          console.log(`No ODA Box Rate found for box type: ${boxType}`);
-        }
+          // } else {
+            // console.log(`Box type ${boxType} is not applicable due to distance. Skipping charge calculation.`);
+          // }
+        // } else {
+          // console.log(`No ODA Box Rate found for box type: ${boxType}`);
+        // }
       }
   
       ODACharge = totalODACharge;
@@ -489,6 +452,9 @@ export const odaChargeCalculation=async(AWBId: number, consignorId: number,consi
         console.log(minimumCharge, ODACalculation, ODACharge);
         return ODACharge
       }
+      else{
+        return null
+      }
     }
     if(ODAChargedWeightRange==false){
       applicableRange = odaResponse.find(range =>
@@ -503,7 +469,127 @@ export const odaChargeCalculation=async(AWBId: number, consignorId: number,consi
         console.log(minimumCharge, ODARatePerKg,AWBChargedWeightWithCeiling,ODACalculation);
         return ODACharge
       }
+      else{
+        return null
+      }
     }
     
   }
 }
+
+export const doorBookingCharge = async () => {
+  const yesterdayDate = moment().subtract(1, 'days').format('YYYY-MM-DD');
+  const yesterdayAWBs  = await prisma.airWayBill.findMany({
+    where: {
+      createdOn: {
+        gte: new Date(`${yesterdayDate}T00:00:00`),
+        lte: new Date(`${yesterdayDate}T23:59:59`),
+      },
+    },
+    select: { id: true,
+      consignorId:true,
+      AWBChargedWeightWithCeiling:true,
+     },
+  });
+
+  if (yesterdayAWBs.length === 0) {
+    console.log("No AWBs found for yesterday.");
+    return;
+  }
+  const awbIds = yesterdayAWBs .map(awb => awb.id);
+  // Count how many AWBs already exist in internalInvoice
+  const existingInternalInvoices = await prisma.internalInvoice.findMany({
+    where: {
+      AWBId: { in: awbIds },
+    },
+    select: { AWBId: true },
+  });
+
+  const existingAWBIds = existingInternalInvoices.map(inv => inv.AWBId);
+  
+  // Determine which AWBs are not in internalInvoice
+  const nonExistingAWBIds = awbIds.filter(id => !existingAWBIds.includes(id));
+
+  console.log("total AWB:",awbIds,
+    "existing AWB in internal:",existingAWBIds,
+    "non existing AWB:",nonExistingAWBIds
+  )
+
+  if (nonExistingAWBIds.length > 0) {
+    console.log('Calling calculateShippingCosts with:', nonExistingAWBIds);
+    await calculateShippingCosts(nonExistingAWBIds);
+    existingAWBIds.push(...nonExistingAWBIds);
+    console.log('Merged AWB list for processing:', existingAWBIds)
+  }
+  if (existingAWBIds.length > 0) {
+    console.log("ENTERS DOOR BOOKING CHARGE")
+    // Group AWBs by consignorId and sum AWBChargedWeightWithCeiling
+    const result = await prisma.airWayBill.groupBy({
+      by: ['consignorId'],
+      where: {
+        id: { in: existingAWBIds },
+      },
+      _sum: {
+        AWBChargedWeightWithCeiling: true,
+      },
+      _count: {
+        id: true,
+      },
+    });
+  
+    for (const entry of result) {
+      const consignorId = entry.consignorId;
+      const totalChargedWeight = entry._sum.AWBChargedWeightWithCeiling ?? 0;
+      const numberOfAWBs = entry._count.id;
+  
+      // Fetch doorBookingWeight and doorBookingCharge from contract
+      const contract = await prisma.contract.findFirst({
+        where: { consignorId },
+        select: {
+          doorBookingWeight: true,
+          doorBookingCharge: true,
+        },
+      });
+        const contractWeight = contract?.doorBookingWeight ?? 0;
+        const doorBookingCharge = contract?.doorBookingCharge ?? 0;
+  
+        if (totalChargedWeight < contractWeight) {
+          const perAWBCharge = doorBookingCharge / numberOfAWBs;
+  
+          console.log(
+            `Consignor ${consignorId}: Applying door booking charge of ${perAWBCharge.toFixed(2)} per AWB for ${numberOfAWBs} AWBs.`
+          );
+  
+          // Fetch AWBs for the consignor
+          const awbsForConsignor = await prisma.airWayBill.findMany({
+            where: {
+              id: { in: existingAWBIds },
+              consignorId,
+            },
+            select: { id: true },
+          });
+  
+          // Update doorBookingCharge for each AWB in internalInvoice
+          for (const awb of awbsForConsignor) {
+            await prisma.internalInvoice.updateMany({
+              where: { AWBId: awb.id },
+              data: { doorBookingCharge: perAWBCharge },
+            });
+  
+            console.log(
+              `Updated doorBookingCharge for AWB ${awb.id} with ${perAWBCharge.toFixed(
+                2
+              )}`
+            );
+          }
+        }
+       else {
+        console.log(`No contract found for consignor ${consignorId}`);
+      }
+    }
+  }
+  
+
+
+ return;
+};

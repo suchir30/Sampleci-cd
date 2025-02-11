@@ -320,6 +320,7 @@ export const podCreation = async (
           id: true,
         },
       });
+      console.log("AWB response:",AWBId,"awbcode:fileName",fileName)
   
       // Match the fileId for the current POD
       const fileResult = fileUploadResp[index];

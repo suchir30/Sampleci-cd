@@ -858,6 +858,8 @@ export const fileUpload = async (req: Request, res: Response, next: NextFunction
 
     const type = req.body.type || 'defaultScreen';
     const fileName = req.body.fileName;
+
+    console.log(fileName,"fileName from req.body")
    
     
     const uploadResults = await handleFileUpload(files.file, type);
@@ -1170,19 +1172,19 @@ export const calculateShippingCosts = async (req: Request, res: Response, next: 
     if (Result=="NoAWBs") {
       res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWB doesn't exists"));
     }
-    else if (Result=="NoContract") {
-      res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWB doesn't have required contract details"));
-    }
+    // else if (Result=="NoContract") {
+    //   res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWB doesn't have required contract details"));
+    // }
    
-    else if (Result=="noAWBLineItem") {
-      res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWB has BoxType contract but doesn't have AWBLineItems"));
-    }
-    else if (Result=="AWBInvalidConsigneeId") {
-      res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWB has Invalid ConsigneeID"));
-    }
-    else if (Result=="AWBInvalidCeilingCW") {
-      res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWB has Invalid ChargeWeightWithCeiling"));
-    }
+    // else if (Result=="noAWBLineItem") {
+    //   res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWB has BoxType contract but doesn't have AWBLineItems"));
+    // }
+    // else if (Result=="AWBInvalidConsigneeId") {
+    //   res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWB has Invalid ConsigneeID"));
+    // }
+    // else if (Result=="AWBInvalidCeilingCW") {
+    //   res.status(HttpStatusCode.OK).json(buildNoContentResponse("AWB has Invalid ChargeWeightWithCeiling"));
+    // }
     else{
       res.status(HttpStatusCode.OK).json(buildNoContentResponse("success"));
     }
