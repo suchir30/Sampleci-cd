@@ -1,20 +1,20 @@
 -- DropForeignKey
-ALTER TABLE `internalinvoice` DROP FOREIGN KEY `InternalInvoice_consigneeId_fkey`;
+ALTER TABLE `InternalInvoice` DROP FOREIGN KEY `InternalInvoice_consigneeId_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `internalinvoice` DROP FOREIGN KEY `InternalInvoice_consignorId_fkey`;
+ALTER TABLE `InternalInvoice` DROP FOREIGN KEY `InternalInvoice_consignorId_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `internalinvoice` DROP FOREIGN KEY `InternalInvoice_contractId_fkey`;
+ALTER TABLE `InternalInvoice` DROP FOREIGN KEY `InternalInvoice_contractId_fkey`;
 
 -- AlterTable
-ALTER TABLE `airwaybill` ADD COLUMN `setDetentionCharges` BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE `AirWayBill` ADD COLUMN `setDetentionCharges` BOOLEAN NOT NULL DEFAULT false;
 
 -- AlterTable
-ALTER TABLE `consignee` ADD COLUMN `modernTradeConsignee` BOOLEAN NULL;
+ALTER TABLE `Consignee` ADD COLUMN `modernTradeConsignee` BOOLEAN NULL;
 
 -- AlterTable
-ALTER TABLE `contract` ADD COLUMN `FOVFixedValue` FLOAT NULL,
+ALTER TABLE `Contract` ADD COLUMN `FOVFixedValue` FLOAT NULL,
     ADD COLUMN `FOVPercentage` FLOAT NULL,
     ADD COLUMN `articleCharge` FLOAT NULL,
     ADD COLUMN `detentionCharge` FLOAT NULL,
@@ -27,7 +27,7 @@ ALTER TABLE `contract` ADD COLUMN `FOVFixedValue` FLOAT NULL,
     ADD COLUMN `modernTradeRatePerKg` FLOAT NULL;
 
 -- AlterTable
-ALTER TABLE `internalinvoice` ADD COLUMN `FOV` FLOAT NULL,
+ALTER TABLE `InternalInvoice` ADD COLUMN `FOV` FLOAT NULL,
     ADD COLUMN `articleCharge` FLOAT NULL,
     ADD COLUMN `detentionCharge` FLOAT NULL,
     ADD COLUMN `docketCharge` FLOAT NULL,
