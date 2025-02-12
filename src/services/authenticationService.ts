@@ -1,5 +1,6 @@
 import prisma from "../client";
 import { AuthUserDetails } from "../types/authTypes";
+import jwt from "jsonwebtoken";
 
 const getEndpointsForUser = async (userId: number) => {
   const userAccess = await prisma.userApplicationLink.findMany({
@@ -79,3 +80,31 @@ export const validateServiceAccess = async (
     return false;
   }
 };
+
+export function generateApplicationToken(
+  applicationId: number,
+  expirationDays: number,
+): string {
+  if (!process.env.JWT_SECRET) {
+    throw new Error("JWT_SECRET is not set in the environment");
+  }
+
+  if (!applicationId) {
+    throw new Error("Application ID must be provided.");
+  }
+
+  // Calculate expiration time
+  const expirationTime =
+    Math.floor(Date.now() / 1000) + expirationDays * 24 * 60 * 60;
+
+  // Create payload
+  const payload = {
+    applicationId: applicationId,
+    exp: expirationTime,
+  };
+
+  // Generate token
+  const token = jwt.sign(payload, process.env.JWT_SECRET);
+
+  return token;
+}
