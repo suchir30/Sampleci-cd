@@ -43,7 +43,6 @@ import {
   VendorMasterCrudResolver,
   VehicleMasterCrudResolver,
   DriverMasterCrudResolver,
-  // ViewHubLoadFactorCrudResolver,
   // Relation resolvers
   UserRelationsResolver,
   AuthApplicationRelationsResolver,
@@ -85,7 +84,6 @@ import {
   StateMasterRelationsResolver,
   GstMasterRelationsResolver,
   VendorMasterRelationsResolver,
-  VehicleMasterRelationsResolver,
   DriverMasterRelationsResolver,
 } from "@generated/type-graphql";
 import { Authorized, NonEmptyArray, UseMiddleware } from "type-graphql";
@@ -100,6 +98,7 @@ import { TripDetailsInterceptor } from "./components/middlewares/tripDetailsInte
 import { ENUMS } from "./components/customResolvers/ENUMS";
 import { ImportAwbLineItem } from "./components/customResolvers/ImportAwbLineItem";
 import { RoleWizard } from "./components/customResolvers/RoleWizard";
+import { generatePodUrl } from "./components/customResolvers/generatePodUrl";
 
 const resolversEnhanceMap: ResolversEnhanceMap = {
   User: { _all: [Authorized()] },
@@ -135,7 +134,6 @@ const resolversEnhanceMap: ResolversEnhanceMap = {
   VehicleMaster: { _all: [Authorized()] },
   DistrictMaster: { _all: [Authorized()] },
   PincodesMaster: { _all: [Authorized()] },
-  // ViewHubLoadFactor: { _all: [Authorized()] },
   AwbArticleTripLogs: { _all: [Authorized()] },
   CommodityMaster: { _all: [Authorized()] },
   CRMObjectPermission: { _all: [Authorized()] },
@@ -182,7 +180,6 @@ const modelsEnhanceMap: ModelsEnhanceMap = {
   VehicleMaster: { fields: { _all: [Authorized()] } },
   DistrictMaster: { fields: { _all: [Authorized()] } },
   PincodesMaster: { fields: { _all: [Authorized()] } },
-  // ViewHubLoadFactor: { fields: { _all: [Authorized()] } },
   AwbArticleTripLogs: { fields: { _all: [Authorized()] } },
   CommodityMaster: { fields: { _all: [Authorized()] } },
   CRMObjectPermission: { fields: { _all: [Authorized()] } },
@@ -230,7 +227,6 @@ export const generatedCrudResolvers: NonEmptyArray<Function> = [
   VehicleMasterCrudResolver,
   DistrictMasterCrudResolver,
   PincodesMasterCrudResolver,
-  // ViewHubLoadFactorCrudResolver,
   AwbArticleTripLogsCrudResolver,
   CommodityMasterCrudResolver,
   CRMObjectPermissionCrudResolver,
@@ -273,7 +269,6 @@ export const generatedRelationResolvers: NonEmptyArray<Function> = [
   DriverMasterRelationsResolver,
   TripLineItemRelationsResolver,
   VendorMasterRelationsResolver,
-  VehicleMasterRelationsResolver,
   DistrictMasterRelationsResolver,
   AwbArticleTripLogsRelationsResolver,
   CommodityMasterRelationsResolver,
@@ -295,4 +290,5 @@ export const customResolvers: NonEmptyArray<Function> = [
   ImportAwbLineItem,
   ENUMS,
   RoleWizard,
+  generatePodUrl,
 ];
