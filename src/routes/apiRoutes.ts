@@ -54,6 +54,7 @@ router.post('/getScannedArticles',apiController.getScannedArticles)
 router.post('/outwardAWBs',apiController.outwardAWBs)
 router.post('/inwardAWBs',apiController.inwardAWBs)
 router.post('/fileUpload', upload.fields([{name: 'file', maxCount: 6}]), apiController.fileUpload)
+router.post('/addPOD', upload.fields([{name: 'file', maxCount: 1}]),apiController.addPOD)
 router.post('/getDepsLists',apiController.getDepsLists)
 router.post('/addDeps',apiController.addDeps)
 router.post('/generatePDF', apiController.pdfGenerateAWB)
@@ -68,9 +69,5 @@ router.post('/calculateShippingCosts', apiController.calculateShippingCosts)
 router.post('/getExcessDeps', apiController.getExcessDeps)
 router.post('/getShortArticles', apiController.getShortArticles)
 router.post('/closeDeps', apiController.closeDeps)
-
-
-router.post('/webhook',apiController.handleWebhook)
-
-
+// router.post('/nscsTripManager',apiController.handleWebhook)
 export default router;
