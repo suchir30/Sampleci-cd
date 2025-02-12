@@ -165,6 +165,7 @@ model CRMField {
   filterView          Boolean              @default(false)
   CRMObjectId         Int
   relatedObjectId     Int?
+  isFormRequired      Boolean              @default(false)             
   CRMObject           CRMObject            @relation("CRMFieldTable", fields: [CRMObjectId], references: [id])
   CRMFieldPermissions CRMFieldPermission[] @relation("CRMFieldPermissionCRMField")
   CRMObjectSort       CRMObject?           @relation("sortField")
@@ -549,7 +550,7 @@ model TripCheckIn {
   type             tripCheckinType @default(Inwarded)
   locationBranchId Int?
   branch           Branch?         @relation("tripCheckinBranchId", fields: [locationBranchId], references: [id])
-  odometerReading  Int
+  odometerReading  Int?
   odometerImgId    Int?
   FileUpload       FileUpload?     @relation("odometerImageTripCheckInRecord", fields: [odometerImgId], references: [id])
   time             String          @map("time")
@@ -1056,17 +1057,4 @@ model VehicleOwner {
 
 //View Tables
 
-view ViewHubLoadFactor {
-  id               Int       @id @unique
-  nscsAwb          String
-  numOfArticles    Int?
-  actualWeight     Float?
-  CDM              Float?
-  chargedWeight    Float?
-  currentHub       String?
-  finalDestination String?
-  status           String?
-  inwardedDate     DateTime?
-  awbDate          DateTime?
-  depsCount        Int?
-}
+

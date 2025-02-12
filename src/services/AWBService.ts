@@ -865,7 +865,8 @@ export const checkAWBComplete = async (AWBId: number) => {
 export const getAwbPdfData = async (AWBId: number) => {
     const result = await prisma.airWayBill.findUnique({
         where: {
-            id: AWBId
+            id: AWBId,
+            completeFlag:true
         },
         select: {
             id: true,

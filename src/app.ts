@@ -5,6 +5,7 @@ import { expressMiddleware } from '@apollo/server/express4';
 
 import authRoutes from './routes/authRoutes';
 import apiRoutes from './routes/apiRoutes';
+import externalRoutes from './routes/externalRoutes'
 import { tokenAuth } from './middleware/auth';
 import { logResponses } from './middleware/loggerMiddleware'; // Import middleware
 import { handleErrors } from './middleware/errorHandler';
@@ -33,6 +34,7 @@ app.use(logResponses); // Log responses
 // REST endpoints
 app.use('/auth', authRoutes, handleErrors);
 app.use('/api', tokenAuth, apiRoutes, handleErrors);
+app.use('/external', externalRoutes, handleErrors);
 
 // Start task schedulers
 startAllTasks();

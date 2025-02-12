@@ -6,6 +6,7 @@ import * as consignorService from '../services/consignorService';
 import * as consigneeService from '../services/consigneeService';
 import * as AWBService from '../services/AWBService';
 import * as tripService from '../services/tripService';
+import * as PODService from '../services/PODService';
 import * as invoiceAWB from '../services/invoiceAWB';
 // import * as pricingServices from '../services/pricingServices';
 import { AWBCreateData } from '../types/awbTypes';
@@ -20,6 +21,11 @@ import { AWBPdfGenerator } from "../services/pdfGeneratorAWB";
 import { tripsPdfGenerator } from '../services/pdfGeneratorTrips';
 import { tripHirePdfGenerator } from '../services/pdfGeneratorTripHire';
 
+import {UploadResult} from "../services/fileService.js";
+import {handleFileUpload, refreshSignedUrlIfNeeded, uploadPDF,fileUploadRes} from "../services/fileService";
+import { float } from 'aws-sdk/clients/cloudfront';
+import { Datetime } from 'aws-sdk/clients/costoptimizationhub';
+
 
 import * as fileService from '../services/fileService'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
@@ -28,11 +34,6 @@ import {
   PutObjectCommand,
   GetObjectCommand
 } from "@aws-sdk/client-s3";
-
-import {UploadResult} from "../services/fileService.js";
-import {handleFileUpload, refreshSignedUrlIfNeeded, uploadPDF,triggerExternalService,fileUploadRes,podCreation} from "../services/fileService";
-import { float } from 'aws-sdk/clients/cloudfront';
-import { Datetime } from 'aws-sdk/clients/costoptimizationhub';
 
 export const getIndustryTypes = async (_req: Request, res: Response, next: NextFunction) => {
   try {
@@ -554,9 +555,9 @@ export const addTripCheckin = async (req: Request, res: Response, next: NextFunc
     if (!hubId) {
       throwValidationError([{ message: "hubId is Mandatory" }]);
     }
-    if (!odometerReading) {
-      throwValidationError([{ message: "odometerReading is Mandatory" }]);
-    }
+    // if (!odometerReading) {
+    //   throwValidationError([{ message: "odometerReading is Mandatory" }]);
+    // }
     if (!tripType) {
       throwValidationError([{ message: "tripType is Mandatory" }]);
     }
@@ -867,19 +868,51 @@ export const fileUpload = async (req: Request, res: Response, next: NextFunction
     console.log(uploadResults,"uploadResultsuploadResults") 
     const fileUploadResp = await fileUploadRes(uploadResults, type); 
      // Run triggerExternalService and podCreation asynchronously in the background
-    if(type=="POD"){  
-      triggerExternalService(files.file,fileUploadResp)
-      .then(async (externalApiResponses) => {
-          await podCreation(externalApiResponses,fileName,fileUploadResp); // Chain pod creation
-      })
-      .catch((error) => console.error("Error in external service or pod creation:", error));
-    }
+    // if(type=="POD"){  
+    //   triggerExternalService(files.file,fileUploadResp)
+    //   .then(async (externalApiResponses) => {
+    //       await podCreation(externalApiResponses,fileName,fileUploadResp); // Chain pod creation
+    //   })
+    //   .catch((error) => console.error("Error in external service or pod creation:", error));
+    // }
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(fileUploadResp));
   } catch (error) {
     console.error('Error in fileUpload:', error);
     next(error);
   }
 };
+
+export const addPOD = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { files } = req as Request & { files?: { file: MulterFile[] } };
+
+      if (!files || !files.file || files.file.length === 0) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+  
+  
+      const type = 'POD';
+      const fileName = req.body.fileName;
+  
+      console.log(fileName,"fileName from req.body")
+    
+      const uploadResults = await handleFileUpload(files.file, type);
+      console.log(uploadResults,"uploadResultsuploadResults") 
+      const fileUploadResp = await fileUploadRes(uploadResults, type); 
+
+      // if(type=="POD"){  
+      console.log(fileUploadResp,"fileUploadResp")
+      
+      PODService.triggerExternalService(files.file,fileUploadResp)
+      .then(async (externalApiResponses) => {
+          await PODService.podCreation(externalApiResponses,fileName,fileUploadResp); // Chain pod creation
+      })
+      res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(fileUploadResp));
+  } catch (err) {
+    console.error('Error getDepsLists', err);
+    next(err)
+  }
+}
 export const getFile = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { fileId } = req.query;
@@ -1276,7 +1309,7 @@ export const closeDeps = async (req: Request, res: Response, next: NextFunction)
 };
 
 
-export const handleWebhook = async (req: Request, res: Response) => {
+export const nscsTripManager = async (req: Request, res: Response) => {
   const payload: WebhookPayload = req.body;
   const err = payload.event;
 

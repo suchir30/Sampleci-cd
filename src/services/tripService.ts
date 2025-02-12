@@ -1400,7 +1400,8 @@ export const getShortArticles = async (
   const articlesWithoutLogsAndDeps = await prisma.awbArticle.findMany({
     where: {
       // AWBId: AWBId, // Filter by specific AWBId
-      AWBId: { in: AWBIds }, 
+      AWBId: { in: AWBIds },
+      status:{not:"Deleted"},
       AWBArtIds: {
         none: {
           scanType: scanTypeEnum,
