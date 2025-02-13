@@ -34,7 +34,7 @@ app.use(logResponses); // Log responses
 // REST endpoints
 app.use('/auth', authRoutes, handleErrors);
 app.use('/api', tokenAuth, apiRoutes, handleErrors);
-app.use('/external', externalRoutes, handleErrors);
+app.use('/external',tokenAuth, externalRoutes, handleErrors);
 
 // Start task schedulers
 startAllTasks();
