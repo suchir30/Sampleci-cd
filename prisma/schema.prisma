@@ -1056,19 +1056,3 @@ model VehicleOwner {
 }
 
 //View Tables
-
-
-view ViewHubLoadFactor {
-  id               Int       @id @unique
-  nscsAwb          String
-  numOfArticles    Int?
-  actualWeight     Float?
-  CDM              Float?
-  chargedWeight    Float?
-  currentHub       String?
-  finalDestination String?
-  status           String?
-  inwardedDate     DateTime?
-  awbDate          DateTime?
-  depsCount        Int?
-}
