@@ -250,6 +250,10 @@ model Branch {
   depsLoadingHubIds        DEPS[]               @relation("depsLoadingHubId")
   depsUnloadLocationIds    DEPS[]               @relation("depsUnloadLocationId")
   AWBArticleTripLogsHubIds AwbArticleTripLogs[] @relation("AWBArticleTripLogsHubId")
+  BranchHubMapBranchs      BranchHubMap[]       @relation("BranchHubMapBranch")
+  BranchHubMapHubs         BranchHubMap[]       @relation("BranchHubMapHub")
+  HLFLineItemFinalHubs     HLFLineItem[]        @relation("HLFLineItemFinalHub")
+  HLFLineItemFinalBranchs  HLFLineItem[]        @relation("HLFLineItemFinalBranch")    
 }
 
 model Consignor {
@@ -298,6 +302,7 @@ model Consignor {
   contractConsignorIds      Contract[]           @relation("contractConsignorId")
   SKUConsignorIds           SKU[]                @relation("SKUConsignorId")
   internalInvocieConsignors InternalInvoice[]    @relation("internalInvocieConsignor")
+  HLFLineItemConsignorIds   HLFLineItem[]        @relation("HLFLineItemConsignorId")
 }
 
 model Consignee {
@@ -330,6 +335,7 @@ model Consignee {
   modifiedOn                DateTime?         @updatedAt
   AWBs                      AirWayBill[]      @relation("AWBConsignee")
   internalInvocieConsignees InternalInvoice[] @relation("internalInvocieConsignee")
+  HLFLineItemConsigneeIds   HLFLineItem[]     @relation("HLFLineItemConsigneeId")
 }
 
 enum AWBStatus {
@@ -615,12 +621,32 @@ model HLFLineItem {
   HLFLineItemAWBId Int
   AWB              AirWayBill        @relation("hlfLineAWBId", fields: [HLFLineItemAWBId], references: [id])
   HLFLineStatus    HLFLineItemStatus
-  branchId         Int?
-  branch           Branch?           @relation("hlfLineBranchId", fields: [branchId], references: [id])
+  hubId            Int?
+  Hub              Branch?           @relation("hlfLineBranchId", fields: [hubId], references: [id])
+  finalHubId       Int?    
+  finalHub         Branch?           @relation("HLFLineItemFinalHub", fields: [finalHubId], references: [id])
+  finalBranchId    Int?
+  finalBranch      Branch?           @relation("HLFLineItemFinalBranch", fields: [finalBranchId], references: [id])
+  consignorId      Int?
+  consignor        Consignor?        @relation("HLFLineItemConsignorId",fields:[consignorId],references:[consignorId])
+  consigneeId      Int?
+  consignee        Consignee?        @relation("HLFLineItemConsigneeId",fields:[consigneeId],references:[consigneeId])
+  numberOfArticles Int?
+  HLFLineItemWeight  Float?            @db.Float
+  HLFLineItemCDM    Float?            @db.Float
   AWBWeightInKgs   Float?            @db.Float
   AWBVolumeInKgs   Float?            @db.Float
   createdOn        DateTime?         @default(now())
   modifiedOn       DateTime?         @updatedAt
+}
+
+model BranchHubMap {
+  id          Int                 @id @default(autoincrement())
+  branchId    Int?
+  branch      Branch?             @relation("BranchHubMapBranch", fields: [branchId], references: [id])
+  hubId       Int?
+  Hub         Branch?             @relation("BranchHubMapHub", fields: [hubId], references: [id])
+  createdOn   DateTime            @default(now())           
 }
 
 enum DEPSTypeList {
@@ -1054,5 +1080,3 @@ model VehicleOwner {
   createdOn  DateTime? @default(now())
   modifiedOn DateTime? @updatedAt
 }
-
-//View Tables
