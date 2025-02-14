@@ -975,6 +975,27 @@ export const outwardAWBs = async (tripId: number, data: any, checkinHub: number)
             id: 'desc',
           },
         });
+        const AWBResponse=await prisma.airWayBill.findFirst({
+          where:{
+            id:item.AWBId
+          },
+          select:{
+            toBranch:true,
+            consignorId:true,
+            consigneeId:true,
+            numOfArticles:true,
+            AWBWeight:true,
+            AWBCDM:true
+          }
+        })
+        const finalHubResponse=await prisma.branchHubMap.findFirst({
+          where:{
+            branchId:AWBResponse?.toBranch?.id
+          },
+          select:{
+            hubId:true
+          }
+        })
 
         if (existingRecord) {
           if (existingRecord.HLFLineStatus == "Inwarded") {
@@ -986,12 +1007,19 @@ export const outwardAWBs = async (tripId: number, data: any, checkinHub: number)
                 HLFLineStatus: 'Outwarded',
               },
             });
-
+            
             await prisma.hLFLineItem.create({
               data: {
                 HLFLineItemAWBId: item.AWBId,
                 HLFLineStatus: 'ToBeInwarded',
-                branchId: item.unloadLocationId,
+                hubId: item.unloadLocationId,
+                finalHubId:finalHubResponse?.hubId,
+                finalBranchId:AWBResponse?.toBranch?.id,
+                consignorId:AWBResponse?.consignorId,
+                consigneeId:AWBResponse?.consigneeId,
+                numberOfArticles:AWBResponse?.numOfArticles,
+                HLFLineItemWeight:AWBResponse?.AWBWeight,
+                HLFLineItemCDM:AWBResponse?.AWBCDM
               },
             });
           }
@@ -1000,7 +1028,15 @@ export const outwardAWBs = async (tripId: number, data: any, checkinHub: number)
             data: {
               HLFLineItemAWBId: item.AWBId,
               HLFLineStatus: 'ToBeInwarded',
-              branchId: item.unloadLocationId,
+              hubId: item.unloadLocationId,
+              finalHubId:finalHubResponse?.hubId,
+              finalBranchId:AWBResponse?.toBranch?.id,
+              consignorId:AWBResponse?.consignorId,
+              consigneeId:AWBResponse?.consigneeId,
+              numberOfArticles:AWBResponse?.numOfArticles,
+              HLFLineItemWeight:AWBResponse?.AWBWeight,
+              HLFLineItemCDM:AWBResponse?.AWBCDM
+            
             },
           });
         }
