@@ -5,10 +5,10 @@
 
 */
 -- DropForeignKey
-ALTER TABLE `hlflineitem` DROP FOREIGN KEY `HLFLineItem_branchId_fkey`;
+ALTER TABLE `HLFLineItem` DROP FOREIGN KEY `HLFLineItem_branchId_fkey`;
 
 -- AlterTable
-ALTER TABLE `hlflineitem` DROP COLUMN `branchId`,
+ALTER TABLE `HLFLineItem` DROP COLUMN `branchId`,
     ADD COLUMN `HLFLineItemCDM` FLOAT NULL,
     ADD COLUMN `HLFLineItemWeight` FLOAT NULL,
     ADD COLUMN `consigneeId` INTEGER NULL,
