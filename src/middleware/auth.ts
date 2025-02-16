@@ -9,11 +9,8 @@ const tokenAuth = async (
   next: NextFunction,
 ): Promise<void | Response> => {
   try {
-    // Skip token auth if disabled or GraphQL endpoint
-    if (
-      process.env.USE_TOKEN_AUTH === "0" ||
-      req.originalUrl.includes("/graphql")
-    ) {
+    // Skip token auth if disabled
+    if (process.env.USE_TOKEN_AUTH === "0") {
       next();
       return;
     }
