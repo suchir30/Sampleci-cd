@@ -86,6 +86,7 @@ import {
   StateMasterRelationsResolver,
   GstMasterRelationsResolver,
   VendorMasterRelationsResolver,
+  VehicleMasterRelationsResolver,
   DriverMasterRelationsResolver,
 } from "@generated/type-graphql";
 import { Authorized, NonEmptyArray, UseMiddleware } from "type-graphql";
@@ -275,6 +276,7 @@ export const generatedRelationResolvers: NonEmptyArray<Function> = [
   DriverMasterRelationsResolver,
   TripLineItemRelationsResolver,
   VendorMasterRelationsResolver,
+  VehicleMasterRelationsResolver,
   DistrictMasterRelationsResolver,
   AwbArticleTripLogsRelationsResolver,
   CommodityMasterRelationsResolver,
