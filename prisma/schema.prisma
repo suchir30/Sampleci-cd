@@ -345,6 +345,7 @@ enum AWBStatus {
   outForDelivery
   Delivered
   Deleted
+  Cancelled
 }
 
 model AirWayBill {
