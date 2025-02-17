@@ -252,14 +252,19 @@ export const createConsignees = async (req: Request, res: Response, next: NextFu
     next(err)
   }
 }
+
 export const getGeneratedAWB = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const consignorId: number = req.body.consignorId;
-    const AWBStatus: string = req.body.AWBStatus;
-    const validAWBStatusValues = ['PickUp', 'InTransit', 'atHub', 'Delivered'];
-    if (!AWBStatus || !validAWBStatusValues.includes(AWBStatus)) {
-      throwValidationError([{ message: "Invalid AWBStatus provided." }]);
-    }
+
+    const AWBStatus: string[] = req.body.AWBStatus;
+    const validAWBStatusValues = ['PickUp', 'InTransit', 'atHub', 'Delivered','Cancelled'];
+
+   // Check if AWBStatus is an array and ensure each value is valid
+   if (!Array.isArray(AWBStatus) || !AWBStatus.every(status => validAWBStatusValues.includes(status))) {
+    throwValidationError([{ message: "Invalid AWBStatus provided." }]);
+  }
+
     const getGeneratedAWBRes = await AWBService.getGeneratedAWB(consignorId, AWBStatus);
     res.status(HttpStatusCode.OK).json(buildObjectFetchResponse(getGeneratedAWBRes));
   } catch (err) {
@@ -267,6 +272,9 @@ export const getGeneratedAWB = async (req: Request, res: Response, next: NextFun
     next(err)
   }
 }
+
+
+
 
 export const generateBulkAWBForConsignor = async (req: Request, res: Response, next: NextFunction) => {
 
