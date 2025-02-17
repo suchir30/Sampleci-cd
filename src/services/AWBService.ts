@@ -107,7 +107,123 @@ export const generateBulkAWBForConsignor = async (
     return result;
 };
 
-export const getGeneratedAWB = async (consignorId: number, AWBStatus: any) => {
+// export const getGeneratedAWB = async (consignorId: number, AWBStatus: any) => {
+//     const getGeneratedAWBQuery = await prisma.airWayBill.findMany({
+//         select: {
+//             id: true,
+//             AWBCode: true,
+//             consignorId: true,
+//             consigneeId: true,
+//             fromBranchId: true,
+//             toBranchId: true,
+//             numOfArticles: true,
+//             AWBStatus:true,
+//             articleGenFlag:true,
+//             rollupArticleCnt:true,
+//             completeFlag:true,
+//             createdOn:true,
+//             consignor: {
+//                 select: {
+//                     consignorCode: true,
+//                     publicName: true,
+//                     legalName: true,
+//                     address1: true,
+//                     wareHouseId:true,
+//                     disstrict: {
+//                         select: {
+//                             name: true,
+//                         },
+//                     },
+//                     state: {
+//                         select: {
+//                             name: true,
+//                         },
+//                     },
+//                     city: {
+//                         select: {
+//                             name: true,
+//                         },
+//                     }
+//                 }
+//             },
+//             consignee: {
+//                 select: {
+//                     consigneeCode: true,
+//                     consigneeName: true,
+//                     address1: true,
+//                     address2: true,
+//                     city: {
+//                         select: {
+//                             name: true,
+//                         },
+//                     },
+//                     district: {
+//                         select: {
+//                             name: true,
+//                         },
+//                     },
+//                     state: {
+//                         select: {
+//                             name: true,
+//                         },
+//                     },
+//                 },
+//             },
+//             fromBranch: {
+//                 select: {
+//                     branchName: true,
+//                     branchCode:true,
+//                 }
+//             },
+//             toBranch: {
+//                 select: {
+//                     branchName: true,
+//                     branchCode:true,
+//                 }
+//             },
+//             AWBIdTripLineItems: {
+//                 select: {
+//                     id: true,
+//                     tripId: true,
+//                     unloadLocationId: true,
+//                     finalDestinationId: true,
+//                     status: true,
+//                     ePODReceived: true,
+//                     originalPODReceived: true,
+//                     trip: {
+//                         select: {
+//                             route: true, // Include the route field from TripDetails
+//                         },
+//                     },
+//                 },
+//             },
+//         },
+//         where: {
+//             consignorId: consignorId !== null ? consignorId : undefined,
+//             AWBStatus: AWBStatus,
+//         },
+//         orderBy: {
+//             createdOn: 'desc', // Order by createdDate in descending order
+//         }
+//     });
+//     return getGeneratedAWBQuery;
+// };
+
+
+export const getGeneratedAWB = async (consignorId?: number, AWBStatus?: string[]) => {
+    // Building the whereClause dynamically
+    const whereClause: any = {};
+
+    if (consignorId !== undefined) {
+        whereClause.consignorId = consignorId;
+    }
+
+    // Only add AWBStatus condition if it's provided and valid
+    if (AWBStatus && AWBStatus.length > 0) {
+        whereClause.AWBStatus = { in: AWBStatus };
+    }
+
+    // Fetching the data with Prisma, applying the dynamic whereClause
     const getGeneratedAWBQuery = await prisma.airWayBill.findMany({
         select: {
             id: true,
@@ -117,33 +233,21 @@ export const getGeneratedAWB = async (consignorId: number, AWBStatus: any) => {
             fromBranchId: true,
             toBranchId: true,
             numOfArticles: true,
-            AWBStatus:true,
-            articleGenFlag:true,
-            rollupArticleCnt:true,
-            completeFlag:true,
-            createdOn:true,
+            AWBStatus: true,
+            articleGenFlag: true,
+            rollupArticleCnt: true,
+            completeFlag: true,
+            createdOn: true,
             consignor: {
                 select: {
                     consignorCode: true,
                     publicName: true,
                     legalName: true,
                     address1: true,
-                    wareHouseId:true,
-                    disstrict: {
-                        select: {
-                            name: true,
-                        },
-                    },
-                    state: {
-                        select: {
-                            name: true,
-                        },
-                    },
-                    city: {
-                        select: {
-                            name: true,
-                        },
-                    }
+                    wareHouseId: true,
+                    disstrict: { select: { name: true } },
+                    state: { select: { name: true } },
+                    city: { select: { name: true } }
                 }
             },
             consignee: {
@@ -152,34 +256,16 @@ export const getGeneratedAWB = async (consignorId: number, AWBStatus: any) => {
                     consigneeName: true,
                     address1: true,
                     address2: true,
-                    city: {
-                        select: {
-                            name: true,
-                        },
-                    },
-                    district: {
-                        select: {
-                            name: true,
-                        },
-                    },
-                    state: {
-                        select: {
-                            name: true,
-                        },
-                    },
-                },
+                    city: { select: { name: true } },
+                    district: { select: { name: true } },
+                    state: { select: { name: true } }
+                }
             },
             fromBranch: {
-                select: {
-                    branchName: true,
-                    branchCode:true,
-                }
+                select: { branchName: true, branchCode: true }
             },
             toBranch: {
-                select: {
-                    branchName: true,
-                    branchCode:true,
-                }
+                select: { branchName: true, branchCode: true }
             },
             AWBIdTripLineItems: {
                 select: {
@@ -190,24 +276,19 @@ export const getGeneratedAWB = async (consignorId: number, AWBStatus: any) => {
                     status: true,
                     ePODReceived: true,
                     originalPODReceived: true,
-                    trip: {
-                        select: {
-                            route: true, // Include the route field from TripDetails
-                        },
-                    },
-                },
+                    trip: { select: { route: true } }
+                }
             },
         },
-        where: {
-            consignorId: consignorId !== null ? consignorId : undefined,
-            AWBStatus: AWBStatus,
-        },
-        orderBy: {
-            createdOn: 'desc', // Order by createdDate in descending order
-        }
+        where: whereClause, 
+        // ...(Object.keys(whereClause).length > 0 && { where: whereClause }), // Only apply where if conditions exist
+        orderBy: { createdOn: 'desc' }
     });
+
     return getGeneratedAWBQuery;
 };
+
+
 
 export const updateArticleCountForAWB = async (AWBId: number, newArticleCount: number) => {
     if (newArticleCount <= 0) {
