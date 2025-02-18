@@ -104,8 +104,8 @@ async function createRecordsInModel(
 
     const calculatedFields = {
       lineItemWeight: numOfArticles
-        ? numOfArticles * articleWeight
-        : articleWeight,
+        ? numOfArticles * (articleWeight || 0)
+        : articleWeight || 0,
       lineItemVolume: volume && numOfArticles ? volume * numOfArticles : volume,
     };
 
