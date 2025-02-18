@@ -71,8 +71,7 @@ async function createRecordsInModel(
   const awbIds = [...new Set([...awbIdMap.values()])];
 
   for (const [index, originalRecord] of data.entries()) {
-    let { LBH, AWBCode, numOfArticles, articleWeight, ...otherFields } =
-      originalRecord;
+    let { LBH, AWBCode, numOfArticles, ...otherFields } = originalRecord;
     //console.log(originalRecord);
 
     if (AWBCode) {
@@ -96,22 +95,8 @@ async function createRecordsInModel(
       LBH && typeof LBH === "string" && LBH.includes("*")
         ? LBH.split("*").map(Number)
         : [null, null, null];
-
-    const volume =
-      lengthCms && breadthCms && heightCms
-        ? lengthCms * breadthCms * heightCms
-        : null;
-
-    const calculatedFields = {
-      lineItemWeight: numOfArticles
-        ? numOfArticles * (articleWeight || 0)
-        : articleWeight || 0,
-      lineItemVolume: volume && numOfArticles ? volume * numOfArticles : volume,
-    };
-
     const transformedRecord = {
       ...otherFields,
-      ...calculatedFields,
       lengthCms,
       breadthCms,
       heightCms,
