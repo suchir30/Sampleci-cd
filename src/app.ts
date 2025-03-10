@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import path from "path";
 import { expressMiddleware } from "@apollo/server/express4";
-
+//kk;
 import authRoutes from "./routes/authRoutes";
 import apiRoutes from "./routes/apiRoutes";
 import externalRoutes from "./routes/externalRoutes";

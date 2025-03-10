@@ -8,7 +8,7 @@ describe('Branch API Tests (Real API Call)', () => {
   test('addConsignorBranch should add a branch successfully', async () => {
     const payload = {
       consignorId: 1,
-      branchId: 12
+      branchId: 19
     };
 
     try {
