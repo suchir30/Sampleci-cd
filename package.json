@@ -7,7 +7,7 @@
     "start": "node dist/app.js",
     "dev": "nodemon",
     "build": "tsc",
-    "test": "jest"
+    "test": "jest --runInBand"
   },
   "keywords": [],
   "author": "",
